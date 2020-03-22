@@ -6,7 +6,7 @@
 #    By: gperez <gperez@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/01/06 13:36:11 by gperez            #+#    #+#              #
-#    Updated: 2020/03/21 20:26:22 by gperez           ###   ########.fr        #
+#    Updated: 2020/03/22 19:55:25 by gperez           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,6 +22,11 @@ APP = -framework AppKit
 
 SRC =	srcs/main.cc \
 		srcs/init.cc \
+		srcs/shader.cc \
+		srcs/Class/Block.cc \
+		srcs/Class/Chunck.cc \
+		srcs/Class/World.cc \
+		srcs/Class/Engine.cc \
 
 NC = \033[0m
 BOLD =\033[1m

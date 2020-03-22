@@ -1,18 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Chunck.hpp                                         :+:      :+:    :+:   */
+/*   World.cc                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/03/21 18:17:27 by gperez            #+#    #+#             */
-/*   Updated: 2020/03/22 19:43:59 by gperez           ###   ########.fr       */
+/*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
+/*   Updated: 2020/03/22 20:21:35 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef _CHUNCK_HPP
-# define _CHUNCK_HPP
+#include "World.hpp"
 
-# include "Block.hpp"
+using namespace std;
+using namespace std::filesystem;
 
-#endif
+World::World(string pathStr)
+{
+}
+
+World::World(path path)
+{
+
+}
+
+World::World(string pathStr,)
+
+World::~World()
+{
+}

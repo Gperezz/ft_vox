@@ -1,18 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Chunck.hpp                                         :+:      :+:    :+:   */
+/*   Coords.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/03/21 18:17:27 by gperez            #+#    #+#             */
-/*   Updated: 2020/03/22 19:43:59 by gperez           ###   ########.fr       */
+/*   Created: 2020/03/22 20:07:59 by gperez            #+#    #+#             */
+/*   Updated: 2020/03/22 20:20:55 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef _CHUNCK_HPP
-# define _CHUNCK_HPP
+#ifndef COORDS_HPP
+# define COORDS_HPP
 
-# include "Block.hpp"
+namespace Coords{
+
+template <typename type, unsigned dims>
+struct Coords
+{
+	int[dims]
+};
+
+
+}
 
 #endif

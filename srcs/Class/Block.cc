@@ -1,18 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Chunck.hpp                                         :+:      :+:    :+:   */
+/*   Block.cc                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/03/21 18:17:27 by gperez            #+#    #+#             */
-/*   Updated: 2020/03/22 19:43:59 by gperez           ###   ########.fr       */
+/*   Created: 2020/03/22 19:14:03 by gperez            #+#    #+#             */
+/*   Updated: 2020/03/22 19:15:57 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef _CHUNCK_HPP
-# define _CHUNCK_HPP
-
 # include "Block.hpp"
 
-#endif
+Block::Block()
+{
+
+}
+
+t_block_info		Block::getInfo(void)
+{
+	return (Block::info);
+}
+
+Block::~Block()
+{
+
+}
