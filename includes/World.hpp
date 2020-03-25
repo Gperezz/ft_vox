@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:08:20 by gperez            #+#    #+#             */
-/*   Updated: 2020/03/22 20:04:58 by gperez           ###   ########.fr       */
+/*   Updated: 2020/03/25 19:10:22 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,25 +24,21 @@ using namespace std::filesystem;
 class Chunk;
 class WorldGenerator;
 
-struct ChunkPos{
-	int x;
-	int z;
-};
-
 
 class World
 {
-private:
-	map<ChunkPos, Chunk>::map&	LoadedChunks;
-	path&						RootDirPath;
-	WorldGenerator&				WorldGen;
-public:
+	private:
+		map<ChunkPos, Chunk>&		LoadedChunks;
+		path&						RootDirPath;
+		WorldGenerator&				WorldGen;
+	public:
+			World(void);
 			World(string pathStr);
 			World(path path);
-			World(string pathStr, );
-			World(string )
+			// World(string pathStr, );
+			// World(string )
 			~World();
-	path	getDir();
+		path	getDir();
 
 };
 

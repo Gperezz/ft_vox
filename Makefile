@@ -6,7 +6,7 @@
 #    By: gperez <gperez@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/01/06 13:36:11 by gperez            #+#    #+#              #
-#    Updated: 2020/03/22 19:55:25 by gperez           ###   ########.fr        #
+#    Updated: 2020/03/25 19:08:42 by gperez           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,12 +21,10 @@ FLAG_OPENGL = -framework Cocoa -framework OpenGL -framework IOKit -framework Cor
 APP = -framework AppKit
 
 SRC =	srcs/main.cc \
-		srcs/init.cc \
-		srcs/shader.cc \
 		srcs/Class/Block.cc \
 		srcs/Class/Chunck.cc \
-		srcs/Class/World.cc \
 		srcs/Class/Engine.cc \
+		srcs/Class/Shader.cc \
 
 NC = \033[0m
 BOLD =\033[1m
@@ -71,6 +69,7 @@ LIBS = $(addprefix -I,$(LIBS_H))
 INC =	includes/ft_vox.hpp \
 		includes/Chunck.hpp \
 		includes/Block.hpp \
+		includes/Shader.hpp \
 
 OBJ = $(SRC:.cc=.o)
 
