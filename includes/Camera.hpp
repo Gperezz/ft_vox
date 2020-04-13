@@ -1,20 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_vox.hpp                                         :+:      :+:    :+:   */
+/*   Camera.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/03/21 17:43:41 by gperez            #+#    #+#             */
-/*   Updated: 2020/03/30 16:45:07 by gperez           ###   ########.fr       */
+/*   Created: 2020/01/04 23:49:41 by gperez            #+#    #+#             */
+/*   Updated: 2020/03/30 18:05:03 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef _FT_VOX_HPP_
-# define _FT_VOX_HPP_
+#ifndef CAMERA_HPP
+# define CAMERA_HPP
 
+#include "Mat.hpp"
 
-# include "Engine.hpp"
-
+class	Camera : public Mat
+{
+	public:
+		Camera();
+		glm::mat4	getProjMatrix(void) const;
+		void		printProjectionMatrix(void);
+		void		setProjMatrix(glm::mat4 mat);
+		~Camera();
+	private:
+		Mat		projection;
+};
 
 #endif

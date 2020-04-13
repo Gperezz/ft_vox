@@ -1,20 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_vox.hpp                                         :+:      :+:    :+:   */
+/*   WorldGenerator.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/03/21 17:43:41 by gperez            #+#    #+#             */
-/*   Updated: 2020/03/30 16:45:07 by gperez           ###   ########.fr       */
+/*   Created: 2020/03/30 16:22:18 by gperez            #+#    #+#             */
+/*   Updated: 2020/04/13 16:55:24 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef _FT_VOX_HPP_
-# define _FT_VOX_HPP_
+#ifndef WORLD_GENERATOR_HPP
+# define WORLD_GENERATOR_HPP
+# include "Rand.hpp"
+# include "Chunk.hpp"
+# include "Block.hpp"
 
+class Chunk;
 
-# include "Engine.hpp"
+class WorldGenerator{
+private:
+	unsigned long seed;
+public:
+	WorldGenerator(unsigned long seed);
+	WorldGenerator(void);
 
-
+	void GenChunk(Chunk);
+}
 #endif

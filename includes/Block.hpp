@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:14:08 by gperez            #+#    #+#             */
-/*   Updated: 2020/03/25 19:03:06 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/13 17:48:15 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,21 @@ extern "C"
 # include "stb_image.h" // Load image
 # include "glm.hpp" // Implementation matrices
 
+enum	e_BlockType : char {
+	AIR,
+	STONE,
+	DIRT,
+	GRASS,
+	LOG,
+	LEAVES,
+	WATER,
+	COAL_ORE,
+	IRON_ORE,
+	GOLD_ORE,
+	DIAMOND_ORE,
+	COBBLESTONE
+};
+
 typedef struct		block_info{
 	unsigned char	id;
 	unsigned		variation : 4;
@@ -32,11 +47,14 @@ typedef struct		block_info{
 
 class Block {
 	private:
-		Block();
-		t_block_info info;
-		~Block();
+		t_block_info	info;
 	public:
-		t_block_info getInfo(void);
+						Block();
+						~Block();
+		t_block_info	getInfo(void);
+		void			setInfo(t_block_info);
+		void			setInfo(char);
+		void			operator=(t_block_info);
 };
 
 #endif

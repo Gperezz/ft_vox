@@ -1,20 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_vox.hpp                                         :+:      :+:    :+:   */
+/*   WorldGenerator.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/03/21 17:43:41 by gperez            #+#    #+#             */
-/*   Updated: 2020/03/30 16:45:07 by gperez           ###   ########.fr       */
+/*   Created: 2020/04/02 08:06:26 by gperez            #+#    #+#             */
+/*   Updated: 2020/04/02 08:06:45 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef _FT_VOX_HPP_
-# define _FT_VOX_HPP_
+#include "WorldGenerator.hpp"
 
+	WorldGenerator::WorldGenerator(unsigned long seed) : seed(seed)
+	{}
+	WorldGenerator::WorldGenerator(void) : seed(Rand<unsigned long>().generate())
+	{}
 
-# include "Engine.hpp"
-
-
-#endif
+	WorldGenerator::GenChunk(Chunk chunk){
+		for (int i = 0; i < 16 * 16 * 256; i++){
+			chunk.get(i) = (t_block_info){1, 0, 0, 0};
+		}
+	}

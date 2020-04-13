@@ -6,11 +6,13 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2020/03/25 19:04:30 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/01 17:14:17 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Engine.hpp"
+
+using namespace std;
 
 Engine::Engine()
 {
@@ -33,7 +35,7 @@ int			Engine::initWindow(void)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	Engine::window = glfwCreateWindow(WIDTH, HEIGHT, "42Run", NULL, NULL);
+	Engine::window = glfwCreateWindow(WIDTH, HEIGHT, "ft_vox", NULL, NULL);
 	if (Engine::window == NULL)
 	{
 		cout << "Failed to create GLFW window" << endl;
@@ -56,9 +58,13 @@ GLFWwindow	*Engine::getWindow(void)
 	return (Engine::window);
 }
 
-Shader		Engine::getShader(void)
+Camera		Engine::getCam(void)
 {
-	return (Engine::shader);
+	return (Engine::camera);
+}
+void		Engine::setCam(Camera cam)
+{
+	Engine::camera = cam;
 }
 
 Engine::~Engine()
