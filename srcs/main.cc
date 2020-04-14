@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/13 15:46:56 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/14 01:38:17 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,25 +35,6 @@ void	exec(Engine *env, unsigned vao, Shader shader)
 	glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
 	glfwSwapBuffers(env->getWindow());
 	glfwPollEvents();
-}
-
-void	generateVao(unsigned int *vao)
-{
-	unsigned int vbo;
-	unsigned int ebo;
-
-	glGenVertexArrays(1, vao);
-	glBindVertexArray(*vao);
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(TEST), TEST, GL_STATIC_DRAW);
-	glGenBuffers(1, &ebo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(EBO),
-		EBO, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3 + sizeof(int), (void*)0);
-	glVertexAttribPointer(1, 1, GL_INT, GL_FALSE, sizeof(float) * 3 + sizeof(int), (void*)(sizeof(float) * 3));
-	glEnableVertexAttribArray(0);
 }
 
 int		main(void)
