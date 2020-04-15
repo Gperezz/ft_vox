@@ -6,7 +6,7 @@
 /*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:17:27 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/15 12:35:18 by karldouveno      ###   ########.fr       */
+/*   Updated: 2020/04/15 16:04:42 by karldouveno      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,38 +69,59 @@ static BlockPos t_cube_pt[] = {
 	BlockPos({LENGTH_BLOCK / 2, LENGTH_BLOCK / 2, -LENGTH_BLOCK / 2}),
 };
 
-static t_add_pt	g_add_pt[] = {
-	{NORTH, {
+struct s_direction_consts{
+	BlockPos	block_vec;
+	ChunkPos	chunk_vec;
+	xyz_vec		axis;
+	int			sens;
+	BlockPos	pts[6];
+
+}
+static const struct s_direction_consts g_dir_c[] = {
+	// NORTH
+	{{0,0,0,1}, {0, 1}, Z, 1,
+		{
 		t_cube_pt[0], t_cube_pt[1], t_cube_pt[2],
 		t_cube_pt[0], t_cube_pt[2], t_cube_pt[3],
 		}
 	},
-	{EAST, {
+	// WEST
+	{{0,1,0,0}, {1, 0}, X, 1,
+		{
 		t_cube_pt[7], t_cube_pt[6], t_cube_pt[3],
 		t_cube_pt[7], t_cube_pt[3], t_cube_pt[4],
 		}
 	},
-	{SOUTH, {
+	// SOUTH
+	{{0,0,0,-1}, {0, -1}, Z, 0,
+		{
 		t_cube_pt[4], t_cube_pt[5], t_cube_pt[6],
 		t_cube_pt[4], t_cube_pt[6], t_cube_pt[7],
 		}
 	},
-	{WEST, {
+	// EAST
+	{{0,-1,0,0}, {-1, 0}, X, 0,
+		{
 		t_cube_pt[0], t_cube_pt[1], t_cube_pt[5],
 		t_cube_pt[0], t_cube_pt[5], t_cube_pt[4],
 		}
 	},
-	{UP, {
+	// UP
+	{{0,0,1,0}, {0, 0}, Y, 1,
+		{
 		t_cube_pt[0], t_cube_pt[4], t_cube_pt[7],
 		t_cube_pt[0], t_cube_pt[7], t_cube_pt[3],
 		}
 	},
-	{DOWN, {
+	// DOWN
+	{{0,0,-1,0}, {0, 0}, Y, 0,
+		{
 		t_cube_pt[1], t_cube_pt[5], t_cube_pt[6],
 		t_cube_pt[1], t_cube_pt[6], t_cube_pt[2],
 		}
 	}
-};
+
+}
 
 enum ChunkState : char{
 	UNFENCED,
@@ -141,7 +162,7 @@ class Chunk{
 		Block&						operator[](BlockPos);
 		Chunk						*getNeighboor(Direction);
 
-		Block						*getBlockNeighboor(char, BlockPos, Direction);
-		bool						blockSurrounded(std::vector<vbo_type> &tempVbo, char meshIdx, BlockPos posMesh)
+		Block						*getBlockNeighboor(BlockPos, Direction);
+		bool						blockSurrounded(std::vector<vbo_type> &tempVbo, BlockPos posMesh)
 };
 #endif
