@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Chunk.cc                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/15 04:59:41 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/15 13:42:10 by karldouveno      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,7 +135,7 @@ void		Chunk::generateGraphics(void)
 Chunk		*Chunk::getNeighboor(Direction dir)
 {
 	if (dir == NORTH)
-		return ((*world)[this->pos + ChunkPos({0, 1})]);
+		return (world->[this->pos + ChunkPos({0, 1})]);
 	else if (dir == EAST)
 		return (world->[this->pos + ChunkPos({1, 0})]);
 	else if (dir == SOUTH)
@@ -145,8 +145,82 @@ Chunk		*Chunk::getNeighboor(Direction dir)
 	return this;
 }
 
-Block		*Chunk::getBlockNeighboor(char meshIdx, BlockPos pos, Direction dir)
+Block		*Chunk::getBlockNeighboor(BlockPos pos, Direction dir)
 {
-	// de la merde pour test
-	return (Chunk::blocks[meshIdx][pos[X]][pos[Y][pos[Z]]]);
+	if (dir == UP)
+	{
+		if (pos[Z] == 15)
+		{
+			if (pos[MY] == 15)
+				return NULL;
+			return tmp->get(pos[MY] + 1, pos[X], 0, pos[Z]);
+		}
+		return this->get(pos + (BlockPos){0, 0, 1, 0});
+	}
+	if (dir == UP)
+	{
+		if (pos[Z] == 15)
+		{
+			if (pos[MY] == 0)
+				return NULL;
+			return tmp->get(pos[MY] - 1, pos[X], 15, pos[Z]);
+		}
+		return this->get(pos + (BlockPos){0, 0, -1, 0});
+	}
+	if (dir == NORTH)
+	{
+		if (pos[Z] == 15)
+		{
+			// to add: overflow +z condition
+			Chunk *tmp = this->world->[{this->pos[XZ_X], this->pos[XZ_Z] + 1}];
+			return tmp->get(pos[MY], pos[X], pos[Y], 0);
+		}
+		return this->get(pos + (BlockPos){0, 0, 0, 1});
+	}
+	if (dir == WEST)
+	{
+		if (pos[X] == 15)
+		{
+			// to add: overflow +x condition
+
+			Chunk *tmp = this->world->[{this->pos[XZ_X] + 1, this->pos[XZ_Z]}];
+			return tmp->get(pos[MY], 0, pos[Y], pos[Z]);
+		}
+		return this->get(pos + (BlockPos){0, 1, 0, 0});
+	} 
+	if (dir == SOUTH)
+	{
+		if (pos[Z] == 0)
+		{
+			// to add: overflow -z condition
+			Chunk *tmp = this->world->[{this->pos[XZ_X], this->pos[XZ_Z] - 1}];
+			return tmp->get(pos[MY], pos[X], pos[Y], 15);
+		}
+		return this->get(pos + (BlockPos){0, 0, 0, -1});
+	}
+	if (dir == EAST)
+	{
+		if (pos[X] == 15)
+		{
+			// to add: overflow -x condition
+			Chunk *tmp = this->world->[{this->pos[XZ_X] - 1, this->pos[XZ_Z]}];
+			return tmp->get(pos[MY], 15, pos[Y], pos[Z]);
+		}
+		return this->get(pos + (BlockPos){0, -1, 0, 0});
+	} 
+}
+
+Block&		Chunk::operator[](BlockPos pos)
+{
+	return this->get(pos);
+}
+
+Block&		Chunk::get(BlockPos pos)
+{
+	return this->get(pos[MY], pos[X], pos[Y], pos[Z]);
+}
+
+Block&		Chunk::get(int my, int x, int y, int z)
+{
+	return this->blocks[my][x][y][z];
 }

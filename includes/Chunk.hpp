@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Chunk.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:17:27 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/15 01:21:03 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/15 12:35:18 by karldouveno      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,9 @@
 # include "Block.hpp"
 
 enum xz_vec {XZ_X, XZ_Z};
-enum xyz_vec {X, Y, Z};
+enum xyz_vec {MY, X, Y, Z};
 using ChunkPos = Coords::Coords<int, 2>;
-using BlockPos = Coords::Coords<int, 3>;
+using BlockPos = Coords::Coords<int, 4>;
 
 enum Biome : char{
 	PLAIN,
@@ -136,7 +136,7 @@ class Chunk{
 		void						validateChunk(void);
 
 		Block&						get(BlockPos);
-		Block&						get(int x, int y, int z);
+		Block&						get(int my, int x, int y, int z);
 		Block&						get(int i);
 		Block&						operator[](BlockPos);
 		Chunk						*getNeighboor(Direction);
