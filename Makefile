@@ -6,7 +6,7 @@
 #    By: gperez <gperez@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/01/06 13:36:11 by gperez            #+#    #+#              #
-#    Updated: 2020/04/01 18:34:57 by gperez           ###   ########.fr        #
+#    Updated: 2020/04/14 21:40:34 by gperez           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,6 +25,9 @@ SRC =	srcs/main.cc \
 		srcs/Class/Shader.cc \
 		srcs/Class/Camera.cc \
 		srcs/Class/Mat.cc \
+		srcs/Class/World.cc \
+		srcs/Class/Chunk.cc \
+		srcs/Class/Block.cc \
 
 NC = \033[0m
 BOLD =\033[1m
@@ -67,11 +70,7 @@ LIBS_H =	libs/libft/includes \
 LIBS = $(addprefix -I,$(LIBS_H))
 
 INC =	includes/ft_vox.hpp \
-		includes/Chunck.hpp \
-		includes/Block.hpp \
-		includes/Shader.hpp \
-		includes/Mat.hpp \
-		includes/Engine.hpp \
+
 
 OBJ = $(SRC:.cc=.o)
 

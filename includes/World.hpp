@@ -6,25 +6,21 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:08:20 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/13 19:40:41 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/14 21:46:41 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef WORLD_HPP
-# define WORLD_HPP
+#ifndef _WORLD_HPP_
+# define _WORLD_HPP_
 # include <map>
 # include <filesystem>
 # include <string>
 
-# include "Chunck.hpp"
+# include "Chunk.hpp"
 # include "WorldGenerator.hpp"
 
 using namespace std;
 using namespace std::filesystem;
-
-class Chunk;
-class WorldGenerator;
-
 
 class World
 {
@@ -45,4 +41,4 @@ class World
 	Chunk	*operator[](ChunkPos);
 };
 
-#endif // WORLD_HPP
+#endif

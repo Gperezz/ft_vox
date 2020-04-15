@@ -6,12 +6,11 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/14 01:38:17 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/14 21:30:27 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_vox.hpp"
-#include <iostream>
 
 void	key(Engine *env)
 {
@@ -59,7 +58,6 @@ int		main(void)
 	ft_printf(MAGENTA"Ceci est Ft_vox:\n" NA);
 	
 	ft_printf(RED"HERE %u\n" NA, vao);
-	generateVao(&vao);
 	ft_printf(RED"HERE %u\n" NA, vao);
 	
 	ft_printf(RED"prog %u\n" NA, shader.getProgram());

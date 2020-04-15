@@ -6,11 +6,13 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/14 02:57:13 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/15 04:59:41 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Chunck.hpp"
+#include "Chunk.hpp"
+
+using namespace std;
 
 Chunk::Chunk(World *w) : state(UNFENCED), world(w)
 {
@@ -20,19 +22,20 @@ Chunk::Chunk(World *w, ChunkPos pos) : state(UNFENCED), pos(pos), world(w)
 {
 }
 
-static void	fillTempVbo(std::vector<vbo_type> &tempVbo, BlockPos pts[6], int id)
+static void	fillTempVbo(vector<vbo_type> &tempVbo, BlockPos pts[6], BlockPos posMesh, int id)
 {
 	int	iPt;
 
+	posMesh.add(-8);
 	iPt = 0;
 	while (iPt < 6)
 	{
-		tempVbo.push_back((vbo_type){pts[iPt], id});
+		tempVbo.push_back((vbo_type){pts[iPt] + posMesh, id});
 		iPt++;
 	}
 }
 
-bool		Chunk::blockSurrounded(std::vector<vbo_type> &tempVbo, char meshIdx, BlockPos posMesh)
+bool		Chunk::blockSurrounded(vector<vbo_type> &tempVbo, char meshIdx, BlockPos posMesh)
 {
 	char	dir;
 	int		i;
@@ -41,17 +44,18 @@ bool		Chunk::blockSurrounded(std::vector<vbo_type> &tempVbo, char meshIdx, Block
 	dir = 0;
 	while (i < 6)
 	{
-		if (Chunk::getBlockNeighboor(meshIdx, posMesh, i).getInfo().id != 0)
+		if (Chunk::getBlockNeighboor(meshIdx, posMesh, (Direction)i)->getInfo().id != 0)
 		{
-			dir += 1 << i;
-			fillTempVbo(tempVbo, g_add_pt[i].pts, this->blocks[meshIdx][posMesh[X]][posMesh[Y]][posMesh[Z]]);
+			dir += 1;
+			fillTempVbo(tempVbo, g_add_pt[i].pts, posMesh,
+				this->blocks[meshIdx][posMesh[X]][posMesh[Y]][posMesh[Z]].getInfo().id);
 		}
 		i++;
 	}
-	return (dir);
+	return (dir == 6);
 }
 
-bool		Chunk::conditionValidate(std::vector<vbo_type> &tempVbo, char meshIdx, BlockPos posMesh, bool &b)
+bool		Chunk::conditionValidate(vector<vbo_type> &tempVbo, char meshIdx, BlockPos posMesh, bool &b)
 {
 	if (this->blocks[meshIdx][pos[0]][pos[1]][pos[2]].getInfo().id == AIR
 		|| this->blockSurrounded(tempVbo, meshIdx, posMesh))
@@ -59,11 +63,11 @@ bool		Chunk::conditionValidate(std::vector<vbo_type> &tempVbo, char meshIdx, Blo
 	b = 1;
 }
 
-void		Chunk::generateVbo(char index, std::vector<vbo_type> tempVbo)
+void		Chunk::generateVbo(char index, vector<vbo_type> tempVbo)
 {
-	glGenVertexArrays(1, tabVao[index]);
+	glGenVertexArrays(1, &(Chunk::tabVao[index]));
 	glBindVertexArray(tabVao[index]);
-	glGenBuffers(1, tabVbo[index]);
+	glGenBuffers(1, &(Chunk::tabVbo[index]));
 	glBindBuffer(GL_ARRAY_BUFFER, tabVbo[index]);
 	glBufferData(GL_ARRAY_BUFFER, tempVbo.size() * sizeof(vbo_type), tempVbo, GL_STATIC_DRAW);
 	// glGenBuffers(1, &ebo);
@@ -78,17 +82,19 @@ void		Chunk::generateVbo(char index, std::vector<vbo_type> tempVbo)
 
 void		Chunk::deleteVbo(char index)
 {
-	glDeleteBuffers(tabVbo[index]);
-	glDeleteVertexArrays(tabVao[index]);
+	glDeleteBuffers(1, &(Chunk::tabVbo[index]));
+	glDeleteVertexArrays(1, &(Chunk::tabVao[index]));
 }
 
 void		Chunk::validateMesh(char meshIdx)
 {
 	BlockPos				pos; // [x][y][z]
 	bool					validateValue;
-	std::vector<vbo_type>	tempVbo;
+	vector<vbo_type>		tempVbo;
 
-	deleteVbo(meshIndex);
+	if (std::find(Chunk::valid.begin(), Chunk::valid.end(),
+		meshIdx) != Chunk::valid.end())
+		deleteVbo(meshIdx);
 	validateValue = 0;
 	while (pos[X] < 16)
 	{
@@ -112,7 +118,6 @@ void		Chunk::validateMesh(char meshIdx)
 
 void		Chunk::validateChunk(void)
 {
-	this->valid.clear();
 	for (unsigned i = 0; i < 16; i++)
 		validateMesh(i);
 }
@@ -130,7 +135,7 @@ void		Chunk::generateGraphics(void)
 Chunk		*Chunk::getNeighboor(Direction dir)
 {
 	if (dir == NORTH)
-		return (world->[this->pos + ChunkPos({0, 1})]);
+		return ((*world)[this->pos + ChunkPos({0, 1})]);
 	else if (dir == EAST)
 		return (world->[this->pos + ChunkPos({1, 0})]);
 	else if (dir == SOUTH)
