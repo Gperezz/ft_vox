@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Chunk.cc                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
+/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/15 15:47:23 by karldouveno      ###   ########.fr       */
+/*   Updated: 2020/04/16 07:43:50 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,13 +24,17 @@ Chunk::Chunk(World *w, ChunkPos pos) : state(UNFENCED), pos(pos), world(w)
 
 static void	fillTempVbo(vector<vbo_type> &tempVbo, BlockPos pts[6], BlockPos posMesh, int id)
 {
-	int	iPt;
+	int			iPt;
+	vbo_type	vboType;
 
-	posMesh.add(-8);
 	iPt = 0;
 	while (iPt < 6)
 	{
-		tempVbo.push_back((vbo_type){pts[iPt] + posMesh, id});
+		vboType.tab[0] = pts[iPt].get(X) + posMesh.get(X);
+		vboType.tab[1] = pts[iPt].get(Y) + posMesh.get(Y);
+		vboType.tab[2] = pts[iPt].get(Z) + posMesh.get(Z);
+		vboType.meta = id;
+		tempVbo.push_back(vboType);
 		iPt++;
 	}
 }
@@ -47,7 +51,7 @@ bool		Chunk::blockSurrounded(vector<vbo_type> &tempVbo, BlockPos posMesh)
 		if (Chunk::getBlockNeighboor(posMesh, (Direction)i)->getInfo().id != 0)
 		{
 			dir += 1;
-			fillTempVbo(tempVbo, g_dir_c[i].pts, posMesh,
+			fillTempVbo(tempVbo, (BlockPos*)g_dir_c[i].pts, posMesh,
 				this->get(posMesh).getInfo().id);
 		}
 		i++;
@@ -63,13 +67,23 @@ bool		Chunk::conditionValidate(vector<vbo_type> &tempVbo, BlockPos posMesh, bool
 	b = 1;
 }
 
+void		Chunk::generateGraphics(void)
+{
+	unsigned int	i;
+
+	i = 0;
+	if (Chunk::state == UNFENCED)
+		return ;
+	Chunk::validateChunk();
+}
+
 void		Chunk::generateVbo(char index, vector<vbo_type> tempVbo)
 {
 	glGenVertexArrays(1, &(Chunk::tabVao[index]));
 	glBindVertexArray(tabVao[index]);
 	glGenBuffers(1, &(Chunk::tabVbo[index]));
 	glBindBuffer(GL_ARRAY_BUFFER, tabVbo[index]);
-	glBufferData(GL_ARRAY_BUFFER, tempVbo.size() * sizeof(vbo_type), tempVbo, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, tempVbo.size() * sizeof(vbo_type), &tempVbo, GL_STATIC_DRAW);
 	// glGenBuffers(1, &ebo);
 	// glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 	// glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(EBO),
@@ -88,21 +102,21 @@ void		Chunk::deleteVbo(char index)
 
 void		Chunk::validateMesh(char meshIdx)
 {
-	BlockPos				pos; // [x][y][z]
+	BlockPos				pos; // [meshY][x][y][z]
 	bool					validateValue;
 	vector<vbo_type>		tempVbo;
 
-	if (std::find(Chunk::valid.begin(), Chunk::valid.end(),
-		meshIdx) != Chunk::valid.end())
+	if (Chunk::valid.find(meshIdx) != Chunk::valid.end())
 		deleteVbo(meshIdx);
 	validateValue = 0;
+	pos[MY] = meshIdx;
 	while (pos[X] < 16)
 	{
 		while (pos[Y] < 16)
 		{
 			while (pos[Z] < 16)
 			{
-				conditionValidate(tempVbo, meshIdx, pos, validateValue);
+				conditionValidate(tempVbo, pos, validateValue);
 				pos[Z]++;
 			}
 			pos[Y]++;
@@ -112,7 +126,7 @@ void		Chunk::validateMesh(char meshIdx)
 	if (validateValue)
 	{
 		generateVbo(meshIdx, tempVbo);
-		this->valid.push_back(meshIdx);
+		this->valid.insert(meshIdx, tempVbo.size() * 6);
 	}
 }
 
@@ -122,21 +136,38 @@ void		Chunk::validateChunk(void)
 		validateMesh(i);
 }
 
-void		Chunk::generateGraphics(void)
+void		Chunk::displayChunk(unsigned int prog)
 {
-	unsigned int	i;
+	std::map<char, unsigned int>::iterator it = Chunk::valid.begin();
 
-	i = 0;
-	if (Chunk::state == UNFENCED)
-		return ;
-	Chunk::validateChunk();
+	while (it != Chunk::valid.end())
+	{
+		glBindVertexArray(Chunk::tabVao[it->first]);
+		glUseProgram(prog);
+		// glUniform1i(glGetUniformLocation(prog, "basicTexture"), i_t >= T_END_OBJ
+			// ? g_objs_entities[0].index_txt : g_objs_entities[entities[i]->getType()].index_txt);
+		// glUniform2f(glGetUniformLocation(prog, "envx"),
+			// entities[i]->getXMin(), entities[i]->getXMax());
+		// glUniform2f(glGetUniformLocation(prog, "envy"),
+			// entities[i]->getYMin(), entities[i]->getYMax());
+		// glUniform2f(glGetUniformLocation(prog, "envz"),
+			// entities[i]->getZMin(), entities[i]->getZMax());
+		// glUniformMatrix4fv(glGetUniformLocation(prog,
+		// 	"model"), 1, GL_FALSE, glm::value_ptr(entities[i]->calcMatrix()));
+		// glUniformMatrix4fv(glGetUniformLocation(prog,
+		// 	"view"), 1, GL_FALSE, glm::value_ptr(cam.calcMatrix()));
+		// glUniformMatrix4fv(glGetUniformLocation(prog,
+		// 	"projection"), 1, GL_FALSE, glm::value_ptr(cam.getProjMatrix()));
+		glDrawArrays(GL_TRIANGLES, 0, it->second);
+		it++;
+	}
 }
 
 Chunk		*Chunk::getNeighboor(Direction dir)
 {
 	if (g_dir_c[dir].axis == Y)
 		return this;
-	return this->world->[this->pos + g_dic_c[dir].chunk_vec];
+	return this->world->get(this->pos + g_dic_c[dir].chunk_vec);
 }
 
 Block		*Chunk::getBlockNeighboor(BlockPos pos, Direction dir)
@@ -153,16 +184,16 @@ Block		*Chunk::getBlockNeighboor(BlockPos pos, Direction dir)
 			if (pos[MY] == c.sens ? 15 : 0)
 				return NULL;
 			pos[MY] += c.sens ? 1 : -1;
-			pos[Y] = c.sems ? 0 : 15;
-			return this->get(pos);
+			pos[Y] = c.sens ? 0 : 15;
+			return &this->get(pos);
 		}
 		else
 		{
-			pos[c.axis] = c.sems ? 0 : 15;
-			return this->getNeighboor(dir)->get(pos);
+			pos[c.axis] = c.sens ? 0 : 15;
+			return &this->getNeighboor(dir)->get(pos);
 		}
 	}
-	return this->get(pos + c.block_vec);
+	return &this->get(pos + c.block_vec);
 }
 
 Block&		Chunk::operator[](BlockPos pos)

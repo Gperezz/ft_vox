@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 20:07:59 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/15 04:59:40 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/16 07:22:00 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,11 +24,11 @@ namespace Coords{
 				bzero(attr, sizeof(T) * dims);
 			}
 			Coords(T attr[dims]){
-				this->attr = attr;
+				this->attr.from(attr);
 			}
 
 			Coords(Coords<T, dims> &toClone){
-				this->attr = toClone.attr;
+				this->attr.from(toClone.attr);
 			}
 
 			float	distance(Coords<T, dims> &toMesure){
@@ -55,7 +55,7 @@ namespace Coords{
 				}
 				return this;
 			}
-			Coords<T, dims> *operator+(Coords<T, dims> a)
+			Coords<T, dims> &operator+(Coords<T, dims> a)
 			{
 				return this->add(a);
 			}
