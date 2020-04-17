@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/16 07:43:50 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/17 16:31:16 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,30 @@
 
 using namespace std;
 
-Chunk::Chunk(World *w) : state(UNFENCED), world(w)
+Chunk::Chunk()
 {
+	this->state = UNFENCED;
+	this->world = NULL;
 }
 
-Chunk::Chunk(World *w, ChunkPos pos) : state(UNFENCED), pos(pos), world(w)
+Chunk::Chunk(World *w)
 {
+	this->state = UNFENCED,
+	this->world = w;
+}
+
+Chunk::Chunk(World *w, ChunkPos pos)
+{
+	this->state = UNFENCED,
+	this->pos = pos;
+	this->world = w;
+}
+
+Chunk::Chunk(const Chunk& copy)
+{
+	this->state = copy.state;
+	this->pos = copy.pos;
+	this->world = copy.world;
 }
 
 static void	fillTempVbo(vector<vbo_type> &tempVbo, BlockPos pts[6], BlockPos posMesh, int id)
@@ -65,6 +83,7 @@ bool		Chunk::conditionValidate(vector<vbo_type> &tempVbo, BlockPos posMesh, bool
 		|| this->blockSurrounded(tempVbo, posMesh))
 		return (0);
 	b = 1;
+	return (1);
 }
 
 void		Chunk::generateGraphics(void)
@@ -79,10 +98,10 @@ void		Chunk::generateGraphics(void)
 
 void		Chunk::generateVbo(char index, vector<vbo_type> tempVbo)
 {
-	glGenVertexArrays(1, &(Chunk::tabVao[index]));
-	glBindVertexArray(tabVao[index]);
-	glGenBuffers(1, &(Chunk::tabVbo[index]));
-	glBindBuffer(GL_ARRAY_BUFFER, tabVbo[index]);
+	glGenVertexArrays(1, &(Chunk::tabVao[(int)index]));
+	glBindVertexArray(tabVao[(int)index]);
+	glGenBuffers(1, &(Chunk::tabVbo[(int)index]));
+	glBindBuffer(GL_ARRAY_BUFFER, tabVbo[(int)index]);
 	glBufferData(GL_ARRAY_BUFFER, tempVbo.size() * sizeof(vbo_type), &tempVbo, GL_STATIC_DRAW);
 	// glGenBuffers(1, &ebo);
 	// glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
@@ -96,8 +115,8 @@ void		Chunk::generateVbo(char index, vector<vbo_type> tempVbo)
 
 void		Chunk::deleteVbo(char index)
 {
-	glDeleteBuffers(1, &(Chunk::tabVbo[index]));
-	glDeleteVertexArrays(1, &(Chunk::tabVao[index]));
+	glDeleteBuffers(1, &(Chunk::tabVbo[(int)index]));
+	glDeleteVertexArrays(1, &(Chunk::tabVao[(int)index]));
 }
 
 void		Chunk::validateMesh(char meshIdx)
@@ -106,8 +125,11 @@ void		Chunk::validateMesh(char meshIdx)
 	bool					validateValue;
 	vector<vbo_type>		tempVbo;
 
-	if (Chunk::valid.find(meshIdx) != Chunk::valid.end())
+	if (this->valid.find(meshIdx) != Chunk::valid.end())
+	{
+		this->valid.erase(meshIdx);
 		deleteVbo(meshIdx);
+	}
 	validateValue = 0;
 	pos[MY] = meshIdx;
 	while (pos[X] < 16)
@@ -126,7 +148,7 @@ void		Chunk::validateMesh(char meshIdx)
 	if (validateValue)
 	{
 		generateVbo(meshIdx, tempVbo);
-		this->valid.insert(meshIdx, tempVbo.size() * 6);
+		this->valid.at(meshIdx) = tempVbo.size() * 6;
 	}
 }
 
@@ -136,14 +158,19 @@ void		Chunk::validateChunk(void)
 		validateMesh(i);
 }
 
-void		Chunk::displayChunk(unsigned int prog)
+void		Chunk::displayChunk(Engine &e)
 {
-	std::map<char, unsigned int>::iterator it = Chunk::valid.begin();
+	std::map<char, unsigned int>::iterator	it = Chunk::valid.begin();
+	Shader&									shader(e.getShader());
 
 	while (it != Chunk::valid.end())
 	{
-		glBindVertexArray(Chunk::tabVao[it->first]);
-		glUseProgram(prog);
+		glBindVertexArray(Chunk::tabVao[(int)it->first]);
+		glUseProgram(shader.getProgram());
+		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),
+			"view"), 1, GL_FALSE, glm::value_ptr(e.getCam().getMatrix()));
+		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),
+			"projection"), 1, GL_FALSE, glm::value_ptr(e.getCam().getProjMatrix()));
 		// glUniform1i(glGetUniformLocation(prog, "basicTexture"), i_t >= T_END_OBJ
 			// ? g_objs_entities[0].index_txt : g_objs_entities[entities[i]->getType()].index_txt);
 		// glUniform2f(glGetUniformLocation(prog, "envx"),
@@ -163,21 +190,18 @@ void		Chunk::displayChunk(unsigned int prog)
 	}
 }
 
-Chunk		*Chunk::getNeighboor(Direction dir)
+Chunk&		Chunk::getNeighboor(Direction dir)
 {
 	if (g_dir_c[dir].axis == Y)
-		return this;
-	return this->world->get(this->pos + g_dic_c[dir].chunk_vec);
+		return *this;
+	return this->world->get(this->pos + g_dir_c[dir].chunk_vec);
 }
 
 Block		*Chunk::getBlockNeighboor(BlockPos pos, Direction dir)
 {
-	struct s_direction_consts&	c;
-	int							limit;
-	int							rev_limit;
+	struct s_direction_consts&	c(g_dir_c[dir]);
 
-	c = g_dir_c[dir];
-	if (pos[c.axis] == limit)
+	if (pos[c.axis] == c.sens ? 15 : 0)
 	{
 		if (c.axis == Y)
 		{
@@ -190,7 +214,7 @@ Block		*Chunk::getBlockNeighboor(BlockPos pos, Direction dir)
 		else
 		{
 			pos[c.axis] = c.sens ? 0 : 15;
-			return &this->getNeighboor(dir)->get(pos);
+			return &this->getNeighboor(dir).get(pos);
 		}
 	}
 	return &this->get(pos + c.block_vec);

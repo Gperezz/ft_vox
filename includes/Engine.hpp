@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:35:15 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/14 21:42:45 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/17 17:16:47 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,13 +62,14 @@ class Engine
 	private:
 		GLFWwindow	*window;
 		Camera		camera;
-		// World		world;
+		Shader		shader;
 	public:
 		Engine();
 		int			initWindow(void);
 		GLFWwindow	*getWindow(void);
-		Camera		getCam(void);
+		Camera&		getCam(void);
 		void		setCam(Camera cam);
+		Shader&		getShader(void);
 		~Engine();
 };
 

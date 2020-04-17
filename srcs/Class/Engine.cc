@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/01 17:14:17 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/16 17:29:36 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,13 +58,18 @@ GLFWwindow	*Engine::getWindow(void)
 	return (Engine::window);
 }
 
-Camera		Engine::getCam(void)
+Camera&		Engine::getCam(void)
 {
 	return (Engine::camera);
 }
 void		Engine::setCam(Camera cam)
 {
 	Engine::camera = cam;
+}
+
+Shader&		Engine::getShader(void)
+{
+	return (Engine::shader);
 }
 
 Engine::~Engine()

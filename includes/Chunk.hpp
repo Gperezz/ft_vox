@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:17:27 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/16 06:51:46 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/17 16:56:30 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,16 @@
 
 # include "Coords.hpp"
 # include "Block.hpp"
-# include "World.hpp"
+# include "Engine.hpp"
+# include <vector>
+# include <map>
+
+class World;
+class Engine;
 
 enum xz_vec {XZ_X, XZ_Z};
 enum xyz_vec {MY, X, Y, Z};
+
 using ChunkPos = Coords::Coords<int, 2>;
 using BlockPos = Coords::Coords<int, 4>;
 
@@ -77,7 +83,7 @@ typedef struct	s_direction_consts{
 	BlockPos	pts[6];
 }				t_direction_consts;
 
-static const t_direction_consts	g_dir_c[] = {
+static t_direction_consts	g_dir_c[] = {
 	// NORTH
 	{BlockPos((int[4]){0,0,0,1}), ChunkPos((int[2]){0, 1}), Z, 1,
 		{
@@ -150,18 +156,19 @@ class Chunk{
 		void							generateVbo(char index, std::vector<vbo_type> tempVbo);
 		void							deleteVbo(char index);
 	public:
+		Chunk();
 		Chunk(World*);
 		Chunk(World*, ChunkPos);
-
+		Chunk(const Chunk& copy);
+		
 		void							validateMesh(char meshIdx);
 		void							validateChunk(void);
-		void							displayChunk(unsigned int prog);
+		void							displayChunk(Engine &e);
 
 		Block&							get(BlockPos);
 		Block&							get(int my, int x, int y, int z);
-		Block&							get(int i);
 		Block&							operator[](BlockPos);
-		Chunk							*getNeighboor(Direction);
+		Chunk&							getNeighboor(Direction);
 
 		Block							*getBlockNeighboor(BlockPos, Direction);
 		bool							blockSurrounded(std::vector<vbo_type> &tempVbo, BlockPos posMesh);

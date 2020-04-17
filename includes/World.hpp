@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:08:20 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/14 21:46:41 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/17 17:14:11 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,24 +21,30 @@
 
 using namespace std;
 using namespace std::filesystem;
+using ChunkPos = Coords::Coords<int, 2>;
+using BlockPos = Coords::Coords<int, 4>;
+
+class Chunk;
+class WorldGenerator;
 
 class World
 {
 	private:
-		map<ChunkPos, Chunk*>&		LoadedChunks;
-		path&						RootDirPath;
-		WorldGenerator&				WorldGen;
+		map<ChunkPos, Chunk>		*LoadedChunks;
+		path						*RootDirPath;
+		WorldGenerator				*WorldGen;
 	public:
-			World(void);
-			World(string pathStr);
-			World(path path);
+			World(unsigned long* = NULL);
+			World(string&, unsigned long*);
+			World(path&, unsigned long*);
 			// World(string pathStr, );
 			// World(string )
 			~World();
-	path	getDir();
+	path	*getDir();
 	void	loadChunk(ChunkPos);
-	void	loadChunk(unsigned x, unsigned z);
-	Chunk	*operator[](ChunkPos);
+	void	loadChunk(int x, int z);
+	Chunk&	get(ChunkPos);
+	Chunk&	operator[](ChunkPos);
 };
 
 #endif

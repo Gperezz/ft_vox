@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/22 16:27:23 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/16 07:52:38 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/17 16:45:38 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define RAND_HPP
 
 # include <ctime>
+# include <math.h>
 template <typename T>
 class Rand
 {
@@ -23,39 +24,39 @@ class Rand
 		unsigned int b;
 		unsigned int m;
 	public:
-		Rand::Rand()
+		Rand()
 		{
-			Rand::a = 16807;
-			Rand::b = 0;
-			Rand::m = 0x7FFFFFFF;
-			Rand::nb = time(NULL);
-			Rand::generate();
+			a = 16807;
+			b = 0;
+			m = 0x7FFFFFFF;
+			nb = time(NULL);
+			generate();
 		}
-		Rand::Rand(unsigned long seed)
+		Rand(unsigned long seed)
 		{
-			Rand::a = 16807;
-			Rand::b = 0;
-			Rand::m = 0x7FFFFFFF;
-			Rand::nb = seed;
-			Rand::generate();
-		}
-
-		T	Rand::generate()
-		{
-			Rand::nb = (Rand::a * Rand::nb + Rand::b) % Rand::m;
-			return (Rand::nb);
+			a = 16807;
+			b = 0;
+			m = 0x7FFFFFFF;
+			nb = seed;
+			generate();
 		}
 
-		T		Rand::generate(T min, T max)
+		T	generate()
+		{
+			nb = (a * nb + b) % m;
+			return (nb);
+		}
+
+		T		generate(T min, T max)
 		{
 			T		rdm;
 
-			max = max - min;
-			rdm = roundf((float)Rand::generate() / (float)Rand::m * (float)max);
+			max -= min;
+			rdm = roundf((float)generate() / (float)m * (float)max);
 			return (rdm + min);
 		}
 
-		Rand::~Rand()
+		~Rand()
 		{
 		}
 };
