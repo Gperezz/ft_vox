@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:35:15 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/17 17:16:47 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/19 15:25:01 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ extern "C"
 # include "stb_image.h" // Load image
 # include "glm.hpp" // Implementation matrices
 
-# include "World.hpp"
 # include "Shader.hpp"
 # include "Camera.hpp"
 # include <iostream>

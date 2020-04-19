@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/17 17:22:18 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/19 18:13:16 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,8 @@ void	exec(World &world, Engine &env)
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// key(env);
+	key(env);
+	world.display(env);
 	glfwSwapBuffers(env.getWindow());
 	glfwPollEvents();
 }
@@ -41,14 +42,18 @@ int		main(void)
 	ft_printf(RED"prog %u\n" NA, shader.getProgram());
 	env.getCam().setProjMatrix(glm::perspective(glm::radians(45.0f),
 		(float)WIDTH / (float)HEIGHT, 0.1f, (float)RENDER_DIST));
-
+	env.getCam().translate((glm::vec3){0.0, 200, 0});
+	env.getCam().rotate((glm::vec3){90, 0, 0});
 	glEnable(GL_DEPTH_TEST);
 	// glEnable(GL_BLEND);
 	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	ft_printf(MAGENTA"Ceci est Ft_vox:\n" NA);
-	
-	ft_printf(RED"prog %u\n" NA, shader.getProgram());
+	world.loadChunk(0, 1);
+	world.loadChunk(0, -1);
+	world.loadChunk(1, 0);
+	world.loadChunk(-1, 0);
+	world.loadChunk(0, 0);
 	while(!glfwWindowShouldClose(env.getWindow()))
 		exec(world, env);
 	shader.freeProgram();

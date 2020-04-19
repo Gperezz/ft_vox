@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/02 08:06:26 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/17 17:07:26 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/19 18:27:13 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ WorldGenerator::WorldGenerator(unsigned long* seed)
 	
 }
 
-void	WorldGenerator::genChunk(Chunk chunk)
+void	WorldGenerator::genChunk(Chunk &chunk)
 {
 	for (int my = 0; my < 10; my++)
 	{
@@ -36,9 +36,17 @@ void	WorldGenerator::genChunk(Chunk chunk)
 			{
 				for (int z = 0; z < 16; z++)
 				{
-					chunk.get(my, x, y, z) = (t_block_info){1,0,0,0};
+					chunk.getBlock(my, x, y, z) = (t_block_info){1,0,0,0};
 				}
 			}
 		}
 	}
+}
+
+void	WorldGenerator::configure(unsigned long* seed)
+{
+	if (!seed)
+		this->seed = Rand<unsigned long>().generate();
+	else
+		this->seed = *seed;
 }

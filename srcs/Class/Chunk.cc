@@ -6,24 +6,28 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/17 16:31:16 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/19 18:55:19 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Chunk.hpp"
+#include "World.hpp"
 
 using namespace std;
 
 Chunk::Chunk()
 {
+	printf("INIT!!!\n");
+
 	this->state = UNFENCED;
-	this->world = NULL;
+	bzero(this->blocks, sizeof(this->blocks));
 }
 
 Chunk::Chunk(World *w)
 {
 	this->state = UNFENCED,
 	this->world = w;
+	bzero(this->blocks, sizeof(this->blocks));
 }
 
 Chunk::Chunk(World *w, ChunkPos pos)
@@ -31,13 +35,20 @@ Chunk::Chunk(World *w, ChunkPos pos)
 	this->state = UNFENCED,
 	this->pos = pos;
 	this->world = w;
+	bzero(this->blocks, sizeof(this->blocks));
 }
 
 Chunk::Chunk(const Chunk& copy)
 {
+	this->operator=(copy);
+}
+
+void		Chunk::operator=(const Chunk& copy)
+{
 	this->state = copy.state;
 	this->pos = copy.pos;
 	this->world = copy.world;
+	memcpy((void*)copy.blocks, this->blocks, sizeof(copy.blocks));
 }
 
 static void	fillTempVbo(vector<vbo_type> &tempVbo, BlockPos pts[6], BlockPos posMesh, int id)
@@ -57,7 +68,7 @@ static void	fillTempVbo(vector<vbo_type> &tempVbo, BlockPos pts[6], BlockPos pos
 	}
 }
 
-bool		Chunk::blockSurrounded(vector<vbo_type> &tempVbo, BlockPos posMesh)
+bool		Chunk::canPrintBlock(vector<vbo_type> &tempVbo, BlockPos posMesh)
 {
 	char	dir;
 	int		i;
@@ -66,22 +77,25 @@ bool		Chunk::blockSurrounded(vector<vbo_type> &tempVbo, BlockPos posMesh)
 	dir = 0;
 	while (i < 6)
 	{
-		if (Chunk::getBlockNeighboor(posMesh, (Direction)i)->getInfo().id != 0)
+		Block *tmp = this->getBlockNeighboor(posMesh, (Direction)i);
+		if (tmp && tmp->getInfo().id == 0)
 		{
 			dir += 1;
 			fillTempVbo(tempVbo, (BlockPos*)g_dir_c[i].pts, posMesh,
-				this->get(posMesh).getInfo().id);
+				this->getBlock(posMesh).getInfo().id);
 		}
 		i++;
 	}
-	return (dir == 6);
+	ft_printf(YELLOW"dir %d\n" NA, dir);
+	return (dir != 0);
 }
 
 bool		Chunk::conditionValidate(vector<vbo_type> &tempVbo, BlockPos posMesh, bool &b)
 {
-	if (this->get(posMesh).getInfo().id == AIR
-		|| this->blockSurrounded(tempVbo, posMesh))
+	if (this->getBlock(posMesh).getInfo().id == AIR
+		|| !this->canPrintBlock(tempVbo, posMesh))
 		return (0);
+	ft_printf(RED"HERE\n" NA);
 	b = 1;
 	return (1);
 }
@@ -147,8 +161,10 @@ void		Chunk::validateMesh(char meshIdx)
 	}
 	if (validateValue)
 	{
+		ft_printf(GREEN "validateValue %d\n" NA, meshIdx);
 		generateVbo(meshIdx, tempVbo);
-		this->valid.at(meshIdx) = tempVbo.size() * 6;
+		ft_printf(GREEN "generate VBO %d\n" NA, meshIdx);
+		this->valid[meshIdx] = tempVbo.size() * 6;
 	}
 }
 
@@ -160,12 +176,14 @@ void		Chunk::validateChunk(void)
 
 void		Chunk::displayChunk(Engine &e)
 {
-	std::map<char, unsigned int>::iterator	it = Chunk::valid.begin();
+	std::map<char, unsigned int>::iterator	it = this->valid.begin();
 	Shader&									shader(e.getShader());
 
-	while (it != Chunk::valid.end())
+	// ft_printf(YELLOW"%d %d\n" NA, this->getPos().get(0), this->getPos().get(1));
+	while (it != this->valid.end())
 	{
-		glBindVertexArray(Chunk::tabVao[(int)it->first]);
+		// ft_printf(CYAN"%d\n" NA, it->first);
+		glBindVertexArray(this->tabVao[(int)it->first]);
 		glUseProgram(shader.getProgram());
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),
 			"view"), 1, GL_FALSE, glm::value_ptr(e.getCam().getMatrix()));
@@ -190,10 +208,10 @@ void		Chunk::displayChunk(Engine &e)
 	}
 }
 
-Chunk&		Chunk::getNeighboor(Direction dir)
+Chunk		*Chunk::getNeighboor(Direction dir)
 {
 	if (g_dir_c[dir].axis == Y)
-		return *this;
+		return this;
 	return this->world->get(this->pos + g_dir_c[dir].chunk_vec);
 }
 
@@ -209,28 +227,59 @@ Block		*Chunk::getBlockNeighboor(BlockPos pos, Direction dir)
 				return NULL;
 			pos[MY] += c.sens ? 1 : -1;
 			pos[Y] = c.sens ? 0 : 15;
-			return &this->get(pos);
+			return &this->getBlock(pos);
 		}
 		else
 		{
 			pos[c.axis] = c.sens ? 0 : 15;
-			return &this->getNeighboor(dir).get(pos);
+			return &this->getNeighboor(dir)->getBlock(pos);
 		}
 	}
-	return &this->get(pos + c.block_vec);
+	return &this->getBlock(pos + c.block_vec);
 }
 
 Block&		Chunk::operator[](BlockPos pos)
 {
-	return this->get(pos);
+	return this->getBlock(pos);
 }
 
-Block&		Chunk::get(BlockPos pos)
+Block&		Chunk::getBlock(BlockPos pos)
 {
-	return this->get(pos[MY], pos[X], pos[Y], pos[Z]);
+	return this->getBlock(pos[MY], pos[X], pos[Y], pos[Z]);
 }
 
-Block&		Chunk::get(int my, int x, int y, int z)
+Block&		Chunk::getBlock(int my, int x, int y, int z)
 {
 	return this->blocks[my][x][y][z];
+}
+
+ChunkPos	Chunk::getPos(void)
+{
+	return this->pos;
+}
+
+void		Chunk::updateFenced(void)
+{
+	if (this->getNeighboor(NORTH) && this->getNeighboor(SOUTH) && this->getNeighboor(EAST) && this->getNeighboor(WEST))
+		this->state = FENCED;
+	else
+		this->state = UNFENCED;
+}
+
+void		Chunk::printSlice(int z)
+{
+	BlockPos meshPos;
+
+	meshPos[Z] = z;
+	while (meshPos[Y] < 16)
+	{
+		while (meshPos[X] < 16)
+		{
+			printf(BLUE "%d " NA, this->getBlock(meshPos).getInfo().id);
+			meshPos[X]++;
+		}
+		printf("\n");
+		meshPos[Y]++;
+		meshPos[X] = 0;
+	}
 }

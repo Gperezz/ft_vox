@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:17:27 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/17 16:56:30 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/19 18:51:38 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@
 # include <map>
 
 class World;
-class Engine;
 
 enum xz_vec {XZ_X, XZ_Z};
 enum xyz_vec {MY, X, Y, Z};
@@ -147,12 +146,14 @@ class Chunk{
 		std::map<char, unsigned int>	valid;
 		// unsigned int	ebo[16];
 		ChunkPos						pos;
-		Biome							biome;
-		Geomorph						geomoprh;
+		// Biome							biome;
+		// Geomorph						geomoprh;
 		ChunkState						state;
 		World							*world;
+		bool							canPrintBlock(std::vector<vbo_type> &tempVbo, BlockPos posMesh);
 		bool							conditionValidate(std::vector<vbo_type> &tempVbo, BlockPos posMesh, bool &b);
-		void							generateGraphics(void);
+		void							validateMesh(char meshIdx);
+		void							validateChunk(void);
 		void							generateVbo(char index, std::vector<vbo_type> tempVbo);
 		void							deleteVbo(char index);
 	public:
@@ -161,16 +162,19 @@ class Chunk{
 		Chunk(World*, ChunkPos);
 		Chunk(const Chunk& copy);
 		
-		void							validateMesh(char meshIdx);
-		void							validateChunk(void);
+		void							printSlice(int z);
 		void							displayChunk(Engine &e);
+		void							generateGraphics(void);
 
-		Block&							get(BlockPos);
-		Block&							get(int my, int x, int y, int z);
+		Block&							getBlock(BlockPos);
+		Block&							getBlock(int my, int x, int y, int z);
+		ChunkPos						getPos(void);
 		Block&							operator[](BlockPos);
-		Chunk&							getNeighboor(Direction);
+		void							operator=(const Chunk	&copy);
+		Chunk							*getNeighboor(Direction);
 
 		Block							*getBlockNeighboor(BlockPos, Direction);
-		bool							blockSurrounded(std::vector<vbo_type> &tempVbo, BlockPos posMesh);
+
+		void							updateFenced(void);
 };
 #endif

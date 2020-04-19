@@ -6,57 +6,79 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/17 17:13:52 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/19 18:56:43 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "World.hpp"
+#include <iostream>
 
 using namespace std;
 using namespace std::filesystem;
 
-World::World(unsigned long *seed = NULL)
+World::World(unsigned long *seed)
 {
-	this->LoadedChunks = new map<ChunkPos, Chunk>();
-	this->RootDirPath = NULL;
-	this->WorldGen = new WorldGenerator(seed);
+	this->worldGen.configure(seed);
 }
 
-World::World(string& pathStr, unsigned long *seed = NULL)
+World::World(string& pathStr, unsigned long *seed)
 {
-	this->LoadedChunks = new map<ChunkPos, Chunk>();
-	this->RootDirPath = new path(pathStr);
-	this->WorldGen = new WorldGenerator(seed);
+	this->rootDirPath.assign(pathStr);
+	this->worldGen.configure(seed);
 }
 
-World::World(path& p, unsigned long *seed = NULL)
+World::World(path& p, unsigned long *seed)
 {
-	this->LoadedChunks = new map<ChunkPos, Chunk>();
-	this->RootDirPath = new path(p);
-	this->WorldGen = new WorldGenerator(seed);
+	this->rootDirPath.assign(p);
+	this->worldGen.configure(seed);
 }
 
-path	*World::getDir(){
-	return this->RootDirPath;
-}
-
-Chunk&	World::get(ChunkPos cp)
+World::~World()
 {
-	return this->LoadedChunks->at(cp);
 }
 
-Chunk&	World::operator[](ChunkPos cp)
+void	World::display(Engine &e)
+{
+	size_t	i;
+
+	i = 0;
+	while (i < this->displayedChunks.size())
+	{
+		this->memoryChunks.at(displayedChunks[i]).displayChunk(e);
+		i++;
+	}
+}
+
+path	World::getDir(){
+	return this->rootDirPath;
+}
+
+Chunk	*World::get(ChunkPos cp)
+{
+	if (this->memoryChunks.count(cp) == 0)
+		return NULL;
+	return &this->memoryChunks.at(cp); // Potentiellement optimisable
+}
+
+Chunk	*World::operator[](ChunkPos cp)
 {
 	return this->get(cp);
 }
 
-void	World::loadChunk(ChunkPos cp){
-	if (this->LoadedChunks->find(cp) == this->LoadedChunks->end())
+void	World::loadChunk(ChunkPos cp)
+{
+	if (this->memoryChunks.count(cp) == 0)
 	{
 		Chunk	newChunk = Chunk(this, cp);
-		this->WorldGen->genChunk(newChunk);
-		this->LoadedChunks->at(cp) = newChunk;
-		newChunk.validateChunk();
+		this->worldGen.genChunk(newChunk);
+		printf("avant\n");
+		this->memoryChunks[cp] = newChunk;
+		printf("apres\n");
+		// this->memoryChunks[cp].printSlice(0);
+		newChunk.printSlice(0);
+		newChunk.updateFenced();
+		newChunk.generateGraphics();
+		displayedChunks.push_back(newChunk.getPos()); // displayQueue
 	}
 }
 

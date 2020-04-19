@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 20:07:59 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/17 16:53:34 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/19 17:31:01 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,22 +56,18 @@ namespace Coords{
 			{
 				return this->get(i);
 			}
-			Coords<T, dims> &add(Coords<T, dims> a)
+			Coords<T, dims> add(Coords<T, dims> a)
 			{
+				Coords<T, dims> out(*this);
 				for (unsigned i = 0; i < dims; i++)
 				{
-					this->attr[i] += a.get(i);
+					out[i] += a.get(i);
 				}
-				return *this;
+				return out;
 			}
-			inline		Coords<T, dims> &operator+(Coords<T, dims> a)
+			inline		Coords<T, dims> operator+(Coords<T, dims> a)
 			{
 				return (this->add(a));
-			}
-
-			inline		Coords<T, dims> &operator-(Coords<T, dims> a)
-			{
-				return (this->add(-a));
 			}
 
 			inline bool	operator<(const Coords<T, dims>& a) const
@@ -87,6 +83,15 @@ namespace Coords{
 						return this->getConst(i) < a.getConst(i);
 				}
 				return false;
+			}
+			inline bool operator==(const Coords<T, dims>& a) const
+			{
+				for (int i = 0; i < dims; i++)
+				{
+					if (this->getConst(i) != a.getConst(i))
+						return false;
+				}
+				return true;
 			}
 	};
 	
