@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:17:27 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/19 18:51:38 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/20 05:06:00 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,7 +146,7 @@ class Chunk{
 		std::map<char, unsigned int>	valid;
 		// unsigned int	ebo[16];
 		ChunkPos						pos;
-		// Biome							biome;
+		// Biome						biome;
 		// Geomorph						geomoprh;
 		ChunkState						state;
 		World							*world;
@@ -168,6 +168,7 @@ class Chunk{
 
 		Block&							getBlock(BlockPos);
 		Block&							getBlock(int my, int x, int y, int z);
+		void							setBlock(BlockPos, t_block_info);
 		ChunkPos						getPos(void);
 		Block&							operator[](BlockPos);
 		void							operator=(const Chunk	&copy);

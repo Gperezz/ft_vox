@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/19 18:56:43 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/20 01:05:28 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,15 +67,13 @@ Chunk	*World::operator[](ChunkPos cp)
 
 void	World::loadChunk(ChunkPos cp)
 {
+	printf(YELLOW "%d %d\n" NA, cp.get(0), cp.get(1));
 	if (this->memoryChunks.count(cp) == 0)
 	{
 		Chunk	newChunk = Chunk(this, cp);
 		this->worldGen.genChunk(newChunk);
-		printf("avant\n");
 		this->memoryChunks[cp] = newChunk;
-		printf("apres\n");
-		// this->memoryChunks[cp].printSlice(0);
-		newChunk.printSlice(0);
+		this->memoryChunks[cp].printSlice(0);
 		newChunk.updateFenced();
 		newChunk.generateGraphics();
 		displayedChunks.push_back(newChunk.getPos()); // displayQueue

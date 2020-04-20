@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 20:07:59 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/19 17:31:01 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/20 02:13:53 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ namespace Coords{
 				memcpy(this->attr, toClone.attr, sizeof(T) * dims);
 			}
 
-			float	distance(Coords<T, dims> &toMesure){
+			float		distance(Coords<T, dims> &toMesure){
 				float out = 0;
 				
 				for (unsigned i = 0; i < dims; i++)
@@ -42,12 +42,12 @@ namespace Coords{
 				}
 			}
 
-			T&		get(const unsigned i)
+			T&			get(const unsigned i)
 			{
 				return (this->attr[i]);
 			}
 			
-			const T&		getConst(const unsigned i) const
+			const T&	getConst(const unsigned i) const
 			{
 				return (this->attr[i]);
 			}
@@ -74,17 +74,13 @@ namespace Coords{
 			{
 				for (unsigned int i = 0; i < dims; i++)
 				{
-					if (this->getConst(i) == a.getConst(i))
-					{
-						i++;
-						continue ;
-					}
-					else
+					if (this->getConst(i) != a.getConst(i))
 						return this->getConst(i) < a.getConst(i);
 				}
 				return false;
 			}
-			inline bool operator==(const Coords<T, dims>& a) const
+
+			inline bool	isEgal(const Coords<T, dims>& a) const
 			{
 				for (int i = 0; i < dims; i++)
 				{
@@ -92,6 +88,16 @@ namespace Coords{
 						return false;
 				}
 				return true;
+			}
+
+			inline bool	operator==(const Coords<T, dims>& a) const
+			{
+				return (isEgal(a));
+			}
+
+			inline bool	operator!=(const Coords<T, dims>& a) const
+			{
+				return (!isEgual(a));
 			}
 	};
 	

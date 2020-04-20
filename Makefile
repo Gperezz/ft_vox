@@ -6,7 +6,7 @@
 #    By: gperez <gperez@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/01/06 13:36:11 by gperez            #+#    #+#              #
-#    Updated: 2020/04/17 16:43:02 by gperez           ###   ########.fr        #
+#    Updated: 2020/04/20 02:09:42 by gperez           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -71,6 +71,7 @@ LIBS_H =	libs/libft/includes \
 LIBS = $(addprefix -I,$(LIBS_H))
 
 INC =	includes/ft_vox.hpp \
+		includes/Coords.hpp \
 
 OBJ = $(SRC:.cc=.o)
 

@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/19 18:55:19 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/20 03:53:34 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,6 @@ using namespace std;
 
 Chunk::Chunk()
 {
-	printf("INIT!!!\n");
-
 	this->state = UNFENCED;
 	bzero(this->blocks, sizeof(this->blocks));
 }
@@ -48,7 +46,7 @@ void		Chunk::operator=(const Chunk& copy)
 	this->state = copy.state;
 	this->pos = copy.pos;
 	this->world = copy.world;
-	memcpy((void*)copy.blocks, this->blocks, sizeof(copy.blocks));
+	memcpy(this->blocks, (void*)copy.blocks, sizeof(copy.blocks));
 }
 
 static void	fillTempVbo(vector<vbo_type> &tempVbo, BlockPos pts[6], BlockPos posMesh, int id)
@@ -78,7 +76,7 @@ bool		Chunk::canPrintBlock(vector<vbo_type> &tempVbo, BlockPos posMesh)
 	while (i < 6)
 	{
 		Block *tmp = this->getBlockNeighboor(posMesh, (Direction)i);
-		if (tmp && tmp->getInfo().id == 0)
+		if (!tmp || (tmp && tmp->getInfo().id == 0))
 		{
 			dir += 1;
 			fillTempVbo(tempVbo, (BlockPos*)g_dir_c[i].pts, posMesh,
@@ -95,16 +93,12 @@ bool		Chunk::conditionValidate(vector<vbo_type> &tempVbo, BlockPos posMesh, bool
 	if (this->getBlock(posMesh).getInfo().id == AIR
 		|| !this->canPrintBlock(tempVbo, posMesh))
 		return (0);
-	ft_printf(RED"HERE\n" NA);
 	b = 1;
 	return (1);
 }
 
 void		Chunk::generateGraphics(void)
 {
-	unsigned int	i;
-
-	i = 0;
 	if (Chunk::state == UNFENCED)
 		return ;
 	Chunk::validateChunk();
@@ -161,17 +155,20 @@ void		Chunk::validateMesh(char meshIdx)
 	}
 	if (validateValue)
 	{
-		ft_printf(GREEN "validateValue %d\n" NA, meshIdx);
 		generateVbo(meshIdx, tempVbo);
-		ft_printf(GREEN "generate VBO %d\n" NA, meshIdx);
-		this->valid[meshIdx] = tempVbo.size() * 6;
+		ft_printf(GREEN "generate VBO (Mesh %d) %d \n" NA, meshIdx, tempVbo.size() * 9);
+		this->valid.insert({meshIdx, tempVbo.size() * 9});
 	}
 }
 
 void		Chunk::validateChunk(void)
 {
+	ft_printf(ORANGE "Validating Chunk %d %d\n" NA, this->pos.get(0), this->pos.get(1));
 	for (unsigned i = 0; i < 16; i++)
+	{
+		ft_printf(ORANGE "Validating Mesh %d\n" NA, i);
 		validateMesh(i);
+	}
 }
 
 void		Chunk::displayChunk(Engine &e)
@@ -179,6 +176,7 @@ void		Chunk::displayChunk(Engine &e)
 	std::map<char, unsigned int>::iterator	it = this->valid.begin();
 	Shader&									shader(e.getShader());
 
+	ft_printf(RED "%d %u\n" NA, it->first, it->second);
 	// ft_printf(YELLOW"%d %d\n" NA, this->getPos().get(0), this->getPos().get(1));
 	while (it != this->valid.end())
 	{
@@ -189,20 +187,6 @@ void		Chunk::displayChunk(Engine &e)
 			"view"), 1, GL_FALSE, glm::value_ptr(e.getCam().getMatrix()));
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),
 			"projection"), 1, GL_FALSE, glm::value_ptr(e.getCam().getProjMatrix()));
-		// glUniform1i(glGetUniformLocation(prog, "basicTexture"), i_t >= T_END_OBJ
-			// ? g_objs_entities[0].index_txt : g_objs_entities[entities[i]->getType()].index_txt);
-		// glUniform2f(glGetUniformLocation(prog, "envx"),
-			// entities[i]->getXMin(), entities[i]->getXMax());
-		// glUniform2f(glGetUniformLocation(prog, "envy"),
-			// entities[i]->getYMin(), entities[i]->getYMax());
-		// glUniform2f(glGetUniformLocation(prog, "envz"),
-			// entities[i]->getZMin(), entities[i]->getZMax());
-		// glUniformMatrix4fv(glGetUniformLocation(prog,
-		// 	"model"), 1, GL_FALSE, glm::value_ptr(entities[i]->calcMatrix()));
-		// glUniformMatrix4fv(glGetUniformLocation(prog,
-		// 	"view"), 1, GL_FALSE, glm::value_ptr(cam.calcMatrix()));
-		// glUniformMatrix4fv(glGetUniformLocation(prog,
-		// 	"projection"), 1, GL_FALSE, glm::value_ptr(cam.getProjMatrix()));
 		glDrawArrays(GL_TRIANGLES, 0, it->second);
 		it++;
 	}
@@ -253,6 +237,11 @@ Block&		Chunk::getBlock(int my, int x, int y, int z)
 	return this->blocks[my][x][y][z];
 }
 
+void		Chunk::setBlock(BlockPos blockPos, t_block_info info)
+{
+	this->blocks[blockPos.get(0)][blockPos.get(1)][blockPos.get(2)][blockPos.get(3)] = info;
+}
+
 ChunkPos	Chunk::getPos(void)
 {
 	return this->pos;
@@ -282,4 +271,5 @@ void		Chunk::printSlice(int z)
 		meshPos[Y]++;
 		meshPos[X] = 0;
 	}
+	printf("\n");
 }
