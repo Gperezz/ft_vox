@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/20 03:21:39 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/20 20:20:35 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,8 +42,8 @@ int		main(void)
 	ft_printf(RED"prog %u\n" NA, shader.getProgram());
 	env.getCam().setProjMatrix(glm::perspective(glm::radians(45.0f),
 		(float)WIDTH / (float)HEIGHT, 0.1f, (float)RENDER_DIST));
-	env.getCam().translate((glm::vec3){0.0, 30.0, 0.0});
-	env.getCam().rotate((glm::vec3){45, 0, 0});
+	env.getCam().translate((glm::vec3){0.0, 0.0, 0.0});
+	env.getCam().rotate((glm::vec3){0, 0, 0});
 	glEnable(GL_DEPTH_TEST);
 	// glEnable(GL_BLEND);
 	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

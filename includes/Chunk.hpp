@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:17:27 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/20 05:06:00 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/20 20:05:08 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,7 +153,6 @@ class Chunk{
 		bool							canPrintBlock(std::vector<vbo_type> &tempVbo, BlockPos posMesh);
 		bool							conditionValidate(std::vector<vbo_type> &tempVbo, BlockPos posMesh, bool &b);
 		void							validateMesh(char meshIdx);
-		void							validateChunk(void);
 		void							generateVbo(char index, std::vector<vbo_type> tempVbo);
 		void							deleteVbo(char index);
 	public:
@@ -161,21 +160,23 @@ class Chunk{
 		Chunk(World*);
 		Chunk(World*, ChunkPos);
 		Chunk(const Chunk& copy);
-		
-		void							printSlice(int z);
-		void							displayChunk(Engine &e);
-		void							generateGraphics(void);
 
+		void							printSlice(int z);
+		
 		Block&							getBlock(BlockPos);
 		Block&							getBlock(int my, int x, int y, int z);
 		void							setBlock(BlockPos, t_block_info);
 		ChunkPos						getPos(void);
-		Block&							operator[](BlockPos);
-		void							operator=(const Chunk	&copy);
-		Chunk							*getNeighboor(Direction);
+		bool							getFenced(void);
+		void							updateFenced(void);
 
+		Chunk							*getNeighboor(Direction);
 		Block							*getBlockNeighboor(BlockPos, Direction);
 
-		void							updateFenced(void);
+		void							generateGraphics(void);
+		void							displayChunk(Engine &e);
+
+		Block&							operator[](BlockPos);
+		void							operator=(const Chunk	&copy);
 };
 #endif

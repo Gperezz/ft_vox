@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:08:20 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/20 00:25:05 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/20 19:31:46 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ class World
 {
 	private:
 		set<ChunkPos>				loadQueue;
-		map<ChunkPos, Chunk>		memoryChunks;
+		map<ChunkPos, Chunk*>		memoryChunks;
 		set<ChunkPos>				graphicQueue;
 		vector<ChunkPos>			displayedChunks;
 		path						rootDirPath;
