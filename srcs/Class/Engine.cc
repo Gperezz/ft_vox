@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/16 17:29:36 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/26 11:04:54 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ using namespace std;
 
 Engine::Engine()
 {
+	
 }
 
 static void		framebuffer_size_callback(GLFWwindow* window, int width, int height)

@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/20 20:13:08 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/26 11:32:15 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -249,7 +249,7 @@ void		Chunk::displayChunk(Engine &e)
 
 	while (it != this->valid.end())
 	{
-		ft_printf(CYAN "%d %u\n" NA, it->first, it->second);
+		// ft_printf(CYAN "%d %u\n" NA, it->first, it->second);
 		glBindVertexArray(this->tabVao[(int)it->first]);
 		glUseProgram(shader.getProgram());
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),

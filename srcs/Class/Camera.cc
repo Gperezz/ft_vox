@@ -6,14 +6,16 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/04 23:48:55 by gperez            #+#    #+#             */
-/*   Updated: 2020/03/30 18:06:51 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/22 19:44:21 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Camera.hpp"
+#include "ft_printf.h"
 
 Camera::Camera()
 {
+	ft_printf(RED "CAM\n" NA);
 	Mat();
 	Camera::projection.setMatrix(glm::mat4(1.0f));
 }

@@ -6,14 +6,16 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/04 23:19:34 by gperez            #+#    #+#             */
-/*   Updated: 2020/03/30 18:05:57 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/26 10:57:51 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Mat.hpp"
+#include "ft_printf.h"
 
 Mat::Mat()
 {
+	ft_printf(RED "HERE\n" NA);
 	Mat::matrix = glm::mat4(1.0f);
 	Mat::trans = glm::vec3(0.0, 0.0, 0.0);
 	Mat::rot = glm::vec3(0.0, 0.0, 0.0);

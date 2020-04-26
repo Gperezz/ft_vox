@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/20 20:07:03 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/26 11:32:45 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,12 +51,12 @@ void	World::display(Engine &e)
 	i = 0;
 	while (i < this->displayedChunks.size())
 	{
-		ft_printf(BLUE "Display Chunk{%d %d}\n" NA, this->displayedChunks[i].get(0),
-			this->displayedChunks[i].get(1));
+		// ft_printf(BLUE "Display Chunk{%d %d}\n" NA, this->displayedChunks[i].get(0),
+			// this->displayedChunks[i].get(1));
 		this->memoryChunks.at(this->displayedChunks[i])->displayChunk(e);
 		i++;
 	}
-	ft_printf("\n");
+	// ft_printf("\n");
 }
 
 path	World::getDir(){
