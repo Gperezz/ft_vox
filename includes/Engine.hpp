@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:35:15 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/26 11:25:31 by gperez           ###   ########.fr       */
+/*   Updated: 2020/05/05 11:58:58 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,43 +25,22 @@ extern "C"
 
 # include "Shader.hpp"
 # include "Camera.hpp"
+# include "Textures.hpp"
 # include <iostream>
+# include <vector>
 
 # define WIDTH 800
 # define HEIGHT 600
 # define RENDER_DIST 100.0f
 
-struct vbo_test {
-	float tab[3];
-	unsigned meta;
-};
-
-// static struct vbo_test TEST[] = {
-// 	{{-1.0, -1.0, 0.0}, 1324124124},
-// 	{{1.0, -1.0, 0.0}, 123412},
-// 	{{0.0, 1.0, 0.0}, 23434654},
-// 	{{2.0, 0.0, 0.0}, 23434654},
-// 	{{-1.0, -1.0, 0.0}, 124124124},
-// 	{{1.0, -1.0, 0.0}, 12341243},
-// 	{{0.0, 1.0, 0.0}, 23434654}
-// };
-
-// static unsigned int EBO[] = {
-// 	0, 1, 2, 9,
-// 	3, 4, 5, 9,
-// 	6, 7, 8, 9
-// };
-
-static unsigned int EBO[] = {
-	0, 1, 2
-};
-
 class Engine
 {
 	private:
-		GLFWwindow	*window;
-		Camera		camera;
-		Shader		shader;
+		GLFWwindow				*window;
+		Camera					camera;
+		Shader					shader;
+		std::vector<Textures*>	textures;
+		void					addTexture(char *path);
 	public:
 		Engine();
 		int			initWindow(void);
@@ -69,6 +48,8 @@ class Engine
 		Camera&		getCam(void);
 		void		setCam(Camera cam);
 		Shader&		getShader(void);
+		void		genTextures(void);
+		Textures	*getTexture(int t);
 		~Engine();
 };
 

@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/26 11:32:15 by gperez           ###   ########.fr       */
+/*   Updated: 2020/05/05 13:11:14 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,8 @@ static void	fillTempVbo(vector<vbo_type> &tempVbo, BlockPos pts[6], BlockPos pos
 		vboType.tab[0] = pts[iPt].get(X) + posMesh.get(X);
 		vboType.tab[1] = pts[iPt].get(Y) + posMesh.get(Y);
 		vboType.tab[2] = pts[iPt].get(Z) + posMesh.get(Z);
+		// ft_printf(MAGENTA "X:%d Y:%d Z:%d\n" NA, posMesh.get(X), posMesh.get(Y), posMesh.get(Z));
+		// ft_printf(CYAN "X:%f Y:%f Z:%f\n" NA, vboType.tab[0], vboType.tab[1], vboType.tab[2]);
 		vboType.meta = id;
 		tempVbo.push_back(vboType);
 		iPt++;
@@ -95,7 +97,7 @@ void		Chunk::generateVbo(char index, vector<vbo_type> tempVbo)
 	glBindVertexArray(tabVao[(int)index]);
 	glGenBuffers(1, &(Chunk::tabVbo[(int)index]));
 	glBindBuffer(GL_ARRAY_BUFFER, tabVbo[(int)index]);
-	glBufferData(GL_ARRAY_BUFFER, tempVbo.size() * sizeof(vbo_type), &tempVbo, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, tempVbo.size() * sizeof(vbo_type), &tempVbo[0], GL_STATIC_DRAW);
 	// glGenBuffers(1, &ebo);
 	// glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 	// glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(EBO),
@@ -121,6 +123,7 @@ void		Chunk::validateMesh(char meshIdx)
 	pos[MY] = meshIdx;
 	while (pos[X] < 16)
 	{
+		// ft_printf(BOLD_YELLOW "X = %d\n" NA, pos[X]);
 		while (pos[Y] < 16)
 		{
 			while (pos[Z] < 16)
@@ -128,15 +131,18 @@ void		Chunk::validateMesh(char meshIdx)
 				conditionValidate(tempVbo, pos, validateValue);
 				pos[Z]++;
 			}
+			pos[Z] = 0;
+			break;
 			pos[Y]++;
 		}
+		pos[Y] = 0;
 		pos[X]++;
 	}
-	if (validateValue)
+	if (validateValue && tempVbo.size())
 	{
 		generateVbo(meshIdx, tempVbo);
-		ft_printf(GREEN "generate VBO (Mesh %d) %d \n" NA, meshIdx, tempVbo.size() * 9);
-		this->valid.insert({meshIdx, tempVbo.size() * 9});
+		ft_printf(GREEN "generate VBO (Mesh %d) %d points (%d floats)\n" NA, meshIdx, tempVbo.size(), tempVbo.size() * 3);
+		this->valid.insert({meshIdx, tempVbo.size()});
 	}
 }
 
@@ -242,20 +248,26 @@ void		Chunk::generateGraphics(void)
 	}
 }
 
-void		Chunk::displayChunk(Engine &e)
+void		Chunk::displayChunk(Engine &e, glm::mat4 world)
 {
 	std::map<char, unsigned int>::iterator	it = this->valid.begin();
 	Shader&									shader(e.getShader());
+	Textures								*t;
 
+	t = e.getTexture(GROUND_TXT);
 	while (it != this->valid.end())
 	{
 		// ft_printf(CYAN "%d %u\n" NA, it->first, it->second);
 		glBindVertexArray(this->tabVao[(int)it->first]);
 		glUseProgram(shader.getProgram());
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),
-			"view"), 1, GL_FALSE, glm::value_ptr(e.getCam().getMatrix()));
+			"world"), 1, GL_FALSE, glm::value_ptr(world));
+		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),
+			"view"), 1, GL_FALSE, glm::value_ptr(e.getCam().getMatrix(true)));
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),
 			"projection"), 1, GL_FALSE, glm::value_ptr(e.getCam().getProjMatrix()));
+		glUniform1i(glGetUniformLocation(shader.getProgram(),
+			"basicTexture"), t ? t->getTxt() : 0);
 		glDrawArrays(GL_TRIANGLES, 0, it->second);
 		it++;
 	}

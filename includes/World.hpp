@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:08:20 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/20 19:31:46 by gperez           ###   ########.fr       */
+/*   Updated: 2020/05/05 12:08:48 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ class World
 		vector<ChunkPos>			displayedChunks;
 		path						rootDirPath;
 		WorldGenerator				worldGen;
+		Mat							worldMatrix;
 	public:
 			World(unsigned long* = NULL);
 			World(string&, unsigned long* = NULL);
@@ -48,6 +49,7 @@ class World
 	path	getDir();
 	void	loadChunk(ChunkPos);
 	void	loadChunk(int x, int z);
+	Mat		&getWorldMat(void);
 	Chunk	*get(ChunkPos);
 	Chunk	*operator[](ChunkPos);
 }; 

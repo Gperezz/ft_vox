@@ -6,38 +6,25 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/04 23:19:34 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/26 10:57:51 by gperez           ###   ########.fr       */
+/*   Updated: 2020/05/05 12:39:02 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Mat.hpp"
-#include "ft_printf.h"
 
 Mat::Mat()
 {
-	ft_printf(RED "HERE\n" NA);
 	Mat::matrix = glm::mat4(1.0f);
 	Mat::trans = glm::vec3(0.0, 0.0, 0.0);
 	Mat::rot = glm::vec3(0.0, 0.0, 0.0);
 	Mat::sc = glm::vec3(1.0, 1.0, 1.0);
 }
 
-glm::mat4	Mat::getMatrix(void) const
+glm::mat4	Mat::getMatrix(bool calc)
 {
-	return (Mat::matrix);
-}
-
-glm::mat4	Mat::calcMatrix(void)
-{
-	Mat::matrix = glm::translate(glm::mat4(1.0f), Mat::trans);
-
-	Mat::matrix = glm::rotate(Mat::matrix, glm::radians(Mat::rot.x), glm::vec3(1.0, 0.0, 0.0));
-	Mat::matrix = glm::rotate(Mat::matrix, glm::radians(Mat::rot.y), glm::vec3(0.0, 1.0, 0.0));
-	Mat::matrix = glm::rotate(Mat::matrix, glm::radians(Mat::rot.z), glm::vec3(0.0, 0.0, 1.0));
-
-	Mat::matrix = glm::scale(Mat::matrix, Mat::sc);
-
-	return (Mat::matrix);
+	if (calc)
+		this->calcMatrix();
+	return (this->matrix);
 }
 
 glm::mat4	Mat::calcMatrix(glm::vec3 t, glm::vec3 r, glm::vec3 s)
@@ -53,6 +40,12 @@ glm::mat4	Mat::calcMatrix(glm::vec3 t, glm::vec3 r, glm::vec3 s)
 	matrix = glm::scale(matrix, s);
 
 	return (matrix);
+}
+
+glm::mat4	Mat::calcMatrix(void)
+{
+	this->matrix = this->calcMatrix(this->trans, this->rot, this->sc);
+	return (this->matrix);
 }
 
 void		Mat::setMatrix(glm::mat4 mat)
@@ -86,9 +79,11 @@ void		Mat::printMatrix(glm::mat4 mat)
 	ft_putchar('\n');
 }
 
-void		Mat::printMatrix(void)
+void		Mat::printMatrix(bool calc)
 {
-	Mat::printMatrix(Mat::matrix);
+	if (calc)
+		this->calcMatrix();
+	this->printMatrix(this->matrix);
 }
 
 void		Mat::translate(glm::vec3 v)

@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:17:27 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/20 20:05:08 by gperez           ###   ########.fr       */
+/*   Updated: 2020/05/05 12:20:09 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,8 +93,8 @@ static t_direction_consts	g_dir_c[] = {
 	// WEST
 	{BlockPos((int[4]){0,1,0,0}), ChunkPos((int[2]){1, 0}), X, 1,
 		{
-			t_cube_pt[7], t_cube_pt[6], t_cube_pt[3],
-			t_cube_pt[7], t_cube_pt[3], t_cube_pt[4],
+			t_cube_pt[4], t_cube_pt[5], t_cube_pt[1],
+			t_cube_pt[4], t_cube_pt[1], t_cube_pt[0],
 		}
 	},
 	// SOUTH
@@ -107,8 +107,8 @@ static t_direction_consts	g_dir_c[] = {
 	// EAST
 	{BlockPos((int[4]){0,-1,0,0}), ChunkPos((int[2]){-1, 0}), X, 0,
 		{
-			t_cube_pt[0], t_cube_pt[1], t_cube_pt[5],
-			t_cube_pt[0], t_cube_pt[5], t_cube_pt[4],
+			t_cube_pt[3], t_cube_pt[2], t_cube_pt[6],
+			t_cube_pt[3], t_cube_pt[6], t_cube_pt[7],
 		}
 	},
 	// UP
@@ -174,7 +174,7 @@ class Chunk{
 		Block							*getBlockNeighboor(BlockPos, Direction);
 
 		void							generateGraphics(void);
-		void							displayChunk(Engine &e);
+		void							displayChunk(Engine &e, glm::mat4 world);
 
 		Block&							operator[](BlockPos);
 		void							operator=(const Chunk	&copy);

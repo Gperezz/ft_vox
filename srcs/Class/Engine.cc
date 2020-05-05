@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/26 11:04:54 by gperez           ###   ########.fr       */
+/*   Updated: 2020/04/28 22:01:59 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ Engine::Engine()
 	
 }
 
-static void		framebuffer_size_callback(GLFWwindow* window, int width, int height)
+static void	framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	(void)window;
 	glViewport(0, 0, width, height);
@@ -73,6 +73,55 @@ Shader&		Engine::getShader(void)
 	return (Engine::shader);
 }
 
+void		Engine::genTextures(void)
+{
+	int		i;
+
+	i = 0;
+	while (i < END_TXT && i < 16)
+	{
+		this->addTexture((char*)g_txt_path[i].path_txt);
+		i++;
+	}
+}
+
+Textures	*Engine::getTexture(int t)
+{
+	if ((unsigned int)t < this->textures.size())
+		return (this->textures[t]);
+	return (NULL);
+}
+
 Engine::~Engine()
 {
+	int	i;
+
+	i = 0;
+	while ((unsigned int)i < this->textures.size())
+	{
+		delete this->textures[i];
+		i++;
+	}
+}
+
+///////////////Private///////////////
+
+void	Engine::addTexture(char *path)
+{
+	unsigned int	textIdx;
+	Textures		*t;
+
+	this->textures.push_back(new Textures(path));
+	glGenTextures(1, &textIdx);
+	t = this->textures[this->textures.size() - 1];
+	t->setTxt(textIdx);
+	glActiveTexture(GL_TEXTURE0 + this->textures.size());
+	glBindTexture(GL_TEXTURE_2D, t->getTxt());
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, t->getWidth(), t->getHeight(), 0,
+		GL_RGB, GL_UNSIGNED_BYTE, t->getTxtData());
+	glGenerateMipmap(GL_TEXTURE_2D);
 }

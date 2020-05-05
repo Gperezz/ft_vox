@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/04 23:29:17 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/22 19:44:31 by gperez           ###   ########.fr       */
+/*   Updated: 2020/05/05 12:39:02 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,12 +25,10 @@ class					Mat
 {
 	public:
 		Mat();
-		glm::mat4			getMatrix(void) const;
-		glm::mat4			calcMatrix(void);
-		static glm::mat4	calcMatrix(glm::vec3 t, glm::vec3 r, glm::vec3 s);
+		glm::mat4			getMatrix(bool calc);
 		void				setMatrix(glm::mat4 mat);
-		void				printMatrix(void);
-		static void			printMatrix(glm::mat4 mat);
+		void				printMatrix(bool calc);
+		void				printMatrix(glm::mat4 mat);
 		void				translate(glm::vec3 v);
 		glm::vec3			getTranslate(void);
 		void				setTranslate(glm::vec3 v);
@@ -45,6 +43,10 @@ class					Mat
 		glm::vec3		trans;
 		glm::vec3		rot;
 		glm::vec3		sc;
+
+		glm::mat4			calcMatrix(glm::vec3 t, glm::vec3 r, glm::vec3 s);
+		glm::mat4			calcMatrix(void);
+
 };
 
 #endif

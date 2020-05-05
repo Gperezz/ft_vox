@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/26 11:32:45 by gperez           ###   ########.fr       */
+/*   Updated: 2020/05/05 12:39:32 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ void	World::display(Engine &e)
 	{
 		// ft_printf(BLUE "Display Chunk{%d %d}\n" NA, this->displayedChunks[i].get(0),
 			// this->displayedChunks[i].get(1));
-		this->memoryChunks.at(this->displayedChunks[i])->displayChunk(e);
+		this->memoryChunks.at(this->displayedChunks[i])->displayChunk(e, this->getWorldMat().getMatrix(true));
 		i++;
 	}
 	// ft_printf("\n");
@@ -96,4 +96,9 @@ void	World::loadChunk(ChunkPos cp)
 void	World::loadChunk(int x, int z)
 {
 	return this->loadChunk(ChunkPos((int[2]){x, z}));
+}
+
+Mat		&World::getWorldMat(void)
+{
+	return (this->worldMatrix);
 }

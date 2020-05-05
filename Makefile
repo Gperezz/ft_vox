@@ -6,7 +6,7 @@
 #    By: gperez <gperez@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/01/06 13:36:11 by gperez            #+#    #+#              #
-#    Updated: 2020/04/20 02:09:42 by gperez           ###   ########.fr        #
+#    Updated: 2020/05/05 13:27:16 by gperez           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,6 +23,7 @@ APP = -framework AppKit
 SRC =	srcs/main.cc \
 		srcs/Class/Engine.cc \
 		srcs/Class/Shader.cc \
+		srcs/Class/Textures.cc \
 		srcs/Class/Camera.cc \
 		srcs/Class/Mat.cc \
 		srcs/Class/World.cc \
@@ -94,9 +95,10 @@ $(NAME) : $(LIB_L) $(LIB_P) $(OBJ)
 	@printf "\r"
 
 clean :
-	@make -C libs/libft clean
-	@make -C libs/ft_printf clean
+	# @make -C libs/libft clean
+	# @make -C libs/ft_printf clean
 	@/bin/rm -rf srcs/*.o
+	@/bin/rm -rf srcs/Class/*.o
 
 fclean : clean
 	@/bin/rm -rf $(NAME)
@@ -104,3 +106,7 @@ fclean : clean
 	@/bin/rm -rf $(LIB_P)
 
 re : fclean all
+
+push : fclean
+	@make -C libs/libft clean
+	@make -C libs/ft_printf clean

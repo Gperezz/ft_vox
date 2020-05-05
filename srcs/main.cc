@@ -6,16 +6,28 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/26 11:37:54 by gperez           ###   ########.fr       */
+/*   Updated: 2020/05/05 13:16:17 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_vox.hpp"
 
-void	key(Engine &env)
+void	key(Engine &env, Mat &world)
 {
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(env.getWindow(), true);
+	if (glfwGetKey(env.getWindow(), GLFW_KEY_S) == GLFW_PRESS)
+		world.translate((glm::vec3){0, 0, 0.1});
+	if (glfwGetKey(env.getWindow(), GLFW_KEY_W) == GLFW_PRESS)
+		world.translate((glm::vec3){0, 0, -0.1});
+	if (glfwGetKey(env.getWindow(), GLFW_KEY_A) == GLFW_PRESS)
+		world.translate((glm::vec3){-0.1, 0, 0});
+	if (glfwGetKey(env.getWindow(), GLFW_KEY_D) == GLFW_PRESS)
+		world.translate((glm::vec3){0.1, 0, 0});
+	if (glfwGetKey(env.getWindow(), GLFW_KEY_SPACE) == GLFW_PRESS)
+		world.translate((glm::vec3){0, -0.1, 0});
+	if (glfwGetKey(env.getWindow(), GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+		world.translate((glm::vec3){0, 0.1, 0});
 }
 
 void	exec(World &world, Engine &env)
@@ -23,7 +35,7 @@ void	exec(World &world, Engine &env)
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	key(env);
+	key(env, world.getWorldMat());
 	world.display(env);
 	glfwSwapBuffers(env.getWindow());
 	glfwPollEvents();
@@ -40,14 +52,16 @@ int		main(void)
 	env.initWindow();
 	shader.loadShader((char*)VERTEX, (char*)FRAGMENT);
 	ft_printf(RED"prog %u\n" NA, shader.getProgram());
+	env.genTextures();
 	env.getCam().setProjMatrix(glm::perspective(glm::radians(45.0f),
 		(float)WIDTH / (float)HEIGHT, 0.1f, (float)RENDER_DIST));
-	env.getCam().translate((glm::vec3){0.0, -2.0, -100.0});
-	env.getCam().rotate((glm::vec3){0, 0, 0});
+	env.getCam().setTranslate((glm::vec3){0, -5, -5});
+	env.getCam().rotate((glm::vec3){20, 180, 0});
 	
-	env.getCam().calcMatrix();
-	env.getCam().printMatrix();
+	ft_printf(MAGENTA "Cam Matrix\n" NA);
+	env.getCam().printMatrix(true);
 
+	ft_printf(MAGENTA "Projection Matrix\n" NA);
 	env.getCam().printProjectionMatrix();
 	glEnable(GL_DEPTH_TEST);
 	// glEnable(GL_BLEND);
