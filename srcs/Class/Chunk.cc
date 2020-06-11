@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2020/05/05 13:11:14 by gperez           ###   ########.fr       */
+/*   Updated: 2020/05/08 19:48:51 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ Chunk::Chunk(const Chunk& copy)
 	this->operator=(copy);
 }
 
-static void	fillTempVbo(vector<vbo_type> &tempVbo, BlockPos pts[6], BlockPos posMesh, int id)
+static void	fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, BlockPos posMesh, int id)
 {
 	int			iPt;
 	vbo_type	vboType;
@@ -49,12 +49,13 @@ static void	fillTempVbo(vector<vbo_type> &tempVbo, BlockPos pts[6], BlockPos pos
 	iPt = 0;
 	while (iPt < 6)
 	{
-		vboType.tab[0] = pts[iPt].get(X) + posMesh.get(X);
-		vboType.tab[1] = pts[iPt].get(Y) + posMesh.get(Y);
-		vboType.tab[2] = pts[iPt].get(Z) + posMesh.get(Z);
+		vboType.tab[0] = dir_c.pts[iPt].get(X) + posMesh.get(X);
+		vboType.tab[1] = dir_c.pts[iPt].get(Y) + posMesh.get(Y);
+		vboType.tab[2] = dir_c.pts[iPt].get(Z) + posMesh.get(Z);
 		// ft_printf(MAGENTA "X:%d Y:%d Z:%d\n" NA, posMesh.get(X), posMesh.get(Y), posMesh.get(Z));
 		// ft_printf(CYAN "X:%f Y:%f Z:%f\n" NA, vboType.tab[0], vboType.tab[1], vboType.tab[2]);
-		vboType.meta = id;
+		vboType.meta = dir_c.axis;
+		(void)id;
 		tempVbo.push_back(vboType);
 		iPt++;
 	}
@@ -73,7 +74,7 @@ bool		Chunk::canPrintBlock(vector<vbo_type> &tempVbo, BlockPos posMesh)
 		if (!tmp || (tmp && tmp->getInfo().id == 0))
 		{
 			dir += 1 << i;
-			fillTempVbo(tempVbo, (BlockPos*)g_dir_c[i].pts, posMesh,
+			fillTempVbo(tempVbo, (t_direction_consts)g_dir_c[i], posMesh,
 				this->getBlock(posMesh).getInfo().id);
 		}
 		i++;
@@ -132,7 +133,6 @@ void		Chunk::validateMesh(char meshIdx)
 				pos[Z]++;
 			}
 			pos[Z] = 0;
-			break;
 			pos[Y]++;
 		}
 		pos[Y] = 0;
@@ -211,29 +211,30 @@ void		Chunk::updateFenced(void)
 Chunk		*Chunk::getNeighboor(Direction dir)
 {
 	if (g_dir_c[dir].axis == Y)
-		return this;
+		return NULL;
 	return this->world->get(this->pos + g_dir_c[dir].chunk_vec);
 }
 
-Block		*Chunk::getBlockNeighboor(BlockPos pos, Direction dir)
+Block		*Chunk::getBlockNeighboor(BlockPos pos, Direction dir) // Fonction peut etre opti
 {
 	struct s_direction_consts&	c(g_dir_c[dir]);
+	Chunk						*neighboor;
 
-	if (pos[c.axis] == c.sens ? 15 : 0)
+	if (pos[c.axis] == 15 && c.block_vec[c.axis] == 1)
 	{
-		if (c.axis == Y)
-		{
-			if (pos[MY] == c.sens ? 15 : 0)
-				return NULL;
-			pos[MY] += c.sens ? 1 : -1;
-			pos[Y] = c.sens ? 0 : 15;
-			return &this->getBlock(pos);
-		}
-		else
-		{
-			pos[c.axis] = c.sens ? 0 : 15;
-			return &this->getNeighboor(dir)->getBlock(pos);
-		}
+		pos[c.axis] = 0;
+		neighboor = this->getNeighboor(dir);
+		if (neighboor)
+			return &neighboor->getBlock(pos);
+		return NULL;
+	}
+	else if (pos[c.axis] == 0 && c.block_vec[c.axis] == -1)
+	{
+		pos[c.axis] = 15;
+		neighboor = this->getNeighboor(dir);
+		if (neighboor)
+			return &neighboor->getBlock(pos);
+		return NULL;
 	}
 	return &this->getBlock(pos + c.block_vec);
 }

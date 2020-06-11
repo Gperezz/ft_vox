@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 17:47:37 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/01 16:50:28 by gperez           ###   ########.fr       */
+/*   Updated: 2020/06/04 21:21:02 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,9 +43,6 @@ class Shader
 		unsigned int	shaderProgram;
 		int				createShader(char *info, const char *vertex_path,
 							const char *frag_path);
-		int				readShader(t_shader *shader, const char file[], char glsl);
-		int				shaderError(int i_s, char *info, char *errorMsg);
-		void			freeTShader(t_shader *shader);
 	public:
 		Shader(void);
 		unsigned int	getProgram(void);
