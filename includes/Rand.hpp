@@ -15,7 +15,9 @@
 
 # include <ctime>
 # include <math.h>
-template <typename T>
+# include <functional>
+
+template <typename T, typename Seed = unsigned long>
 class Rand
 {
 	private:
@@ -23,6 +25,7 @@ class Rand
 		unsigned int a;
 		unsigned int b;
 		unsigned int m;
+		std::hash<Seed> hasher;
 	public:
 		Rand()
 		{
@@ -32,12 +35,13 @@ class Rand
 			nb = time(NULL);
 			generate();
 		}
-		Rand(unsigned long seed)
+		Rand(Seed seed)
 		{
+			hasher = std::hash<Seed>();
 			a = 16807;
 			b = 0;
 			m = 0x7FFFFFFF;
-			nb = seed;
+			nb = hasher(seed);
 			generate();
 		}
 
@@ -47,7 +51,13 @@ class Rand
 			return (nb);
 		}
 
-		T		generate(T min, T max)
+		T	generate(Seed new_seed){
+			nb = hasher(new_seed);
+			generate();
+			return generate();
+		}
+
+		T	generate(T min, T max)
 		{
 			T		rdm;
 
