@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2020/07/28 17:12:48 by gperez           ###   ########.fr       */
+/*   Updated: 2020/07/28 19:49:17 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,12 +50,12 @@ static void	fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, Blo
 	while (iPt < 6)
 	{
 		vboType.tab[0] = dir_c.pts[iPt].get(X) + posMesh.get(X);
-		vboType.tab[1] = dir_c.pts[iPt].get(Y) + posMesh.get(Y);
+		vboType.tab[1] = dir_c.pts[iPt].get(Y) + posMesh.get(Y) + posMesh.get(MY) * 16;
 		vboType.tab[2] = dir_c.pts[iPt].get(Z) + posMesh.get(Z);
 		// ft_printf(MAGENTA "X:%d Y:%d Z:%d\n" NA, posMesh.get(X), posMesh.get(Y), posMesh.get(Z));
 		// ft_printf(CYAN "X:%f Y:%f Z:%f\n" NA, vboType.tab[0], vboType.tab[1], vboType.tab[2]);
 		vboType.meta = dir_c.axis; 
-		// ft_printf(RED"Direction : %d\n" NA, dir_c.axis);
+		// ft_printf(RED"Direction : %d\n" NA, vboType.meta);
 		(void)id;
 		tempVbo.push_back(vboType);
 		iPt++;
@@ -224,7 +224,13 @@ Block		*Chunk::getBlockNeighboor(BlockPos pos, Direction dir) // Fonction peut e
 	if (pos[c.axis] == 15 && c.block_vec[c.axis] == 1)
 	{
 		pos[c.axis] = 0;
-		neighboor = this->getNeighboor(dir);
+		if (c.axis == Y && pos[MY] < 15)
+		{
+			neighboor = this;
+			pos[MY] = pos[MY] + 1;
+		}
+		else
+			neighboor = this->getNeighboor(dir);
 		if (neighboor)
 			return &neighboor->getBlock(pos);
 		return NULL;
@@ -232,7 +238,13 @@ Block		*Chunk::getBlockNeighboor(BlockPos pos, Direction dir) // Fonction peut e
 	else if (pos[c.axis] == 0 && c.block_vec[c.axis] == -1)
 	{
 		pos[c.axis] = 15;
-		neighboor = this->getNeighboor(dir);
+		if (c.axis == Y && pos[MY] > 0)
+		{
+			neighboor = this;
+			pos[MY] = pos[MY] - 1;
+		}
+		else
+			neighboor = this->getNeighboor(dir);
 		if (neighboor)
 			return &neighboor->getBlock(pos);
 		return NULL;

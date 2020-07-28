@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:35:15 by gperez            #+#    #+#             */
-/*   Updated: 2020/05/05 11:58:58 by gperez           ###   ########.fr       */
+/*   Updated: 2020/07/28 19:58:48 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ extern "C"
 
 # define WIDTH 800
 # define HEIGHT 600
-# define RENDER_DIST 100.0f
+# define RENDER_DIST 1000.0f
 
 class Engine
 {

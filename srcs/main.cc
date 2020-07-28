@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2020/05/05 13:16:17 by gperez           ###   ########.fr       */
+/*   Updated: 2020/07/28 19:25:46 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,17 +17,35 @@ void	key(Engine &env, Mat &world)
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(env.getWindow(), true);
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_S) == GLFW_PRESS)
+	{
 		world.translate((glm::vec3){0, 0, 0.1});
+		world.printMatrix(true);
+	}
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_W) == GLFW_PRESS)
+	{
 		world.translate((glm::vec3){0, 0, -0.1});
+		world.printMatrix(true);
+	}
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_A) == GLFW_PRESS)
+	{
 		world.translate((glm::vec3){-0.1, 0, 0});
+		world.printMatrix(true);
+	}
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_D) == GLFW_PRESS)
+	{
 		world.translate((glm::vec3){0.1, 0, 0});
+		world.printMatrix(true);
+	}
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_SPACE) == GLFW_PRESS)
+	{
 		world.translate((glm::vec3){0, -0.1, 0});
+		world.printMatrix(true);
+	}
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+	{
 		world.translate((glm::vec3){0, 0.1, 0});
+		world.printMatrix(true);
+	}
 }
 
 void	exec(World &world, Engine &env)
@@ -55,7 +73,7 @@ int		main(void)
 	env.genTextures();
 	env.getCam().setProjMatrix(glm::perspective(glm::radians(45.0f),
 		(float)WIDTH / (float)HEIGHT, 0.1f, (float)RENDER_DIST));
-	env.getCam().setTranslate((glm::vec3){0, -5, -5});
+	env.getCam().setTranslate((glm::vec3){8, 0, -5});
 	env.getCam().rotate((glm::vec3){20, 180, 0});
 	
 	ft_printf(MAGENTA "Cam Matrix\n" NA);

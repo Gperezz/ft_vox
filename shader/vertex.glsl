@@ -18,6 +18,6 @@ void main()
 	else if (meta == 2)
 		tCoords = aPos.xz;
 	else
-		tCoords = aPos.xz;
+		tCoords = aPos.xy;
 	gl_Position = projection * view * world * pos4;
 }
