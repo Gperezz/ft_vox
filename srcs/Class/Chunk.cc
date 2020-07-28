@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2020/05/08 19:48:51 by gperez           ###   ########.fr       */
+/*   Updated: 2020/07/28 17:12:48 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,8 @@ static void	fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, Blo
 		vboType.tab[2] = dir_c.pts[iPt].get(Z) + posMesh.get(Z);
 		// ft_printf(MAGENTA "X:%d Y:%d Z:%d\n" NA, posMesh.get(X), posMesh.get(Y), posMesh.get(Z));
 		// ft_printf(CYAN "X:%f Y:%f Z:%f\n" NA, vboType.tab[0], vboType.tab[1], vboType.tab[2]);
-		vboType.meta = dir_c.axis;
+		vboType.meta = dir_c.axis; 
+		// ft_printf(RED"Direction : %d\n" NA, dir_c.axis);
 		(void)id;
 		tempVbo.push_back(vboType);
 		iPt++;
@@ -71,15 +72,15 @@ bool		Chunk::canPrintBlock(vector<vbo_type> &tempVbo, BlockPos posMesh)
 	while (i < 6)
 	{
 		Block *tmp = this->getBlockNeighboor(posMesh, (Direction)i);
-		if (!tmp || (tmp && tmp->getInfo().id == 0))
+		if (!tmp || (tmp->getInfo().id == 0))
 		{
-			dir += 1 << i;
+			dir += 1 << i; //Faces visibles
 			fillTempVbo(tempVbo, (t_direction_consts)g_dir_c[i], posMesh,
 				this->getBlock(posMesh).getInfo().id);
 		}
 		i++;
 	}
-	ft_printf(YELLOW"dir %b\n" NA, dir);
+	// ft_printf(YELLOW"dir %b\n" NA, dir);
 	return (dir != 0);
 }
 

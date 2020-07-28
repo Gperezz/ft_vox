@@ -13,11 +13,11 @@ void main()
 	vec4 pos4;
 
 	pos4 = vec4(aPos.xyz, 1.0);
-	// if (dir == 1)
-	// 	tCoords = aPos.zy;
-	// else if (dir == 2)
+	if (meta == 1)
+		tCoords = aPos.zy;
+	else if (meta == 2)
 		tCoords = aPos.xz;
-	// else
-	// 	tCoords = aPos.xy;
+	else
+		tCoords = aPos.xz;
 	gl_Position = projection * view * world * pos4;
 }
