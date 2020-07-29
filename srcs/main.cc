@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2020/07/28 19:25:46 by gperez           ###   ########.fr       */
+/*   Updated: 2020/07/29 23:11:16 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,17 @@ void	exec(World &world, Engine &env)
 	glfwPollEvents();
 }
 
+// static void	recLoad(World &w, int x, int y)
+// {
+// 	w.loadChunk(x, y);
+// 	if (x < -LIM_GEN || x > LIM_GEN || y < -LIM_GEN || y > LIM_GEN)
+// 		return;
+// 	recLoad(w, x, y + 1);
+// 	recLoad(w, x, y - 1);
+// 	recLoad(w, x + 1, y);
+// 	recLoad(w, x - 1, y);
+// }
+
 int		main(void)
 {
 	Engine			env;
@@ -73,7 +84,7 @@ int		main(void)
 	env.genTextures();
 	env.getCam().setProjMatrix(glm::perspective(glm::radians(45.0f),
 		(float)WIDTH / (float)HEIGHT, 0.1f, (float)RENDER_DIST));
-	env.getCam().setTranslate((glm::vec3){8, 0, -5});
+	env.getCam().setTranslate((glm::vec3){7.5, 0, -5});
 	env.getCam().rotate((glm::vec3){20, 180, 0});
 	
 	ft_printf(MAGENTA "Cam Matrix\n" NA);
@@ -86,12 +97,39 @@ int		main(void)
 	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	ft_printf(MAGENTA"Ceci est Ft_vox:\n" NA);
+
+	///////////////////////////////////// Load test ////////////////////
+
+	// recLoad(world, 0, 0);
 	world.loadChunk(0, 1);
 	world.loadChunk(0, -1);
-	world.loadChunk(0, -1);
+	// world.loadChunk(0, -1);
 	world.loadChunk(1, 0);
 	world.loadChunk(-1, 0);
+
 	world.loadChunk(0, 0);
+
+	world.loadChunk(0, 0);
+	world.loadChunk(2, 0);
+	world.loadChunk(1, 1);
+	world.loadChunk(1, -1);
+
+	world.loadChunk(1, 0);
+
+	ChunkPos	posTest = ChunkPos((int[2]){1, 0});
+
+	ft_printf(GREEN "Fenced ? %d\n" NA, world.get(posTest)->getFenced());
+	world.getMemoryChunk(posTest)->updateFenced();
+	if (world.getMemoryChunk(posTest)->getFenced())
+	{
+		world.getMemoryChunk(posTest)->generateGraphics();
+		world.getDisplayedChunks().push_back(world.getMemoryChunk(posTest)->getPos()); // displayQueue
+	}
+	ft_printf(GREEN "Fenced ? %d\n" NA, world.get(posTest)->getFenced());
+
+	//////////////////////////////////////////////////////////////////////////
+
+
 	while(!glfwWindowShouldClose(env.getWindow()))
 		exec(world, env);
 	shader.freeProgram();

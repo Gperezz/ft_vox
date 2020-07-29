@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2020/07/28 19:49:17 by gperez           ###   ########.fr       */
+/*   Updated: 2020/07/29 23:22:43 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,8 @@ Chunk::Chunk(const Chunk& copy)
 	this->operator=(copy);
 }
 
-static void	fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, BlockPos posMesh, int id)
+
+void	Chunk::fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, BlockPos posInMesh, int id)
 {
 	int			iPt;
 	vbo_type	vboType;
@@ -49,20 +50,21 @@ static void	fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, Blo
 	iPt = 0;
 	while (iPt < 6)
 	{
-		vboType.tab[0] = dir_c.pts[iPt].get(X) + posMesh.get(X);
-		vboType.tab[1] = dir_c.pts[iPt].get(Y) + posMesh.get(Y) + posMesh.get(MY) * 16;
-		vboType.tab[2] = dir_c.pts[iPt].get(Z) + posMesh.get(Z);
-		// ft_printf(MAGENTA "X:%d Y:%d Z:%d\n" NA, posMesh.get(X), posMesh.get(Y), posMesh.get(Z));
+		vboType.tab[0] = dir_c.pts[iPt].get(X) + posInMesh.get(X) + this->getPos().get(0) * 16;
+		vboType.tab[1] = dir_c.pts[iPt].get(Y) + posInMesh.get(Y) + posInMesh.get(MY) * 16;
+		vboType.tab[2] = dir_c.pts[iPt].get(Z) + posInMesh.get(Z) + this->getPos().get(1) * 16;
+		// ft_printf(MAGENTA "X:%d Y:%d Z:%d\n" NA, posInMesh.get(X), posInMesh.get(Y), posInMesh.get(Z));
 		// ft_printf(CYAN "X:%f Y:%f Z:%f\n" NA, vboType.tab[0], vboType.tab[1], vboType.tab[2]);
 		vboType.meta = dir_c.axis; 
-		// ft_printf(RED"Direction : %d\n" NA, vboType.meta);
 		(void)id;
 		tempVbo.push_back(vboType);
 		iPt++;
 	}
+	// ft_printf(RED"Direction : %d\n" NA, dir_c.axis);
+
 }
 
-bool		Chunk::canPrintBlock(vector<vbo_type> &tempVbo, BlockPos posMesh)
+bool		Chunk::canPrintBlock(vector<vbo_type> &tempVbo, BlockPos posInMesh)
 {
 	char	dir;
 	int		i;
@@ -71,12 +73,12 @@ bool		Chunk::canPrintBlock(vector<vbo_type> &tempVbo, BlockPos posMesh)
 	dir = 0;
 	while (i < 6)
 	{
-		Block *tmp = this->getBlockNeighboor(posMesh, (Direction)i);
+		Block *tmp = this->getBlockNeighboor(posInMesh, (Direction)i);
 		if (!tmp || (tmp->getInfo().id == 0))
 		{
 			dir += 1 << i; //Faces visibles
-			fillTempVbo(tempVbo, (t_direction_consts)g_dir_c[i], posMesh,
-				this->getBlock(posMesh).getInfo().id);
+			fillTempVbo(tempVbo, (t_direction_consts)g_dir_c[i], posInMesh,
+				this->getBlock(posInMesh).getInfo().id);
 		}
 		i++;
 	}
@@ -84,10 +86,10 @@ bool		Chunk::canPrintBlock(vector<vbo_type> &tempVbo, BlockPos posMesh)
 	return (dir != 0);
 }
 
-bool		Chunk::conditionValidate(vector<vbo_type> &tempVbo, BlockPos posMesh, bool &b)
+bool		Chunk::conditionValidate(vector<vbo_type> &tempVbo, BlockPos posInMesh, bool &b)
 {
-	if (this->getBlock(posMesh).getInfo().id == AIR
-		|| !this->canPrintBlock(tempVbo, posMesh))
+	if (this->getBlock(posInMesh).getInfo().id == AIR
+		|| !this->canPrintBlock(tempVbo, posInMesh))
 		return (0);
 	b = 1;
 	return (1);
@@ -100,14 +102,24 @@ void		Chunk::generateVbo(char index, vector<vbo_type> tempVbo)
 	glGenBuffers(1, &(Chunk::tabVbo[(int)index]));
 	glBindBuffer(GL_ARRAY_BUFFER, tabVbo[(int)index]);
 	glBufferData(GL_ARRAY_BUFFER, tempVbo.size() * sizeof(vbo_type), &tempVbo[0], GL_STATIC_DRAW);
+
+	// ON REGARDE CE QU IL Y A DANS LE VBO (TEST)
+	//
+	// vbo_type	*ptr_pos = (vbo_type*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
+	// for (int i = 0; (size_t)i < tempVbo.size(); i++)
+	// {
+	// 	ft_printf(BLUE "TRUC %u\n" NA, ptr_pos[i].meta);
+	// }
+
 	// glGenBuffers(1, &ebo);
 	// glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 	// glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(EBO),
 		// EBO, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3 + sizeof(int), (void*)0);
-	glVertexAttribPointer(1, 1, GL_INT, GL_FALSE, sizeof(float) * 3 + sizeof(int), (void*)(sizeof(float) * 3));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3 + sizeof(unsigned int), (void*)0);
+	glVertexAttribPointer(1, 1, GL_UNSIGNED_INT, GL_FALSE, sizeof(float) * 3 + sizeof(unsigned int), (void*)(sizeof(float) * 3));
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
+	// glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
 void		Chunk::validateMesh(char meshIdx)

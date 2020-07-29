@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:17:27 by gperez            #+#    #+#             */
-/*   Updated: 2020/05/08 19:28:59 by gperez           ###   ########.fr       */
+/*   Updated: 2020/07/29 23:22:42 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,8 +149,9 @@ class Chunk{
 		// Geomorph						geomoprh;
 		ChunkState						state;
 		World							*world;
-		bool							canPrintBlock(std::vector<vbo_type> &tempVbo, BlockPos posMesh);
-		bool							conditionValidate(std::vector<vbo_type> &tempVbo, BlockPos posMesh, bool &b);
+		bool							canPrintBlock(std::vector<vbo_type> &tempVbo, BlockPos posInMesh);
+		void							fillTempVbo(std::vector<vbo_type> &tempVbo, t_direction_consts dir_c, BlockPos posInMesh, int id);
+		bool							conditionValidate(std::vector<vbo_type> &tempVbo, BlockPos posInMesh, bool &b);
 		void							validateMesh(char meshIdx);
 		void							generateVbo(char index, std::vector<vbo_type> tempVbo);
 		void							deleteVbo(char index);

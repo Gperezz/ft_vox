@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:41 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/19 15:26:03 by gperez           ###   ########.fr       */
+/*   Updated: 2020/07/29 18:40:56 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,5 +16,7 @@
 
 # include "Engine.hpp"
 # include "World.hpp"
+
+# define LIM_GEN 0
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2020/05/05 12:39:32 by gperez           ###   ########.fr       */
+/*   Updated: 2020/07/29 23:23:13 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ void	World::display(Engine &e)
 	while (i < this->displayedChunks.size())
 	{
 		// ft_printf(BLUE "Display Chunk{%d %d}\n" NA, this->displayedChunks[i].get(0),
-			// this->displayedChunks[i].get(1));
+		// 	this->displayedChunks[i].get(1));
 		this->memoryChunks.at(this->displayedChunks[i])->displayChunk(e, this->getWorldMat().getMatrix(true));
 		i++;
 	}
@@ -83,7 +83,7 @@ void	World::loadChunk(ChunkPos cp)
 		Chunk	*newChunk = new Chunk(this, cp);
 		this->worldGen.genChunk(newChunk);
 		this->memoryChunks[cp] = newChunk;
-		this->memoryChunks[cp]->printSlice(0);
+		// this->memoryChunks[cp]->printSlice(0);
 		this->memoryChunks[cp]->updateFenced();
 		if (this->memoryChunks[cp]->getFenced())
 		{
@@ -91,6 +91,16 @@ void	World::loadChunk(ChunkPos cp)
 			this->displayedChunks.push_back(this->memoryChunks[cp]->getPos()); // displayQueue
 		}
 	}
+}
+
+Chunk	*World::getMemoryChunk(ChunkPos pos)
+{
+	return (this->memoryChunks.at(pos));
+}
+
+vector<ChunkPos>	&World::getDisplayedChunks(void)
+{
+	return (this->displayedChunks);
 }
 
 void	World::loadChunk(int x, int z)
