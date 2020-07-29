@@ -80,7 +80,7 @@ namespace Coords{
 				return false;
 			}
 
-			inline bool	isEgal(const Coords<T, dims>& a) const
+			inline bool	equals(const Coords<T, dims>& a) const
 			{
 				for (int i = 0; i < dims; i++)
 				{
@@ -92,12 +92,12 @@ namespace Coords{
 
 			inline bool	operator==(const Coords<T, dims>& a) const
 			{
-				return (isEgal(a));
+				return (equals(a));
 			}
 
 			inline bool	operator!=(const Coords<T, dims>& a) const
 			{
-				return (!isEgual(a));
+				return (!equals(a));
 			}
 	};
 	
