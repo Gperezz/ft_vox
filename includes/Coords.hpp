@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 20:07:59 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/20 02:13:53 by gperez           ###   ########.fr       */
+/*   Updated: 2020/07/30 23:02:51 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,7 @@ namespace Coords{
 
 			inline bool	equals(const Coords<T, dims>& a) const
 			{
-				for (int i = 0; i < dims; i++)
+				for (unsigned i = 0; i < dims; i++)
 				{
 					if (this->getConst(i) != a.getConst(i))
 						return false;
@@ -107,10 +107,10 @@ namespace std{
 		public:
 			size_t operator()(const Coords::Coords<T, dims> &x) const{
 				size_t out = hash<T>()(x.attr[0]);
-				for (int i = 1; i < dims; i++)
+				for (unsigned i = 1; i < dims; i++)
 					out ^= hash<T>()(x.attr[i]);
 				return out;
 			}
-		}
+		};
 };
 #endif

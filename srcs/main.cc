@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2020/07/29 23:11:16 by gperez           ###   ########.fr       */
+/*   Updated: 2020/07/30 22:42:33 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,17 +115,6 @@ int		main(void)
 	world.loadChunk(1, -1);
 
 	world.loadChunk(1, 0);
-
-	ChunkPos	posTest = ChunkPos((int[2]){1, 0});
-
-	ft_printf(GREEN "Fenced ? %d\n" NA, world.get(posTest)->getFenced());
-	world.getMemoryChunk(posTest)->updateFenced();
-	if (world.getMemoryChunk(posTest)->getFenced())
-	{
-		world.getMemoryChunk(posTest)->generateGraphics();
-		world.getDisplayedChunks().push_back(world.getMemoryChunk(posTest)->getPos()); // displayQueue
-	}
-	ft_printf(GREEN "Fenced ? %d\n" NA, world.get(posTest)->getFenced());
 
 	//////////////////////////////////////////////////////////////////////////
 
