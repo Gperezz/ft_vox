@@ -46,17 +46,9 @@ World::~World()
 
 void	World::display(Engine &e)
 {
-	size_t	i;
 
-	i = 0;
-	while (i < this->displayedChunks.size())
-	{
-		// ft_printf(BLUE "Display Chunk{%d %d}\n" NA, this->displayedChunks[i].get(0),
-		// 	this->displayedChunks[i].get(1));
-		this->memoryChunks.at(this->displayedChunks[i])->displayChunk(e, this->getWorldMat().getMatrix(true));
-		i++;
-	}
-	// ft_printf("\n");
+	for (auto it = this->displayedChunks.begin(); it != this->displayedChunks.end(); it++)
+		this->memoryChunks.at(*it)->displayChunk(e, this->getWorldMat().getMatrix(true));
 }
 
 path	World::getDir(){
