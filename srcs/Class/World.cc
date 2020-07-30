@@ -70,7 +70,7 @@ Chunk	*World::operator[](ChunkPos cp)
 void	World::pushInDisplay(Chunk* chunk)
 {
 	Chunk*	tmp;
-	pair<unordered_set<ChunkPos>::iterator, bool> ret;
+	pair<set<ChunkPos>::iterator, bool> ret(this->getDisplayedChunks.begin(), false);
 	int		i = 0;
 
 	if (chunk->getFenced())
