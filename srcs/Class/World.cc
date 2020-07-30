@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2020/07/29 23:23:13 by gperez           ###   ########.fr       */
+/*   Updated: 2020/07/30 23:13:34 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,20 +69,20 @@ Chunk	*World::operator[](ChunkPos cp)
 
 void	World::pushInDisplay(Chunk* chunk)
 {
-	Chunk*	base = chunk;
 	Chunk*	tmp;
-	pair<set<ChunkPos>::iterator, bool> ret;
+	pair<unordered_set<ChunkPos>::iterator, bool> ret;
 	int		i = 0;
-	if (base->getFenced())
+
+	if (chunk->getFenced())
 	{
-		ret = this->displayedChunks.insert(base->getPos()); // displayQueue
+		ret = this->displayedChunks.insert(chunk->getPos()); // displayQueue
 		if (ret.second)
-			base->generateGraphics();
+			chunk->generateGraphics();
 	}
 	while (i < 4)
 	{
-		tmp = base->getNeighboor(i);
-		if (tmp && tmp->getFenced)
+		tmp = chunk->getNeighboor((Direction)i);
+		if (tmp && tmp->getFenced())
 		{
 			ret = this->displayedChunks.insert(tmp->getPos());
 			if (ret.second)
@@ -110,7 +110,7 @@ Chunk	*World::getMemoryChunk(ChunkPos pos)
 	return (this->memoryChunks.at(pos));
 }
 
-vector<ChunkPos>	&World::getDisplayedChunks(void)
+unordered_set<ChunkPos>	&World::getDisplayedChunks(void)
 {
 	return (this->displayedChunks);
 }
