@@ -213,8 +213,20 @@ bool	Chunk::getFenced(void)
 	return (this->state);
 }
 
-void		Chunk::updateFenced(void)
+void		Chunk::updateFenced(int source)
 {
+	if (source)
+	{
+		Chunk* tmp;
+		if (tmp = this->getNeighboor(NORTH))
+			tmp->updateFenced(0);
+		if (tmp = this->getNeighboor(SOUTH))
+			tmp->updateFenced(0);
+		if (tmp = this->getNeighboor(EAST))
+			tmp->updateFenced(0);
+		if (tmp = this->getNeighboor(WEST))
+			tmp->updateFenced(0);
+	}
 	if (this->getNeighboor(NORTH) && this->getNeighboor(SOUTH) && this->getNeighboor(EAST) && this->getNeighboor(WEST))
 		this->state = FENCED;
 	else

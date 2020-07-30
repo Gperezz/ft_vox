@@ -75,6 +75,31 @@ Chunk	*World::operator[](ChunkPos cp)
 	return this->get(cp);
 }
 
+void	World::pushInDisplay(ChunkPos cp)
+{
+	Chunk*	base = this->memoryChunks[cp];
+	Chunk*	tmp;
+	pair<set<ChunkPos>::iterator, bool> ret;
+	int		i = 0;
+	if (base->getFenced())
+	{
+		ret = this->displayedChunks.insert(base->getPos()); // displayQueue
+		if (ret.second)
+			base->generateGraphics();
+	}
+	while (i < 4)
+	{
+		tmp = base->getNeighboor(i);
+		if (tmp && tmp->getFenced)
+		{
+			ret = this->displayedChunks.insert(tmp->getPos());
+			if (ret.second)
+				tmp->generateGraphics();
+		}
+		i++;
+	}
+}
+
 void	World::loadChunk(ChunkPos cp)
 {
 	printf(YELLOW "%d %d\n" NA, cp.get(0), cp.get(1));
@@ -83,13 +108,8 @@ void	World::loadChunk(ChunkPos cp)
 		Chunk	*newChunk = new Chunk(this, cp);
 		this->worldGen.genChunk(newChunk);
 		this->memoryChunks[cp] = newChunk;
-		// this->memoryChunks[cp]->printSlice(0);
-		this->memoryChunks[cp]->updateFenced();
-		if (this->memoryChunks[cp]->getFenced())
-		{
-			this->memoryChunks[cp]->generateGraphics();
-			this->displayedChunks.push_back(this->memoryChunks[cp]->getPos()); // displayQueue
-		}
+		this->memoryChunks[cp]->updateFenced(1);
+		this->pushInDisplay(cp);
 	}
 }
 

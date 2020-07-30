@@ -15,8 +15,9 @@
 # include <map>
 # include <filesystem>
 # include <string>
-# include <set>
+# include <unordered_set>
 # include <vector>
+# include <queue>
 
 # include "Chunk.hpp"
 # include "WorldGenerator.hpp"
@@ -31,10 +32,10 @@ class Engine;
 class World
 {
 	private:
-		set<ChunkPos>				loadQueue;
+		queue<ChunkPos>				loadQueue;
 		map<ChunkPos, Chunk*>		memoryChunks;
-		set<ChunkPos>				graphicQueue;
-		vector<ChunkPos>			displayedChunks;
+		queue<ChunkPos>				graphicQueue;
+		unordered_set<ChunkPos>		displayedChunks;
 		path						rootDirPath;
 		WorldGenerator				worldGen;
 		Mat							worldMatrix;
@@ -47,6 +48,7 @@ class World
 						~World();
 	void				display(Engine &e);
 	path				getDir();
+	void				pushInDisplay(ChunkPos cp)
 	void				loadChunk(ChunkPos);
 	void				loadChunk(int x, int z);
 	Mat					&getWorldMat(void);
