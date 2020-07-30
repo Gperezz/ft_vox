@@ -67,9 +67,9 @@ Chunk	*World::operator[](ChunkPos cp)
 	return this->get(cp);
 }
 
-void	World::pushInDisplay(ChunkPos cp)
+void	World::pushInDisplay(Chunk* chunk)
 {
-	Chunk*	base = this->memoryChunks[cp];
+	Chunk*	base = chunk;
 	Chunk*	tmp;
 	pair<set<ChunkPos>::iterator, bool> ret;
 	int		i = 0;
@@ -101,7 +101,7 @@ void	World::loadChunk(ChunkPos cp)
 		this->worldGen.genChunk(newChunk);
 		this->memoryChunks[cp] = newChunk;
 		this->memoryChunks[cp]->updateFenced(1);
-		this->pushInDisplay(cp);
+		this->pushInDisplay(newChunk);
 	}
 }
 
