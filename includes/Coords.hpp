@@ -113,5 +113,5 @@ namespace std{
 				return out;
 			}
 		}
-}
+};
 #endif

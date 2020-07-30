@@ -48,7 +48,7 @@ class World
 						~World();
 	void				display(Engine &e);
 	path				getDir();
-	void				pushInDisplay(ChunkPos cp)
+	void				pushInDisplay(ChunkPos cp);
 	void				loadChunk(ChunkPos);
 	void				loadChunk(int x, int z);
 	Mat					&getWorldMat(void);
