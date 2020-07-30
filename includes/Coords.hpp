@@ -14,7 +14,6 @@
 # define _COORDS_HPP_
 
 # include <cstring>
-
 namespace Coords{
 	template <typename T, unsigned dims>
 	struct Coords
@@ -101,5 +100,18 @@ namespace Coords{
 			}
 	};
 	
+}
+namespace std{
+	template<typename T, unsigned dims>
+		class hash<Coords<T, dims>>{
+			size_t operator()(const Coords<T, dims> &x) const{
+				size_t out = hash<T>()(x.attr[0]);
+				for (int i = 1; i < dims; i++)
+				{
+					out ^= hash<T>()(x.attr[i]);
+				}
+				return out;
+			}
+		}
 }
 #endif
