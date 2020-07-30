@@ -104,12 +104,11 @@ namespace Coords{
 namespace std{
 	template<typename T, unsigned dims>
 		class hash<Coords::Coords<T, dims>>{
+		public:
 			size_t operator()(const Coords::Coords<T, dims> &x) const{
 				size_t out = hash<T>()(x.attr[0]);
 				for (int i = 1; i < dims; i++)
-				{
 					out ^= hash<T>()(x.attr[i]);
-				}
 				return out;
 			}
 		}
