@@ -71,7 +71,7 @@ void	World::pushInDisplay(Chunk* chunk)
 {
 	Chunk*	base = chunk;
 	Chunk*	tmp;
-	pair<set<ChunkPos>::iterator, bool> ret;
+	pair<set<ChunkPos>::iterator, bool> ret(this->getDisplayedChunks.begin(), false);
 	int		i = 0;
 	if (base->getFenced())
 	{
