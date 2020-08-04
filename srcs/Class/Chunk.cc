@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2020/07/29 23:22:43 by gperez           ###   ########.fr       */
+/*   Updated: 2020/08/03 21:59:06 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -218,13 +218,13 @@ void		Chunk::updateFenced(int source)
 	if (source)
 	{
 		Chunk* tmp;
-		if (tmp = this->getNeighboor(NORTH))
+		if ((tmp = this->getNeighboor(NORTH)))
 			tmp->updateFenced(0);
-		if (tmp = this->getNeighboor(SOUTH))
+		if ((tmp = this->getNeighboor(SOUTH)))
 			tmp->updateFenced(0);
-		if (tmp = this->getNeighboor(EAST))
+		if ((tmp = this->getNeighboor(EAST)))
 			tmp->updateFenced(0);
-		if (tmp = this->getNeighboor(WEST))
+		if ((tmp = this->getNeighboor(WEST)))
 			tmp->updateFenced(0);
 	}
 	if (this->getNeighboor(NORTH) && this->getNeighboor(SOUTH) && this->getNeighboor(EAST) && this->getNeighboor(WEST))
