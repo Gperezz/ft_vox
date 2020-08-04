@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2020/08/03 21:25:54 by gperez           ###   ########.fr       */
+/*   Updated: 2020/08/04 18:27:44 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ Chunk	*World::operator[](ChunkPos cp)
 void	World::pushInDisplay(Chunk* chunk)
 {
 	Chunk*	tmp;
-	pair<set<ChunkPos>::iterator, bool> ret(this->getDisplayedChunks.begin(), false);
+	pair<unordered_set<ChunkPos>::iterator, bool> ret(this->getDisplayedChunks().begin(), false);
 	int		i = 0;
 
 	if (chunk->getFenced())
