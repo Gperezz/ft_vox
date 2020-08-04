@@ -26,7 +26,7 @@ WorldGenerator::WorldGenerator(unsigned long* seed)
 	
 }
 
-void	WorldGenerator::genChunk(Chunk *chunk)
+void	WorldGenerator::genTest(Chunk *chunk)
 {
 	for (int my = 0; my < 16; my++)
 	{
@@ -46,6 +46,11 @@ void	WorldGenerator::genChunk(Chunk *chunk)
 		(t_block_info){0,0,0,0});
 	chunk->setBlock(BlockPos((int[4]){0, 7, 0, 7}),
 		(t_block_info){0,0,0,0});
+}
+
+void	WorldGenerator::genChunk(Chunk *chunk)
+{
+	
 }
 
 void	WorldGenerator::configure(unsigned long* seed)

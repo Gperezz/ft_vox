@@ -23,6 +23,7 @@ class WorldGenerator{
 		WorldGenerator();
 		WorldGenerator(unsigned long* seed);
 
+		void genTest(Chunk*);
 		void genChunk(Chunk*);
 		void configure(unsigned long* seed);
 };

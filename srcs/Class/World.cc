@@ -97,7 +97,7 @@ void	World::loadChunk(ChunkPos cp)
 	if (this->memoryChunks.count(cp) == 0)
 	{
 		Chunk	*newChunk = new Chunk(this, cp);
-		this->worldGen.genChunk(newChunk);
+		this->worldGen.genTest(newChunk);
 		this->memoryChunks[cp] = newChunk;
 		this->memoryChunks[cp]->updateFenced(1);
 		this->pushInDisplay(newChunk);
