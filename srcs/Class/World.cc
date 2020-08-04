@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2020/07/30 23:13:34 by gperez           ###   ########.fr       */
+/*   Updated: 2020/08/03 21:25:54 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,6 @@ World::~World()
 
 void	World::display(Engine &e)
 {
-
 	for (auto it = this->displayedChunks.begin(); it != this->displayedChunks.end(); it++)
 		this->memoryChunks.at(*it)->displayChunk(e, this->getWorldMat().getMatrix(true));
 }

@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 20:07:59 by gperez            #+#    #+#             */
-/*   Updated: 2020/07/30 23:02:51 by gperez           ###   ########.fr       */
+/*   Updated: 2020/08/03 21:55:30 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,14 +101,15 @@ namespace Coords{
 	};
 	
 }
+
 namespace std{
 	template<typename T, unsigned dims>
 		class hash<Coords::Coords<T, dims>>{
 		public:
-			size_t operator()(const Coords::Coords<T, dims> &x) const{
-				size_t out = hash<T>()(x.attr[0]);
+			size_t operator()(Coords::Coords<T, dims> const &x) const{
+				size_t out = hash<T>()(x.getConst(0));
 				for (unsigned i = 1; i < dims; i++)
-					out ^= hash<T>()(x.attr[i]);
+					out ^= hash<T>()(x.getConst(i));
 				return out;
 			}
 		};
