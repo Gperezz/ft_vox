@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 20:07:59 by gperez            #+#    #+#             */
-/*   Updated: 2020/08/03 21:55:30 by gperez           ###   ########.fr       */
+/*   Updated: 2020/08/04 18:22:27 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,8 +103,7 @@ namespace Coords{
 }
 
 namespace std{
-	template<>
-	template<typename T, int dims>
+	template<typename T, unsigned dims>
 	struct hash<Coords::Coords<T, dims>>{
 		size_t operator()(Coords::Coords<T, dims> const &x) const{
 			size_t out = hash<T>()(x.getConst(0));
