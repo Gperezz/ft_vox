@@ -104,7 +104,8 @@ namespace Coords{
 
 namespace std{
 	template<>
-	struct hash<Coords::Coords<typename T, int dims>>{
+	template<typename T, int dims>
+	struct hash<Coords::Coords<T, dims>>{
 		size_t operator()(Coords::Coords<T, dims> const &x) const{
 			size_t out = hash<T>()(x.getConst(0));
 			for (unsigned i = 1; i < dims; i++)
