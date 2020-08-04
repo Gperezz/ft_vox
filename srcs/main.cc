@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2020/07/30 22:42:33 by gperez           ###   ########.fr       */
+/*   Updated: 2020/08/04 19:51:32 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,16 +59,16 @@ void	exec(World &world, Engine &env)
 	glfwPollEvents();
 }
 
-// static void	recLoad(World &w, int x, int y)
-// {
-// 	w.loadChunk(x, y);
-// 	if (x < -LIM_GEN || x > LIM_GEN || y < -LIM_GEN || y > LIM_GEN)
-// 		return;
-// 	recLoad(w, x, y + 1);
-// 	recLoad(w, x, y - 1);
-// 	recLoad(w, x + 1, y);
-// 	recLoad(w, x - 1, y);
-// }
+static void	recLoad(World &w, int x, int y, int rec)
+{
+	w.loadChunk(x, y);
+	if (rec == 1)
+		return;
+	recLoad(w, x, y + 1, 1);
+	recLoad(w, x, y - 1, 1);
+	recLoad(w, x + 1, y, 1);
+	recLoad(w, x - 1, y, 1);
+}
 
 int		main(void)
 {
@@ -100,21 +100,13 @@ int		main(void)
 
 	///////////////////////////////////// Load test ////////////////////
 
-	// recLoad(world, 0, 0);
-	world.loadChunk(0, 1);
-	world.loadChunk(0, -1);
-	// world.loadChunk(0, -1);
-	world.loadChunk(1, 0);
-	world.loadChunk(-1, 0);
-
-	world.loadChunk(0, 0);
-
-	world.loadChunk(0, 0);
-	world.loadChunk(2, 0);
-	world.loadChunk(1, 1);
-	world.loadChunk(1, -1);
-
-	world.loadChunk(1, 0);
+	for (int y = 0; y < 5; y++)
+	{
+		for (int x = 0; x < 5; x++)
+		{
+			recLoad(world, x, y, 0);
+		}
+	}
 
 	//////////////////////////////////////////////////////////////////////////
 
