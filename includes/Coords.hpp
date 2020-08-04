@@ -103,15 +103,14 @@ namespace Coords{
 }
 
 namespace std{
-	template<typename T, unsigned dims>
-		class hash<Coords::Coords<T, dims>>{
-		public:
-			size_t operator()(Coords::Coords<T, dims> const &x) const{
-				size_t out = hash<T>()(x.getConst(0));
-				for (unsigned i = 1; i < dims; i++)
-					out ^= hash<T>()(x.getConst(i));
-				return out;
-			}
-		};
+	template<>
+	struct hash<Coords::Coords<typename T, int dims>>{
+		size_t operator()(Coords::Coords<T, dims> const &x) const{
+			size_t out = hash<T>()(x.getConst(0));
+			for (unsigned i = 1; i < dims; i++)
+				out ^= hash<T>()(x.getConst(i));
+			return out;
+		}
+	};
 };
 #endif
