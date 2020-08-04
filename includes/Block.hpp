@@ -31,11 +31,11 @@ enum	e_BlockType : char {
 	LOG,
 	LEAVES,
 	WATER,
-	COAL_ORE,
-	IRON_ORE,
-	GOLD_ORE,
-	DIAMOND_ORE,
-	COBBLESTONE
+	// COAL_ORE,
+	// IRON_ORE,
+	// GOLD_ORE,
+	// DIAMOND_ORE,
+	// COBBLESTONE
 };
 
 typedef struct		block_info{
