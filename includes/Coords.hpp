@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 20:07:59 by gperez            #+#    #+#             */
-/*   Updated: 2020/08/04 18:22:27 by gperez           ###   ########.fr       */
+/*   Updated: 2020/08/04 18:39:27 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define _COORDS_HPP_
 
 # include <cstring>
+# include <functional>
 namespace Coords{
 	template <typename T, unsigned dims>
 	struct Coords
