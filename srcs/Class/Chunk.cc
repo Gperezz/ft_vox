@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2020/08/10 23:16:29 by gperez           ###   ########.fr       */
+/*   Updated: 2020/08/11 22:53:54 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -281,7 +281,7 @@ void		Chunk::displayChunk(Engine &e, glm::mat4 world)
 	Shader&									shader(e.getShader());
 	Textures								*t;
 
-	t = e.getTexture(GROUND_TXT);
+	t = e.getTexture(TEST_T - (END_BLOCK_T + 1));
 	while (it != this->valid.end())
 	{
 		// ft_printf(CYAN "%d %u\n" NA, it->first, it->second);

@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2020/08/07 00:35:15 by gperez           ###   ########.fr       */
+/*   Updated: 2020/08/11 22:54:26 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,8 @@ World::~World()
 
 void	World::display(Engine &e)
 {
-	if (e.isSkybox() && e.getTexture(SKY_TXT))
-		e.displaySky(e.getTexture(SKY_TXT));
+	if (e.isSkybox() && e.getTexture(SKY_T - (END_BLOCK_T + 1)))
+		e.displaySky(e.getTexture(SKY_T - (END_BLOCK_T + 1)));
 	for (auto it = this->displayedChunks.begin(); it != this->displayedChunks.end(); it++)
 		this->memoryChunks.at(*it)->displayChunk(e, this->getWorldMat().getMatrix(true));
 }

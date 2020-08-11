@@ -6,14 +6,14 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/13 17:54:04 by gperez            #+#    #+#             */
-/*   Updated: 2020/08/11 19:47:26 by gperez           ###   ########.fr       */
+/*   Updated: 2020/08/11 22:39:37 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Textures.hpp"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+# define STB_IMAGE_IMPLEMENTATION
+# include "stb_image.h"
 
 Textures::Textures()
 {
@@ -24,15 +24,15 @@ Textures::Textures()
 	this->txtData = NULL;
 }
 
-Textures::Textures(char *buffer, size_t len)
-{
-	this->txtData = stbi_load_from_memory((const stbi_uc *)buffer, len, &width, &height, &nrChannels, 0);
-}
-
 Textures::Textures(char *txtPath)
 {
 	stbi_set_flip_vertically_on_load(true);
 	this->txtData = stbi_load(txtPath, &width, &height, &nrChannels, 0);
+}
+
+Textures::Textures(char *buffer, unsigned long len)
+{
+	this->txtData = stbi_load_from_memory((const stbi_uc *)buffer, len, &width, &height, &nrChannels, 0);
 }
 
 int				Textures::getWidth(void) const

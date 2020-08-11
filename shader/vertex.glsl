@@ -14,7 +14,7 @@ void main()
 
 	tCoords = aPos.zy;
 	pos4 = vec4(aPos.xyz, 1.0);
-	if (int(meta) == 1 || int(meta) == 4)
+	if (int(meta) == 1 || int(meta) == 6)
 		tCoords = aPos.zy;
 	else if (int(meta) == 2 ||int(meta) == 5)
 		tCoords = aPos.xz;

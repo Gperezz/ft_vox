@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2020/08/11 20:04:34 by gperez           ###   ########.fr       */
+/*   Updated: 2020/08/11 23:27:31 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,7 +167,7 @@ void	Engine::genBlocksTextures(void)
 
 	// Recuperer les datas de chaques txt et en faire une et une seule // A FAIRE AVEC CL
 
-	for (int i = 0; i < this->textures.size(); i++)
+	for (size_t i = 0; i < this->textures.size(); i++)
 		delete this->textures[i];
 	this->textures.clear();
 
@@ -177,25 +177,8 @@ void	Engine::genBlocksTextures(void)
 
 void		Engine::genTextures(void)
 {
-	int		i;
-	string	str;
-	size_t	len;
-
 	this->genBlocksTextures();
 	this->fillTextureVector(END_BLOCK_T + 1, END_T, true);
-	// i = END_BLOCK_T + 1;
-	// while (i < END_T && this->textures.size() < 16)
-	// {
-	// 	len = ft_strlen(g_txt_path[i].path_txt);
-	// 	if (len)
-	// 	{
-	// 		str.assign(g_txt_path[i].path_txt, len);
-	// 		this->addTexture((char*)g_txt_path[i].path_txt,
-	// 		str.find(".png") == (len - 4) ? true : false);
-	// 	}
-	// 	str.clear();
-	// 	i++;
-	// }
 }
 
 Textures	*Engine::getTexture(unsigned int t)
@@ -224,10 +207,11 @@ void	Engine::addTexture(char *pathOrBuffer, size_t len, bool alpha)
 	unsigned int	textIdx;
 	Textures		*t;
 
-	if (len == 0)
+	(void)len;
+	// if (len == 0)
 		this->textures.push_back(new Textures(pathOrBuffer));
-	else
-		this->textures.push_back(new Textures(pathOrBuffer, len));
+	// else
+	// 	this->textures.push_back(new Textures(pathOrBuffer, len));
 	glGenTextures(1, &textIdx);
 	t = this->textures[this->textures.size() - 1];
 	t->setTxt(textIdx);
