@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2020/08/04 19:51:32 by gperez           ###   ########.fr       */
+/*   Updated: 2020/08/08 18:03:27 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,13 +79,14 @@ int		main(void)
 	// ft_printf(RED"%ld\n" NA, sizeof(block.getInfo()));
 	
 	env.initWindow();
-	shader.loadShader((char*)VERTEX, (char*)FRAGMENT);
-	ft_printf(RED"prog %u\n" NA, shader.getProgram());
+	if (shader.loadShader((char*)VERTEX, (char*)FRAGMENT))
+		return (1);
 	env.genTextures();
+	env.genSkybox();
 	env.getCam().setProjMatrix(glm::perspective(glm::radians(45.0f),
 		(float)WIDTH / (float)HEIGHT, 0.1f, (float)RENDER_DIST));
-	env.getCam().setTranslate((glm::vec3){7.5, 0, -5});
-	env.getCam().rotate((glm::vec3){20, 180, 0});
+	env.getCam().setTranslate((glm::vec3){0.5, -0.5, 0.5});
+	env.getCam().rotate((glm::vec3){0, 180, 0});
 	
 	ft_printf(MAGENTA "Cam Matrix\n" NA);
 	env.getCam().printMatrix(true);
@@ -98,16 +99,17 @@ int		main(void)
 
 	ft_printf(MAGENTA"Ceci est Ft_vox:\n" NA);
 
+	int lim = 1;
+
 	///////////////////////////////////// Load test ////////////////////
 
-	for (int y = 0; y < 5; y++)
+	for (int y = 0; y < lim; y++)
 	{
-		for (int x = 0; x < 5; x++)
+		for (int x = 0; x < lim; x++)
 		{
 			recLoad(world, x, y, 0);
 		}
 	}
-
 	//////////////////////////////////////////////////////////////////////////
 
 

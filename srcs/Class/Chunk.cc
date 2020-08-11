@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2020/08/03 21:59:06 by gperez           ###   ########.fr       */
+/*   Updated: 2020/08/10 23:16:29 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,9 +53,8 @@ void	Chunk::fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, Blo
 		vboType.tab[0] = dir_c.pts[iPt].get(X) + posInMesh.get(X) + this->getPos().get(0) * 16;
 		vboType.tab[1] = dir_c.pts[iPt].get(Y) + posInMesh.get(Y) + posInMesh.get(MY) * 16;
 		vboType.tab[2] = dir_c.pts[iPt].get(Z) + posInMesh.get(Z) + this->getPos().get(1) * 16;
-		// ft_printf(MAGENTA "X:%d Y:%d Z:%d\n" NA, posInMesh.get(X), posInMesh.get(Y), posInMesh.get(Z));
-		// ft_printf(CYAN "X:%f Y:%f Z:%f\n" NA, vboType.tab[0], vboType.tab[1], vboType.tab[2]);
-		vboType.meta = dir_c.axis; 
+
+		vboType.meta = dir_c.axis < 0 ? dir_c.axis + 7 : dir_c.axis;
 		(void)id;
 		tempVbo.push_back(vboType);
 		iPt++;
@@ -73,6 +72,7 @@ bool		Chunk::canPrintBlock(vector<vbo_type> &tempVbo, BlockPos posInMesh)
 	dir = 0;
 	while (i < 6)
 	{
+		// ft_printf(BLUE "HERE\n" NA);
 		Block *tmp = this->getBlockNeighboor(posInMesh, (Direction)i);
 		if (!tmp || (tmp->getInfo().id == 0))
 		{
@@ -103,23 +103,10 @@ void		Chunk::generateVbo(char index, vector<vbo_type> tempVbo)
 	glBindBuffer(GL_ARRAY_BUFFER, tabVbo[(int)index]);
 	glBufferData(GL_ARRAY_BUFFER, tempVbo.size() * sizeof(vbo_type), &tempVbo[0], GL_STATIC_DRAW);
 
-	// ON REGARDE CE QU IL Y A DANS LE VBO (TEST)
-	//
-	// vbo_type	*ptr_pos = (vbo_type*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
-	// for (int i = 0; (size_t)i < tempVbo.size(); i++)
-	// {
-	// 	ft_printf(BLUE "TRUC %u\n" NA, ptr_pos[i].meta);
-	// }
-
-	// glGenBuffers(1, &ebo);
-	// glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-	// glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(EBO),
-		// EBO, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3 + sizeof(unsigned int), (void*)0);
-	glVertexAttribPointer(1, 1, GL_UNSIGNED_INT, GL_FALSE, sizeof(float) * 3 + sizeof(unsigned int), (void*)(sizeof(float) * 3));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3 + sizeof(float), (void*)0);
+	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 3 + sizeof(float), (void*)(sizeof(float) * 3));
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
-	// glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
 void		Chunk::validateMesh(char meshIdx)
@@ -235,7 +222,7 @@ void		Chunk::updateFenced(int source)
 
 Chunk		*Chunk::getNeighboor(Direction dir)
 {
-	if (g_dir_c[dir].axis == Y)
+	if (g_dir_c[dir].axis == Y || g_dir_c[dir].axis == -Y)
 		return NULL;
 	return this->world->get(this->pos + g_dir_c[dir].chunk_vec);
 }
@@ -244,11 +231,13 @@ Block		*Chunk::getBlockNeighboor(BlockPos pos, Direction dir) // Fonction peut e
 {
 	struct s_direction_consts&	c(g_dir_c[dir]);
 	Chunk						*neighboor;
+	short						axis;
 
-	if (pos[c.axis] == 15 && c.block_vec[c.axis] == 1)
+	axis = c.axis < 0 ? -c.axis : c.axis;
+	if (pos[axis] == 15 && c.block_vec[axis] == 1)
 	{
-		pos[c.axis] = 0;
-		if (c.axis == Y && pos[MY] < 15)
+		pos[axis] = 0;
+		if (axis == Y && pos[MY] < 15)
 		{
 			neighboor = this;
 			pos[MY] = pos[MY] + 1;
@@ -259,10 +248,10 @@ Block		*Chunk::getBlockNeighboor(BlockPos pos, Direction dir) // Fonction peut e
 			return &neighboor->getBlock(pos);
 		return NULL;
 	}
-	else if (pos[c.axis] == 0 && c.block_vec[c.axis] == -1)
+	else if (pos[axis] == 0 && c.block_vec[axis] == -1)
 	{
-		pos[c.axis] = 15;
-		if (c.axis == Y && pos[MY] > 0)
+		pos[axis] = 15;
+		if (axis == Y && pos[MY] > 0)
 		{
 			neighboor = this;
 			pos[MY] = pos[MY] - 1;

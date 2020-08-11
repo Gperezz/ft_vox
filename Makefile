@@ -6,7 +6,7 @@
 #    By: gperez <gperez@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/01/06 13:36:11 by gperez            #+#    #+#              #
-#    Updated: 2020/05/06 16:03:41 by gperez           ###   ########.fr        #
+#    Updated: 2020/08/11 18:06:05 by gperez           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,6 +17,8 @@ FLAGCPP = -std=c++17
 FLAG = -Wall -Werror -Wextra
 
 FLAG_OPENGL = -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo
+
+FLAG_OPENCL = -cl-std=CL1.2 -framework OpenCL
 
 APP = -framework AppKit
 
@@ -30,6 +32,7 @@ SRC =	srcs/main.cc \
 		srcs/Class/Chunk.cc \
 		srcs/Class/Block.cc \
 		srcs/Class/WorldGenerator.cc \
+		srcs/Class/ContextOpenCL.cc \
 
 NC = \033[0m
 BOLD =\033[1m
@@ -64,6 +67,8 @@ LIBS_H =	libs/libft/includes \
 			libs/ft_printf/includes \
 			libs/glfw_mac/include/GLFW \
 			libs/glad/include/glad \
+			libs/ \
+			libs/CL \
 			libs/glm \
 			libs/glm/gtc \
 			includes \
@@ -87,7 +92,7 @@ $(LIB_P) :
 
 $(NAME) : $(LIB_L) $(LIB_P) $(OBJ)
 	@gcc $(FLAG) -o srcs/glad.o -c libs/glad/src/glad.c
-	@g++ $(FLAG) $(FLAGCPP) $(FLAG_OPENGL) $(LIB_G) srcs/glad.o $^ -o $(NAME)
+	@g++ $(FLAG) $(FLAGCPP) $(FLAG_OPENCL) $(FLAG_OPENGL) $(LIB_G) srcs/glad.o $^ -o $(NAME)
 	@printf "$(BOLD)$(COLOR1)%20s : $(RS_BL)$(RS_BO)$(GREEN)succesfuly made!$(NC)%20s\n" $(NAME)
 
 %.o : %.cc $(INC)

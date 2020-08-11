@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/02 08:06:26 by gperez            #+#    #+#             */
-/*   Updated: 2020/07/28 20:15:47 by gperez           ###   ########.fr       */
+/*   Updated: 2020/08/05 18:38:41 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ void	WorldGenerator::genTest(Chunk *chunk)
 
 void	WorldGenerator::genChunk(Chunk *chunk)
 {
-	
+	(void)chunk;
 }
 
 void	WorldGenerator::configure(unsigned long* seed)

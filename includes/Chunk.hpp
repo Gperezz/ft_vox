@@ -6,26 +6,19 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:17:27 by gperez            #+#    #+#             */
-/*   Updated: 2020/07/30 22:41:49 by gperez           ###   ########.fr       */
+/*   Updated: 2020/08/10 23:07:28 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef _CHUNK_HPP_
 # define _CHUNK_HPP_
 
-# include "Coords.hpp"
 # include "Block.hpp"
 # include "Engine.hpp"
 # include <vector>
 # include <map>
 
 class World;
-
-enum xz_vec {XZ_X, XZ_Z};
-enum xyz_vec {MY, X, Y, Z};
-
-using ChunkPos = Coords::Coords<int, 2>;
-using BlockPos = Coords::Coords<int, 4>;
 
 enum Biome : char{
 	PLAIN,
@@ -54,87 +47,9 @@ enum Direction : char{
 	DOWN
 };
 
-# define LENGTH_BLOCK 1
-
-typedef struct	s_add_pt {
-	char		dir;
-	BlockPos	pts[6];
-}				t_add_pt;
-
-static BlockPos t_cube_pt[] = {
-	// +Z // haut gauche -> bas gauche -> bas droite -> haut droite
-	BlockPos((int[4]){0,0				, LENGTH_BLOCK	, LENGTH_BLOCK}),
-	BlockPos((int[4]){0,0				, 0				, LENGTH_BLOCK}),
-	BlockPos((int[4]){0,LENGTH_BLOCK	, 0				, LENGTH_BLOCK}),
-	BlockPos((int[4]){0,LENGTH_BLOCK	, LENGTH_BLOCK	, LENGTH_BLOCK}),
-	// -Z
-	BlockPos((int[4]){0,0				, LENGTH_BLOCK	, 0}),
-	BlockPos((int[4]){0,0				, 0				, 0}),
-	BlockPos((int[4]){0,LENGTH_BLOCK	, 0				, 0}),
-	BlockPos((int[4]){0,LENGTH_BLOCK	, LENGTH_BLOCK	, 0}),
-};
-
-typedef struct	s_direction_consts{
-	BlockPos	block_vec;
-	ChunkPos	chunk_vec;
-	xyz_vec		axis;
-	BlockPos	pts[6];
-}				t_direction_consts;
-
-static t_direction_consts	g_dir_c[] = {
-	// NORTH
-	{BlockPos((int[4]){0,0,0,1}), ChunkPos((int[2]){0, 1}), Z,
-		{
-			t_cube_pt[0], t_cube_pt[1], t_cube_pt[2],
-			t_cube_pt[0], t_cube_pt[2], t_cube_pt[3],
-		}
-	},
-	// EAST
-	{BlockPos((int[4]){0,1,0,0}), ChunkPos((int[2]){1, 0}), X,
-		{
-			t_cube_pt[3], t_cube_pt[2], t_cube_pt[6],
-			t_cube_pt[3], t_cube_pt[6], t_cube_pt[7],
-		}
-	},
-	// SOUTH
-	{BlockPos((int[4]){0,0,0,-1}), ChunkPos((int[2]){0, -1}), Z,
-		{
-			t_cube_pt[4], t_cube_pt[5], t_cube_pt[6],
-			t_cube_pt[4], t_cube_pt[6], t_cube_pt[7],
-		}
-	},
-	// WEST
-	{BlockPos((int[4]){0,-1,0,0}), ChunkPos((int[2]){-1, 0}), X,
-		{
-			t_cube_pt[4], t_cube_pt[5], t_cube_pt[1],
-			t_cube_pt[4], t_cube_pt[1], t_cube_pt[0],
-		}
-	},
-	// UP
-	{BlockPos((int[4]){0,0,1,0}), ChunkPos((int[2]){0, 0}), Y,
-		{
-			t_cube_pt[0], t_cube_pt[4], t_cube_pt[7],
-			t_cube_pt[0], t_cube_pt[7], t_cube_pt[3],
-		}
-	},
-	// DOWN
-	{BlockPos((int[4]){0,0,-1,0}), ChunkPos((int[2]){0, 0}), Y,
-		{
-			t_cube_pt[1], t_cube_pt[5], t_cube_pt[6],
-			t_cube_pt[1], t_cube_pt[6], t_cube_pt[2],
-		}
-	}
-
-};
-
 enum ChunkState : char{
 	UNFENCED,
 	FENCED
-};
-
-struct vbo_type {
-	float		tab[3];
-	unsigned	meta;
 };
 
 class Chunk{
