@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2020/08/08 18:03:27 by gperez           ###   ########.fr       */
+/*   Updated: 2020/09/21 20:23:24 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,32 +19,32 @@ void	key(Engine &env, Mat &world)
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_S) == GLFW_PRESS)
 	{
 		world.translate((glm::vec3){0, 0, 0.1});
-		world.printMatrix(true);
+		// world.printMatrix(true);
 	}
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_W) == GLFW_PRESS)
 	{
 		world.translate((glm::vec3){0, 0, -0.1});
-		world.printMatrix(true);
+		// world.printMatrix(true);
 	}
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_A) == GLFW_PRESS)
 	{
 		world.translate((glm::vec3){-0.1, 0, 0});
-		world.printMatrix(true);
+		// world.printMatrix(true);
 	}
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_D) == GLFW_PRESS)
 	{
 		world.translate((glm::vec3){0.1, 0, 0});
-		world.printMatrix(true);
+		// world.printMatrix(true);
 	}
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_SPACE) == GLFW_PRESS)
 	{
 		world.translate((glm::vec3){0, -0.1, 0});
-		world.printMatrix(true);
+		// world.printMatrix(true);
 	}
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 	{
 		world.translate((glm::vec3){0, 0.1, 0});
-		world.printMatrix(true);
+		// world.printMatrix(true);
 	}
 }
 
@@ -94,8 +94,8 @@ int		main(void)
 	ft_printf(MAGENTA "Projection Matrix\n" NA);
 	env.getCam().printProjectionMatrix();
 	glEnable(GL_DEPTH_TEST);
-	// glEnable(GL_BLEND);
-	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	ft_printf(MAGENTA"Ceci est Ft_vox:\n" NA);
 

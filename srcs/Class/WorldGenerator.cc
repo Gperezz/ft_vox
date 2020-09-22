@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/02 08:06:26 by gperez            #+#    #+#             */
-/*   Updated: 2020/08/05 18:38:41 by gperez           ###   ########.fr       */
+/*   Updated: 2020/09/22 18:28:13 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ void	WorldGenerator::genTest(Chunk *chunk)
 				for (int x = 0; x < 16; x++)
 				{
 					chunk->setBlock(BlockPos((int[4]){my, x, y, z}),
-						(t_block_info){1,0,0,0});
+						(t_block_info){2,0,0,0});
 				}
 			}
 		}

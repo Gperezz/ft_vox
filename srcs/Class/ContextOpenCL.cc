@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/12 15:37:27 by gperez            #+#    #+#             */
-/*   Updated: 2020/06/26 18:46:28 by gperez           ###   ########.fr       */
+/*   Updated: 2020/08/25 13:09:38 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,8 @@ using namespace std;
 
 ContextOpenCL::ContextOpenCL()
 {
-	this->value = NULL;
+	this->bufferImage = NULL;
+	this->ptrTextures = NULL;
 	this->loaded = false;
 }
 
@@ -53,6 +54,8 @@ int			ContextOpenCL::initContext()
 	cl_uint			nbPlat = 0;
 	cl_int			err;
 
+	if (loaded)
+		return (0);
 // Get Platforms
 	clGetPlatformIDs(0, NULL, &nbPlat);
 	cl_platform_id		platform[nbPlat];
@@ -139,13 +142,13 @@ int			ContextOpenCL::initContext()
 	return (0);
 }
 
-int		ContextOpenCL::useKernel(void)
+int		ContextOpenCL::useKernel(char *finalBuffer, std::vector<Textures*> &textures)
 {
 	cl_int			err;
-	
+
 	err = 0;
 	if (!loaded)
-		return (1);
+		return (0);
 	// Create Kernel
 	this->kernel = clCreateKernel(this->clProgram, "test", &err);
 	if (err != CL_SUCCESS)
@@ -154,8 +157,20 @@ int		ContextOpenCL::useKernel(void)
 		return (1);
 	}
 
+	short	lenText = 16 * 16 * sizeof(int);
+
 	// Allocate value
-	this->value = clCreateBuffer(this->clContext, CL_MEM_READ_WRITE, sizeof(int) * 42, NULL, &err);
+	this->bufferImage = clCreateBuffer(this->clContext, CL_MEM_WRITE_ONLY, lenText * textures.size(), NULL, &err);
+
+	if (err != CL_SUCCESS)
+	{
+		ft_printf(RED "Failed to allocate value for OpenCL\n" NA);
+		return (1);
+	}
+
+	this->ptrTextures = clCreateBuffer(this->clContext, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(Textures) * textures.size(), textures.data(), &err);
+	// buferImage = clCreateImage2D(this->clContext, CL_MEM_READ_WRITE,
+	// 	$image_format, 16 * textures.size(), 16 * textures.size(), $stride, $source, &err);
 	if (err != CL_SUCCESS)
 	{
 		ft_printf(RED "Failed to allocate value for OpenCL\n" NA);
@@ -163,7 +178,29 @@ int		ContextOpenCL::useKernel(void)
 	}
 
 	// Set Arguments
-	err = clSetKernelArg(this->kernel, 0, sizeof(cl_mem), &this->value);
+	err = clSetKernelArg(this->kernel, 0, sizeof(cl_mem), &this->bufferImage);
+	if (err != CL_SUCCESS)
+	{
+		ft_printf(RED "Failed to set kernel's arguments for OpenCL\n" NA);
+		return (1);
+	}
+
+	err = clSetKernelArg(this->kernel, 1, sizeof(cl_mem), &this->ptrTextures);
+	if (err != CL_SUCCESS)
+	{
+		ft_printf(RED "Failed to set kernel's arguments for OpenCL\n" NA);
+		return (1);
+	}
+
+	short	offset = sizeof(int) * 4;
+	err = clSetKernelArg(this->kernel, 2, sizeof(short), &offset);
+	if (err != CL_SUCCESS)
+	{
+		ft_printf(RED "Failed to set kernel's arguments for OpenCL\n" NA);
+		return (1);
+	}
+
+	err = clSetKernelArg(this->kernel, 3, sizeof(short), &lenText);
 	if (err != CL_SUCCESS)
 	{
 		ft_printf(RED "Failed to set kernel's arguments for OpenCL\n" NA);
@@ -172,23 +209,23 @@ int		ContextOpenCL::useKernel(void)
 
 	// Queuing kernel
 	size_t glob[1];
-	size_t local[1];
+	// size_t local[1];
 
-	glob[0] = 42;
-	local[0] = 2;
-	err = clEnqueueNDRangeKernel(this->clQueue, this->kernel, 1, NULL, glob, local,
+	glob[0] = textures.size();
+	// local[0] = 16;
+	err = clEnqueueNDRangeKernel(this->clQueue, this->kernel, 1, NULL, glob, NULL,
 	0, NULL, NULL);
-	
 	if (err != CL_SUCCESS)
 	{
 		ft_printf(RED "Failed to enqueuing kernel for OpenCL\n" NA);
 		return (1);
 	}
 
-	// Get data from device
-	int	test[42];
 
-	err = clEnqueueReadBuffer(clQueue, this->value, CL_TRUE, 0, sizeof(int) * 42, test, 0, NULL, NULL);
+	// Get data from device
+	ft_printf(BLUE "HERE %d\n" NA, textures.size());
+	err = clEnqueueReadBuffer(this->clQueue, this->bufferImage, CL_TRUE, 0, lenText, &finalBuffer[0], 0, NULL, NULL);
+	ft_printf(RED "HERE %d\n" NA, textures.size());
 
 	if (err != CL_SUCCESS)
 	{
@@ -196,17 +233,19 @@ int		ContextOpenCL::useKernel(void)
 		return (1);
 	}
 
-	for (int i = 0; i < 42; i++)
-	{
-		ft_printf(GREEN "GOOD %d\n" NA, test[i]);
-	}
+	// for (size_t i = 0; i < textures.size(); i++)
+	// {
+	// 	ft_printf(BLUE "Height %d\n" NA, textures[i]->getHeight());
+	// 	ft_printf(BLUE "Width %d\n" NA, textures[i]->getWidth());
+	// }
+
 	return (0);
 }
 
 ContextOpenCL::~ContextOpenCL()
 {
 	size_t	i;
-	int		err[5];
+	int		err[6];
 
 	i = 0;
 	while (i < this->programString.size())
@@ -219,8 +258,10 @@ ContextOpenCL::~ContextOpenCL()
 	err[1] = clReleaseCommandQueue(this->clQueue);
 	err[2] = clReleaseProgram(this->clProgram);
 	err[3] = clReleaseKernel(this->kernel);
-	err[4] = clReleaseMemObject(this->value);
+	err[4] = clReleaseMemObject(this->bufferImage);
+	err[5] = clReleaseMemObject(this->ptrTextures);
 
+	clFinish(clQueue);
 	for (i = 0; i < 5; i++)
 	{
 		if (err[i] != CL_SUCCESS)

@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2020/08/11 22:53:54 by gperez           ###   ########.fr       */
+/*   Updated: 2020/09/22 17:47:29 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,10 +42,11 @@ Chunk::Chunk(const Chunk& copy)
 }
 
 
-void	Chunk::fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, BlockPos posInMesh, int id)
+void	Chunk::fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, BlockPos posInMesh, unsigned char id)
 {
 	int			iPt;
 	vbo_type	vboType;
+	short		idBitwise;
 
 	iPt = 0;
 	while (iPt < 6)
@@ -55,7 +56,8 @@ void	Chunk::fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, Blo
 		vboType.tab[2] = dir_c.pts[iPt].get(Z) + posInMesh.get(Z) + this->getPos().get(1) * 16;
 
 		vboType.meta = dir_c.axis < 0 ? dir_c.axis + 7 : dir_c.axis;
-		(void)id;
+		idBitwise = id << 8;
+		vboType.meta = (int)vboType.meta | idBitwise;
 		tempVbo.push_back(vboType);
 		iPt++;
 	}
@@ -72,7 +74,6 @@ bool		Chunk::canPrintBlock(vector<vbo_type> &tempVbo, BlockPos posInMesh)
 	dir = 0;
 	while (i < 6)
 	{
-		// ft_printf(BLUE "HERE\n" NA);
 		Block *tmp = this->getBlockNeighboor(posInMesh, (Direction)i);
 		if (!tmp || (tmp->getInfo().id == 0))
 		{
@@ -281,7 +282,7 @@ void		Chunk::displayChunk(Engine &e, glm::mat4 world)
 	Shader&									shader(e.getShader());
 	Textures								*t;
 
-	t = e.getTexture(TEST_T - (END_BLOCK_T + 1));
+	t = e.getTexture(0);
 	while (it != this->valid.end())
 	{
 		// ft_printf(CYAN "%d %u\n" NA, it->first, it->second);
@@ -293,6 +294,8 @@ void		Chunk::displayChunk(Engine &e, glm::mat4 world)
 			"view"), 1, GL_FALSE, glm::value_ptr(e.getCam().getMatrix(true)));
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),
 			"projection"), 1, GL_FALSE, glm::value_ptr(e.getCam().getProjMatrix()));
+		glUniform1i(glGetUniformLocation(shader.getProgram(),
+			"nbTxt"), END_BLOCK_T);
 		glUniform1i(glGetUniformLocation(shader.getProgram(),
 			"basicTexture"), t ? t->getTxt() : 0);
 		glDrawArrays(GL_TRIANGLES, 0, it->second);

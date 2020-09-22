@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/13 17:42:19 by gperez            #+#    #+#             */
-/*   Updated: 2020/08/11 23:22:23 by gperez           ###   ########.fr       */
+/*   Updated: 2020/09/16 19:34:36 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ static t_txt_path g_txt_path[] = {
 	{LOG_OAK_T, "textures/blocks/log_oak.png"},
 	{STONE_T, "textures/blocks/stone.png"},
 	{END_BLOCK_T, ""},
-	{SKY_T, "textures_test/water.bmp"},
+	{SKY_T, "textures/blocks/dirt.png"},
 	{TEST_T, "textures/blocks/dirt.png"},
 	{END_T, ""}
 };
@@ -40,7 +40,7 @@ class Textures
 	public:
 		Textures();
 		Textures(char *txtPath);
-		Textures(char *buffer, unsigned long len);
+		Textures(char *buffer, unsigned long width, unsigned long height);
 		int				getWidth(void) const;
 		int				getHeight(void) const;
 		void			setTxt(unsigned int t);

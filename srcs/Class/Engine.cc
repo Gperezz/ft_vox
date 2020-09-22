@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2020/08/11 23:27:31 by gperez           ###   ########.fr       */
+/*   Updated: 2020/09/18 19:09:29 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,37 +142,81 @@ void 		Engine::fillTextureVector(size_t start, size_t end, bool load)
 	size_t	i = start;
 	string	str;
 	size_t	len;
+	bool	isPng;
 
 	while (i < end && (!load || textures.size() < 16))
 	{
 		len = ft_strlen(g_txt_path[i].path_txt);
-		if (len && load)
-		{
-			str.assign(g_txt_path[i].path_txt, len);
-			this->addTexture((char*)g_txt_path[i].path_txt, 0,
-			str.find(".png") == (len - 4) ? true : false);
-		}
-		else if (!load)
+		str.assign(g_txt_path[i].path_txt, len);
+		isPng = str.find(".png") == (len - 4);
+		if (len && load && isPng)
+			this->addTexture((char*)g_txt_path[i].path_txt, 0, 0);
+		else if (!load && isPng)
 			this->textures.push_back(new Textures((char*)g_txt_path[i].path_txt));
+		else if (!isPng)
+			this->textures.push_back(new Textures((char*)g_txt_path[TEST_T].path_txt));
 		str.clear();
 		i++;
 	}
 }
 
+static void	fillBuffer(char **buffer, std::vector<Textures*> &textures)
+{
+	unsigned int	i;
+	unsigned int	iX;
+	unsigned int	iY;
+	short			lenTxt = 16 * 16 * sizeof(int);
+
+	for (unsigned int idxTxt = 0; idxTxt < textures.size(); idxTxt++)
+	{
+		for (iY = 0; iY < (unsigned int)textures[idxTxt]->getHeight(); iY++)
+		{
+			for (iX = 0; iX < (unsigned int)textures[idxTxt]->getWidth(); iX++)
+			{
+				for (i = 0; i < 4; i++)
+				{
+					(*buffer)[idxTxt * lenTxt
+						+ iY * textures[idxTxt]->getWidth() * sizeof(int)
+						+ iX * sizeof(int) + i]
+							= textures[idxTxt]->getTxtData()
+								[iY * textures[idxTxt]->getWidth() * sizeof(int)
+								+ iX * sizeof(int) + i];
+				}
+			}
+		}
+	}
+}
+
 void	Engine::genBlocksTextures(void)
 {
-	ContextOpenCL	cl;
+	// ContextOpenCL	cl;
+	char			*buffer;
+	size_t			size;
+	size_t			size_y;
 
-	this->fillTextureVector(0, END_BLOCK_T, false);
-
+	this->fillTextureVector(DIRT_T, END_BLOCK_T, false);
+	size = 16 * 16 * sizeof(int) * this->textures.size();
+	buffer = (char*)ft_memalloc(size);
+	size_y = textures.size() * 16;
 	// Recuperer les datas de chaques txt et en faire une et une seule // A FAIRE AVEC CL
+	// if (!cl.initContext())
+	// 	cl.useKernel(buffer, this->textures);
 
+	// ft_printf(RED "Apres Opencl\n" NA);
+	fillBuffer(&buffer, this->textures);
 	for (size_t i = 0; i < this->textures.size(); i++)
 		delete this->textures[i];
 	this->textures.clear();
 
 	// Rajouter la texture generer avec openCL dans le vector textures
+	this->addTexture(buffer, 16, size_y);
+}
 
+Textures	*Engine::getTexture(unsigned int t)
+{
+	if (t < this->textures.size())
+		return (this->textures[t]);
+	return (NULL);
 }
 
 void		Engine::genTextures(void)
@@ -181,11 +225,27 @@ void		Engine::genTextures(void)
 	this->fillTextureVector(END_BLOCK_T + 1, END_T, true);
 }
 
-Textures	*Engine::getTexture(unsigned int t)
+void	Engine::addTexture(char *pathOrBuffer, unsigned long width, unsigned long height)
 {
-	if (t < this->textures.size())
-		return (this->textures[t]);
-	return (NULL);
+	unsigned int	textIdx;
+	Textures		*t;
+
+	if (width == 0 && height == 0)
+		this->textures.push_back(new Textures(pathOrBuffer));
+	else
+		this->textures.push_back(new Textures(pathOrBuffer, width, height));
+	glGenTextures(1, &textIdx);
+	t = this->textures[this->textures.size() - 1];
+	t->setTxt(textIdx);
+	glActiveTexture(GL_TEXTURE0 + this->textures.size());
+	glBindTexture(GL_TEXTURE_2D, t->getTxt());
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, t->getWidth(), t->getHeight(), 0,
+		GL_RGBA, GL_UNSIGNED_BYTE, t->getTxtData());
+	glGenerateMipmap(GL_TEXTURE_2D);
 }
 
 Engine::~Engine()
@@ -201,33 +261,3 @@ Engine::~Engine()
 }
 
 ///////////////Private///////////////
-
-void	Engine::addTexture(char *pathOrBuffer, size_t len, bool alpha)
-{
-	unsigned int	textIdx;
-	Textures		*t;
-
-	(void)len;
-	// if (len == 0)
-		this->textures.push_back(new Textures(pathOrBuffer));
-	// else
-	// 	this->textures.push_back(new Textures(pathOrBuffer, len));
-	glGenTextures(1, &textIdx);
-	t = this->textures[this->textures.size() - 1];
-	t->setTxt(textIdx);
-	glActiveTexture(GL_TEXTURE0 + this->textures.size());
-	glBindTexture(GL_TEXTURE_2D, t->getTxt());
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	if (alpha)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, t->getWidth(), t->getHeight(), 0,
-			GL_RGBA, GL_UNSIGNED_BYTE, t->getTxtData());
-	}
-	else
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, t->getWidth(), t->getHeight(), 0,
-			GL_RGB, GL_UNSIGNED_BYTE, t->getTxtData());
-	glGenerateMipmap(GL_TEXTURE_2D);
-}

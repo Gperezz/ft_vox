@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:35:15 by gperez            #+#    #+#             */
-/*   Updated: 2020/08/11 19:49:53 by gperez           ###   ########.fr       */
+/*   Updated: 2020/09/15 19:05:34 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,9 +133,6 @@ class Engine
 		unsigned				vboSky;
 		unsigned				vaoSky;
 		bool					sky;
-		void 					fillTextureVector(size_t start, size_t end, bool load);
-		void					genBlocksTextures(void);
-		void					addTexture(char *pathOrBuffer, size_t len, bool alpha);
 	public:
 		Engine();
 		int			initWindow(void);
@@ -149,6 +146,9 @@ class Engine
 		Shader&		getShader(void);
 		void		genTextures(void);
 		Textures	*getTexture(unsigned int t);
+		void 		fillTextureVector(size_t start, size_t end, bool load);
+		void		genBlocksTextures(void);
+		void		addTexture(char *pathOrBuffer, unsigned long width, unsigned long height);
 		~Engine();
 };
 

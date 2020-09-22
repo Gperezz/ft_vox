@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:17:27 by gperez            #+#    #+#             */
-/*   Updated: 2020/08/10 23:07:28 by gperez           ###   ########.fr       */
+/*   Updated: 2020/09/22 17:47:42 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ class Chunk{
 		ChunkState						state;
 		World							*world;
 		bool							canPrintBlock(std::vector<vbo_type> &tempVbo, BlockPos posInMesh);
-		void							fillTempVbo(std::vector<vbo_type> &tempVbo, t_direction_consts dir_c, BlockPos posInMesh, int id);
+		void							fillTempVbo(std::vector<vbo_type> &tempVbo, t_direction_consts dir_c, BlockPos posInMesh, unsigned char id);
 		bool							conditionValidate(std::vector<vbo_type> &tempVbo, BlockPos posInMesh, bool &b);
 		void							validateMesh(char meshIdx);
 		void							generateVbo(char index, std::vector<vbo_type> tempVbo);

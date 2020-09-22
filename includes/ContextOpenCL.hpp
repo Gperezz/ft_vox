@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/12 15:32:35 by gperez            #+#    #+#             */
-/*   Updated: 2020/06/26 18:41:39 by gperez           ###   ########.fr       */
+/*   Updated: 2020/08/25 13:02:40 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include <cstdio>
 # include <vector>
 # include <map>
+# include "Textures.hpp"
 
 extern "C"
 {
@@ -42,7 +43,10 @@ class ContextOpenCL
 		cl_command_queue	clQueue;
 		cl_program			clProgram;
 		cl_kernel			kernel;
-		cl_mem				value;
+
+		cl_mem	bufferImage;
+		cl_mem	ptrTextures;
+
 		char				info[1024];
 		std::vector<char*>	programString;
 		std::vector<size_t>	programLength;
@@ -51,7 +55,7 @@ class ContextOpenCL
 		ContextOpenCL();
 		int		addProgramString(std::string programFileName);
 		int		initContext();
-		int		useKernel(void);
+		int		useKernel(char *finalBuffer, std::vector<Textures*> &textures);
 		~ContextOpenCL();
 };
 
