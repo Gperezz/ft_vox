@@ -3,17 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   World.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:08:20 by gperez            #+#    #+#             */
-/*   Updated: 2020/07/30 23:00:54 by gperez           ###   ########.fr       */
+/*   Updated: 2020/10/09 16:58:03 by karldouveno      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef _WORLD_HPP_
 # define _WORLD_HPP_
 # include <map>
-# include <filesystem>
 # include <string>
 # include <unordered_set>
 # include <vector>
@@ -23,7 +22,6 @@
 # include "WorldGenerator.hpp"
 
 using namespace std;
-using namespace std::filesystem;
 using ChunkPos = Coords::Coords<int, 2>;
 using BlockPos = Coords::Coords<int, 4>;
 
@@ -36,18 +34,16 @@ class World
 		map<ChunkPos, Chunk*>		memoryChunks;
 		queue<ChunkPos>				graphicQueue;
 		unordered_set<ChunkPos>		displayedChunks;
-		path						rootDirPath;
 		WorldGenerator				worldGen;
 		Mat							worldMatrix;
+		string						path;
 	public:
 							World(unsigned long* = NULL);
 							World(string&, unsigned long* = NULL);
-							World(path&, unsigned long* = NULL);
 							// World(string pathStr, );
 							// World(string )
 							~World();
 	void					display(Engine &e);
-	path					getDir();
 	void					pushInDisplay(Chunk* chunk);
 	void					loadChunk(ChunkPos);
 	void					loadChunk(int x, int z);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   World.cc                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2020/09/21 21:22:55 by gperez           ###   ########.fr       */
+/*   Updated: 2020/10/09 16:57:49 by karldouveno      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,22 +14,15 @@
 #include <iostream>
 
 using namespace std;
-using namespace std::filesystem;
 
 World::World(unsigned long *seed)
 {
 	this->worldGen.configure(seed);
 }
 
-World::World(string& pathStr, unsigned long *seed)
+World::World(string& path, unsigned long *seed)
 {
-	this->rootDirPath.assign(pathStr);
-	this->worldGen.configure(seed);
-}
-
-World::World(path& p, unsigned long *seed)
-{
-	this->rootDirPath.assign(p);
+	this->path = path;
 	this->worldGen.configure(seed);
 }
 
@@ -52,9 +45,6 @@ void	World::display(Engine &e)
 		this->memoryChunks.at(*it)->displayChunk(e, this->getWorldMat().getMatrix(true));
 }
 
-path	World::getDir(){
-	return this->rootDirPath;
-}
 
 Chunk	*World::get(ChunkPos cp)
 {

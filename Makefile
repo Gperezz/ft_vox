@@ -3,16 +3,16 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: gperez <gperez@student.42.fr>              +#+  +:+       +#+         #
+#    By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/01/06 13:36:11 by gperez            #+#    #+#              #
-#    Updated: 2020/08/11 18:06:05 by gperez           ###   ########.fr        #
+#    Updated: 2020/10/09 16:53:18 by karldouveno      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = ft_vox
 
-FLAGCPP = -std=c++17
+FLAGCPP = -std=c++11
 
 FLAG = -Wall -Werror -Wextra
 

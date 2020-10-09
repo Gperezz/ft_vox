@@ -1,3 +1,4 @@
 **/*.o
 .vscode
 garbage
+ft_vox
