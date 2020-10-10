@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2020/09/22 17:47:29 by gperez           ###   ########.fr       */
+/*   Updated: 2020/10/10 18:36:00 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,11 +75,11 @@ bool		Chunk::canPrintBlock(vector<vbo_type> &tempVbo, BlockPos posInMesh)
 	while (i < 6)
 	{
 		Block *tmp = this->getBlockNeighboor(posInMesh, (Direction)i);
-		if (!tmp || (tmp->getInfo().id == 0))
+		if (!tmp || (tmp->getInfo().id == AIR))
 		{
 			dir += 1 << i; //Faces visibles
 			fillTempVbo(tempVbo, (t_direction_consts)g_dir_c[i], posInMesh,
-				this->getBlock(posInMesh).getInfo().id);
+				Textures::getIndexTxt((e_BlockType)this->getBlock(posInMesh).getInfo().id));
 		}
 		i++;
 	}

@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+         #
+#    By: gperez <gperez@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2020/01/06 13:36:11 by gperez            #+#    #+#              #
-#    Updated: 2020/10/09 16:53:18 by karldouveno      ###   ########.fr        #
+#    Created: 2020/10/10 18:22:58 by gperez            #+#    #+#              #
+#    Updated: 2020/10/10 18:23:00 by gperez           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 

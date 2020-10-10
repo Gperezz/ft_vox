@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/13 17:54:04 by gperez            #+#    #+#             */
-/*   Updated: 2020/09/22 18:19:27 by gperez           ###   ########.fr       */
+/*   Updated: 2020/10/10 19:03:42 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,24 @@ unsigned char	*Textures::getTxtData(void)
 	return (this->txtData);
 }
 
+e_txt			Textures::getIndexTxt(e_BlockType type)
+{
+	e_txt	index = (e_txt)0;
+	bool	find = false;
+
+	for (int i = 0; find == false && i < END_T; i++)
+	{
+		if (g_txt_path[i].type == type)
+		{
+			index = g_txt_path[i].index_txt;
+			find = true;
+		}
+	}
+	return (index);
+}
+
 Textures::~Textures()
 {
-	stbi_image_free(this->txtData);
+	if (this->txtData)
+		stbi_image_free(this->txtData);
 }
