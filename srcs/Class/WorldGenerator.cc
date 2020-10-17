@@ -6,7 +6,7 @@
 /*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/02 08:06:26 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/17 11:23:23 by karldouveno      ###   ########.fr       */
+/*   Updated: 2020/10/17 11:58:39 by karldouveno      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,6 @@ void	WorldGenerator::genChunk(Chunk *chunk)
 			int height = (int)((perlinNoise + 1.0f) * 10) + 100;
 			int y = 0;
 			for (; y < height; y++) {
-				printf("%d %d %d %d %d\n", y / 16, x, y % 16, z, height);
 				chunk->setBlock(BlockPos((int[4]){y / 16, x, y % 16, z}),
 						(t_block_info){2,0,0,0});
 			}
