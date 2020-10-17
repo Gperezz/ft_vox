@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WorldGenerator.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/30 16:22:18 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/20 19:32:51 by gperez           ###   ########.fr       */
+/*   Updated: 2020/10/09 17:40:39 by karldouveno      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,12 @@
 # include "Rand.hpp"
 # include "Block.hpp"
 # include "Chunk.hpp"
+# include "Perlin.hpp"
 
 class WorldGenerator{
 	private:
-		unsigned long seed;
+		unsigned long	seed;
+		PerlinNoise		tP;
 	public:
 		WorldGenerator();
 		WorldGenerator(unsigned long* seed);

@@ -6,7 +6,7 @@
 /*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/09 16:57:49 by karldouveno      ###   ########.fr       */
+/*   Updated: 2020/10/17 10:58:46 by karldouveno      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ void	World::loadChunk(ChunkPos cp)
 	if (this->memoryChunks.count(cp) == 0)
 	{
 		Chunk	*newChunk = new Chunk(this, cp);
-		this->worldGen.genTest(newChunk);
+		this->worldGen.genChunk(newChunk);
 		this->memoryChunks[cp] = newChunk;
 		this->memoryChunks[cp]->updateFenced(1);
 		this->pushInDisplay(newChunk);
