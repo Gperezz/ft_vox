@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   World.cc                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
+/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/09 16:57:49 by karldouveno      ###   ########.fr       */
+/*   Updated: 2020/10/19 19:56:21 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@ using namespace std;
 World::World(unsigned long *seed)
 {
 	this->worldGen.configure(seed);
+	this->deltaFrameTime = 0.0;
+	this->lastFrameTime = 0.0;
 }
 
 World::World(string& path, unsigned long *seed)
@@ -37,12 +39,14 @@ World::~World()
 	}
 }
 
-void	World::display(Engine &e)
+void	World::display(Engine &e, float currentFrameTime)
 {
 	if (e.isSkybox() && e.getTexture(SKY_T - END_BLOCK_T))
 		e.displaySky(e.getTexture(SKY_T - END_BLOCK_T));
 	for (auto it = this->displayedChunks.begin(); it != this->displayedChunks.end(); it++)
-		this->memoryChunks.at(*it)->displayChunk(e, this->getWorldMat().getMatrix(true));
+		this->memoryChunks.at(*it)->displayChunk(e);
+	this->deltaFrameTime = currentFrameTime - this->lastFrameTime;
+	this->lastFrameTime = currentFrameTime;
 }
 
 
@@ -108,10 +112,10 @@ unordered_set<ChunkPos>	&World::getDisplayedChunks(void)
 
 void	World::loadChunk(int x, int z)
 {
-	return this->loadChunk(ChunkPos((int[2]){x, z}));
+	return (this->loadChunk(ChunkPos((int[2]){x, z})));
 }
 
-Mat		&World::getWorldMat(void)
+float	World::getDeltaFrameTime(void) const
 {
-	return (this->worldMatrix);
+	return (this->deltaFrameTime);
 }

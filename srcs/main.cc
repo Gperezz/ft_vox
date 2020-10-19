@@ -6,55 +6,55 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2020/09/21 20:23:24 by gperez           ###   ########.fr       */
+/*   Updated: 2020/10/19 19:55:44 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_vox.hpp"
 
-void	key(Engine &env, Mat &world)
+void	key(Engine &env, const float deltaFrameTime)
 {
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(env.getWindow(), true);
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_S) == GLFW_PRESS)
 	{
-		world.translate((glm::vec3){0, 0, 0.1});
-		// world.printMatrix(true);
+		env.getCam().translate(E_FRONT, SPEED * deltaFrameTime);
+		// env.getCam().printMatrix(true);
 	}
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_W) == GLFW_PRESS)
 	{
-		world.translate((glm::vec3){0, 0, -0.1});
-		// world.printMatrix(true);
+		env.getCam().translate(E_FRONT, -SPEED * deltaFrameTime);
+		// env.getCam().printMatrix(true);
 	}
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_A) == GLFW_PRESS)
 	{
-		world.translate((glm::vec3){-0.1, 0, 0});
-		// world.printMatrix(true);
+		env.getCam().translate(E_RIGHT, SPEED * deltaFrameTime);
+		// env.getCam().printMatrix(true);
 	}
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_D) == GLFW_PRESS)
 	{
-		world.translate((glm::vec3){0.1, 0, 0});
-		// world.printMatrix(true);
+		env.getCam().translate(E_RIGHT, -SPEED * deltaFrameTime);
+		// env.getCam().printMatrix(true);
 	}
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_SPACE) == GLFW_PRESS)
 	{
-		world.translate((glm::vec3){0, -0.1, 0});
-		// world.printMatrix(true);
+		env.getCam().translate(E_UP, SPEED * deltaFrameTime);
+		// env.getCam().printMatrix(true);
 	}
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 	{
-		world.translate((glm::vec3){0, 0.1, 0});
-		// world.printMatrix(true);
+		env.getCam().translate(E_UP, -SPEED * deltaFrameTime);
+		// env.getCam().printMatrix(true);
 	}
 }
 
-void	exec(World &world, Engine &env)
+void	exec(World &world, Engine &env, TimeMs time)
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	key(env, world.getWorldMat());
-	world.display(env);
+	key(env, world.getDeltaFrameTime());
+	world.display(env, time.getTimeSeconds());
 	glfwSwapBuffers(env.getWindow());
 	glfwPollEvents();
 }
@@ -75,7 +75,8 @@ int		main(void)
 	Engine			env;
 	World			world;
 	Shader&			shader(env.getShader());
-	
+	TimeMs			time;
+
 	// ft_printf(RED"%ld\n" NA, sizeof(block.getInfo()));
 	
 	env.initWindow();
@@ -86,7 +87,6 @@ int		main(void)
 	env.getCam().setProjMatrix(glm::perspective(glm::radians(45.0f),
 		(float)WIDTH / (float)HEIGHT, 0.1f, (float)RENDER_DIST));
 	env.getCam().setTranslate((glm::vec3){0.5, -0.5, 0.5});
-	env.getCam().rotate((glm::vec3){0, 180, 0});
 	
 	ft_printf(MAGENTA "Cam Matrix\n" NA);
 	env.getCam().printMatrix(true);
@@ -112,9 +112,9 @@ int		main(void)
 	}
 	//////////////////////////////////////////////////////////////////////////
 
-
+	time.setTime();
 	while(!glfwWindowShouldClose(env.getWindow()))
-		exec(world, env);
+		exec(world, env, time);
 	shader.freeProgram();
 	glfwDestroyWindow(env.getWindow());
 	glfwTerminate();

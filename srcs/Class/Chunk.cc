@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/10 18:36:00 by gperez           ###   ########.fr       */
+/*   Updated: 2020/10/19 18:42:15 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -276,7 +276,7 @@ void		Chunk::generateGraphics(void)
 	}
 }
 
-void		Chunk::displayChunk(Engine &e, glm::mat4 world)
+void		Chunk::displayChunk(Engine &e)
 {
 	std::map<char, unsigned int>::iterator	it = this->valid.begin();
 	Shader&									shader(e.getShader());
@@ -288,8 +288,6 @@ void		Chunk::displayChunk(Engine &e, glm::mat4 world)
 		// ft_printf(CYAN "%d %u\n" NA, it->first, it->second);
 		glBindVertexArray(this->tabVao[(int)it->first]);
 		glUseProgram(shader.getProgram());
-		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),
-			"world"), 1, GL_FALSE, glm::value_ptr(world));
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),
 			"view"), 1, GL_FALSE, glm::value_ptr(e.getCam().getMatrix(true)));
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),

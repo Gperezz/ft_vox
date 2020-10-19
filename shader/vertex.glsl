@@ -3,7 +3,6 @@ layout (location = 0) in vec3 aPos;
 layout (location = 1) in float meta;
 
 uniform mat4	view;
-uniform mat4	world;
 uniform mat4	projection;
 uniform int		nbTxt;
 
@@ -28,5 +27,5 @@ void main()
 	// tCoords.x = mod(tCoords.x, 16);
 	tCoords.y = mod(tCoords.y, 16 / nbTxt);
 	tCoords.y = ((tCoords.y + type) / nbTxt);
-	gl_Position = projection * view * world * pos4;
+	gl_Position = projection * view * pos4;
 }

@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:17:27 by gperez            #+#    #+#             */
-/*   Updated: 2020/09/22 17:47:42 by gperez           ###   ########.fr       */
+/*   Updated: 2020/10/19 18:42:47 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ class Chunk{
 		Block							*getBlockNeighboor(BlockPos, Direction);
 
 		void							generateGraphics(void);
-		void							displayChunk(Engine &e, glm::mat4 world);
+		void							displayChunk(Engine &e);
 
 		Block&							operator[](BlockPos);
 		void							operator=(const Chunk	&copy);

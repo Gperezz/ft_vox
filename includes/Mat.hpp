@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/04 23:29:17 by gperez            #+#    #+#             */
-/*   Updated: 2020/05/05 12:39:02 by gperez           ###   ########.fr       */
+/*   Updated: 2020/10/19 19:04:25 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ class					Mat
 {
 	public:
 		Mat();
+		glm::mat4			getMatrix(void);
 		glm::mat4			getMatrix(bool calc);
 		void				setMatrix(glm::mat4 mat);
 		void				printMatrix(bool calc);
@@ -37,15 +38,15 @@ class					Mat
 		void				setScale(glm::vec3 v);
 		void				scale(glm::vec3 s);
 		glm::vec3			getScale(void);
-		~Mat();
+		virtual				~Mat();
 	private:
 		glm::mat4		matrix;
 		glm::vec3		trans;
 		glm::vec3		rot;
 		glm::vec3		sc;
 
-		glm::mat4			calcMatrix(glm::vec3 t, glm::vec3 r, glm::vec3 s);
-		glm::mat4			calcMatrix(void);
+		virtual glm::mat4	calcMatrix(glm::vec3 t, glm::vec3 r, glm::vec3 s);
+		virtual glm::mat4	calcMatrix(void);
 
 };
 
