@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/04 23:29:17 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/19 19:04:25 by gperez           ###   ########.fr       */
+/*   Updated: 2020/10/20 03:26:41 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ class					Mat
 		glm::vec3			getTranslate(void);
 		void				setTranslate(glm::vec3 v);
 		void				rotate(glm::vec3 v);
+		void				setRotation(glm::vec3 rot);
 		glm::vec3			getRotation(void);
 		void				setScale(glm::vec3 v);
 		void				scale(glm::vec3 s);

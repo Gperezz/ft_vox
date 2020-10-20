@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/19 19:55:44 by gperez           ###   ########.fr       */
+/*   Updated: 2020/10/20 16:10:48 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,8 +86,8 @@ int		main(void)
 	env.genSkybox();
 	env.getCam().setProjMatrix(glm::perspective(glm::radians(45.0f),
 		(float)WIDTH / (float)HEIGHT, 0.1f, (float)RENDER_DIST));
-	env.getCam().setTranslate((glm::vec3){0.5, -0.5, 0.5});
-	
+	env.getCam().setTranslate((glm::vec3){7.5, 1, 2});
+
 	ft_printf(MAGENTA "Cam Matrix\n" NA);
 	env.getCam().printMatrix(true);
 

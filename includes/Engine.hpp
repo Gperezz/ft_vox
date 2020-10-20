@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:35:15 by gperez            #+#    #+#             */
-/*   Updated: 2020/09/15 19:05:34 by gperez           ###   ########.fr       */
+/*   Updated: 2020/10/20 03:46:51 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,6 +133,8 @@ class Engine
 		unsigned				vboSky;
 		unsigned				vaoSky;
 		bool					sky;
+		glm::vec2				mouseLastPos;
+		bool					firstMouse;
 	public:
 		Engine();
 		int			initWindow(void);
@@ -149,6 +151,10 @@ class Engine
 		void 		fillTextureVector(size_t start, size_t end, bool load);
 		void		genBlocksTextures(void);
 		void		addTexture(char *pathOrBuffer, unsigned long width, unsigned long height);
+		glm::vec2	getMouseLastPos(void);
+		void		setMouseLastPos(glm::vec2 v);
+		bool		isFirst(void);
+		void		setFirst(bool f);
 		~Engine();
 };
 

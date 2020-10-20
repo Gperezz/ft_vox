@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/04 23:49:41 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/19 19:57:33 by gperez           ###   ########.fr       */
+/*   Updated: 2020/10/20 16:10:18 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,11 @@
 # define CAMERA_HPP
 
 # include "Mat.hpp"
-# define SPEED 2.5
+# define SPEED 2.5f
+# define SENSITIVITY 0.15f
 
 enum	e_axes{E_RIGHT, E_UP, E_FRONT};
-
+enum	e_rot{PITCH, YAW, ROLL};
 
 class	Camera : public Mat
 {
@@ -29,7 +30,10 @@ class	Camera : public Mat
 		void				lookAt(glm::vec3 look);
 		void				lookAt(void);
 		void				look(void);
-		void				translate(e_axes axe, float speed);
+		virtual void		translate(e_axes axe, float speed);
+		virtual void		rotate(glm::vec3 rotEuler);
+		float				getEuler(e_rot euler);
+		void				setCameraFront(glm::vec3 front);
 		virtual				~Camera();
 	private:
 		Mat					projection;

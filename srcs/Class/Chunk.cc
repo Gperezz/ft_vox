@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/19 18:42:15 by gperez           ###   ########.fr       */
+/*   Updated: 2020/10/20 16:13:06 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -289,7 +289,7 @@ void		Chunk::displayChunk(Engine &e)
 		glBindVertexArray(this->tabVao[(int)it->first]);
 		glUseProgram(shader.getProgram());
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),
-			"view"), 1, GL_FALSE, glm::value_ptr(e.getCam().getMatrix(true)));
+			"view"), 1, GL_FALSE, glm::value_ptr(e.getCam().getMatrix(false)));
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),
 			"projection"), 1, GL_FALSE, glm::value_ptr(e.getCam().getProjMatrix()));
 		glUniform1i(glGetUniformLocation(shader.getProgram(),

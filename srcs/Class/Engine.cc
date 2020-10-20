@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2020/09/18 19:09:29 by gperez           ###   ########.fr       */
+/*   Updated: 2020/10/20 16:19:31 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,28 @@ using namespace std;
 Engine::Engine()
 {
 	this->sky = false;
+	this->firstMouse = true;
+}
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+	Engine		*engine = (Engine*)glfwGetWindowUserPointer(window);
+	glm::vec2	offsetMouse;
+	glm::vec2	lastMousePos;
+
+	if (!engine)
+		return ;
+	if (engine->isFirst())
+	{
+		engine->setMouseLastPos(glm::vec2(xpos, ypos));
+		engine->setFirst(false);
+	}
+	lastMousePos = engine->getMouseLastPos();
+	offsetMouse.y = xpos - lastMousePos.x;
+	offsetMouse.x = ypos - lastMousePos.y;
+	engine->setMouseLastPos(glm::vec2(xpos, ypos));
+	offsetMouse *= SENSITIVITY;
+	engine->getCam().rotate(glm::vec3(offsetMouse.x, offsetMouse.y, 0.0));
 }
 
 static void	framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -36,20 +58,23 @@ int			Engine::initWindow(void)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	Engine::window = glfwCreateWindow(WIDTH, HEIGHT, "ft_vox", NULL, NULL);
-	if (Engine::window == NULL)
+	this->window = glfwCreateWindow(WIDTH, HEIGHT, "ft_vox", NULL, NULL);
+	if (this->window == NULL)
 	{
 		cout << "Failed to create GLFW window" << endl;
 		glfwTerminate();
 		return (-1);
 	}
-	glfwMakeContextCurrent(Engine::window);
+	glfwMakeContextCurrent(this->window);
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
 		cout << "Failed to initialize GLAD" << endl;
 		return (-1);
 	}
-	glfwSetFramebufferSizeCallback(Engine::window, framebuffer_size_callback);
+	glfwSetCursorPosCallback(this->window, mouse_callback);
+	glfwSetFramebufferSizeCallback(this->window, framebuffer_size_callback);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetWindowUserPointer(window, this);
 	glfwSwapInterval(1);
 	return (0);
 }
@@ -246,6 +271,26 @@ void	Engine::addTexture(char *pathOrBuffer, unsigned long width, unsigned long h
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, t->getWidth(), t->getHeight(), 0,
 		GL_RGBA, GL_UNSIGNED_BYTE, t->getTxtData());
 	glGenerateMipmap(GL_TEXTURE_2D);
+}
+
+glm::vec2	Engine::getMouseLastPos(void)
+{
+	return (this->mouseLastPos);
+}
+
+void		Engine::setMouseLastPos(glm::vec2 v)
+{
+	this->mouseLastPos = v;
+}
+
+bool		Engine::isFirst(void)
+{
+	return (this->firstMouse);
+}
+
+void		Engine::setFirst(bool f)
+{
+	this->firstMouse = f;
 }
 
 Engine::~Engine()

@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/04 23:19:34 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/19 11:44:50 by gperez           ###   ########.fr       */
+/*   Updated: 2020/10/20 03:40:53 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,6 +109,11 @@ glm::vec3	Mat::getTranslate(void)
 void		Mat::rotate(glm::vec3 v)
 {
 	Mat::rot += v;
+}
+
+void	Mat::setRotation(glm::vec3 v)
+{
+	this->rot = v;
 }
 
 glm::vec3	Mat::getRotation(void)
