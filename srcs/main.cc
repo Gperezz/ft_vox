@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/20 16:10:48 by gperez           ###   ########.fr       */
+/*   Updated: 2020/10/21 13:26:52 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,8 +78,9 @@ int		main(void)
 	TimeMs			time;
 
 	// ft_printf(RED"%ld\n" NA, sizeof(block.getInfo()));
-	
-	env.initWindow();
+
+	if (env.initWindow() == -1)
+		return (1);
 	if (shader.loadShader((char*)VERTEX, (char*)FRAGMENT))
 		return (1);
 	env.genTextures();

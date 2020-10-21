@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/20 16:19:31 by gperez           ###   ########.fr       */
+/*   Updated: 2020/10/21 17:20:56 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,9 @@ int			Engine::initWindow(void)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+
+	// glfwWindowHint(GLFW_AUTO_ICONIFY, GL_TRUE);
+	// this->window = glfwCreateWindow(WIDTH, HEIGHT, "ft_vox", glfwGetPrimaryMonitor(), NULL);
 	this->window = glfwCreateWindow(WIDTH, HEIGHT, "ft_vox", NULL, NULL);
 	if (this->window == NULL)
 	{
@@ -133,18 +136,22 @@ Shader&		Engine::getShaderSky(void)
 
 void		Engine::displaySky(Textures *t)
 {
-	Shader	&shader = this->shaderSky;
-
+	Shader		&shader = this->shaderSky;
+	Camera		centerCam;
+	
+	this->getCam().look();
+	centerCam.setRotation(this->getCam().getRotation());
+	centerCam.setTranslate(glm::vec3(0.5, 0.5, 0.5));
 	glDepthMask(false);
 	glBindVertexArray(this->vaoSky);
 	glUseProgram(shader.getProgram());
 	glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),
-		"view"), 1, GL_FALSE, glm::value_ptr(this->getCam().getMatrix(true)));
+		"view"), 1, GL_FALSE, glm::value_ptr(centerCam.getMatrix(true)));
 	glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),
 		"projection"), 1, GL_FALSE, glm::value_ptr(this->getCam().getProjMatrix()));
 	glUniform1i(glGetUniformLocation(shader.getProgram(),
 		"basicTexture"), t ? t->getTxt() : 0);
-	glDrawArrays(GL_TRIANGLES, 0, NB_TRIANGLES_CUBE);
+	glDrawArrays(GL_TRIANGLES, 0, NB_PTS_CUBE);
 	glDepthMask(true);
 }
 
@@ -152,6 +159,7 @@ Camera&		Engine::getCam(void)
 {
 	return (Engine::camera);
 }
+
 void		Engine::setCam(Camera cam)
 {
 	Engine::camera = cam;

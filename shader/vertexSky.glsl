@@ -9,9 +9,18 @@ out vec2 tCoords;
 
 void main()
 {
-	vec4 pos4;
+	vec4	pos4;
+	int		dir;
 
+	dir = int(meta);
 	tCoords = aPos.xy;
 	pos4 = vec4(aPos.xyz, 1.0);
+	if (dir == 1 || dir == 6)
+		tCoords = aPos.zy;
+	else if (dir == 2 ||dir == 5)
+		tCoords = aPos.xz;
+	else
+		tCoords = aPos.xy;
 	gl_Position = projection * view * pos4;
+
 }

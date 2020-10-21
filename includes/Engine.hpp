@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:35:15 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/20 03:46:51 by gperez           ###   ########.fr       */
+/*   Updated: 2020/10/21 14:06:46 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,8 @@ extern "C"
 # include <iostream>
 # include <vector>
 
-# define WIDTH 800
-# define HEIGHT 600
+# define WIDTH 1920
+# define HEIGHT 1080
 # define RENDER_DIST 1000.0f
 # define VERTEX_SKY	"shader/vertexSky.glsl"
 
@@ -64,7 +64,7 @@ typedef struct	s_direction_consts{
 	BlockPos	pts[6];
 }				t_direction_consts;
 
-# define NB_TRIANGLES_CUBE 12
+# define NB_PTS_CUBE 36
 
 static t_direction_consts	g_dir_c[] = {
 	// NORTH
