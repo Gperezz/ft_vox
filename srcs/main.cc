@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cc                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2020/09/21 20:23:24 by gperez           ###   ########.fr       */
+/*   Updated: 2020/10/25 23:54:52 by karldouveno      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,18 +99,19 @@ int		main(void)
 
 	ft_printf(MAGENTA"Ceci est Ft_vox:\n" NA);
 
-	int lim = 1;
+	// int lim = 1;
 
 	///////////////////////////////////// Load test ////////////////////
 
-	for (int y = 0; y < lim; y++)
-	{
-		for (int x = 0; x < lim; x++)
-		{
-			recLoad(world, x, y, 0);
-		}
-	}
+	// for (int y = 0; y < lim; y++)
+	// {
+	// 	for (int x = 0; x < lim; x++)
+	// 	{
+	// 	}
+	// }
 	//////////////////////////////////////////////////////////////////////////
+
+	recLoad(world, 0, 0, 0);
 
 
 	while(!glfwWindowShouldClose(env.getWindow()))

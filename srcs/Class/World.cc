@@ -6,22 +6,27 @@
 /*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/17 10:58:46 by karldouveno      ###   ########.fr       */
+/*   Updated: 2020/10/26 00:23:05 by karldouveno      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "World.hpp"
 #include <iostream>
-
 using namespace std;
 
 World::World(unsigned long *seed)
 {
+	this->queueOn = true;
+	this->initQueueSorter();
+	this->initQueueThread();
 	this->worldGen.configure(seed);
 }
 
 World::World(string& path, unsigned long *seed)
 {
+	this->queueOn = true;
+	this->initQueueSorter();
+	this->initQueueThread();
 	this->path = path;
 	this->worldGen.configure(seed);
 }
@@ -29,20 +34,85 @@ World::World(string& path, unsigned long *seed)
 World::~World()
 {
 	std::map<ChunkPos, Chunk*>::iterator it = memoryChunks.begin();
-
 	while (it != memoryChunks.end())
 	{
 		delete it->second;
 		it++;
 	}
+	
+	queueThread.join();
+}
+
+void	World::initQueueSorter()
+{
+	auto cmp = [this](ChunkPos a, ChunkPos b)->bool{
+		ChunkPos center = this->getCameraChunkPos();
+		float da = a.distance(center);
+		float db = b.distance(center);
+		return da < db;
+	};
+	this->loadQueue = set<ChunkPos, function<bool (ChunkPos, ChunkPos)>>(cmp);
+}
+
+void	World::initQueueThread()
+{
+	auto queueLoop = [this]() {
+		while (this->queueOn){
+			if (this->loadQueue.size()){
+				printf("something's up");
+				decltype(this->loadQueue.begin()) pos;
+				{
+					unique_lock<mutex> lock(this->queueMutex);
+					pos = this->loadQueue.begin();
+					this->loadQueue.erase(pos);
+				}
+				this->loadChunk(*pos);
+			}
+		}
+	};
+	this->queueThread = thread(queueLoop);
 }
 
 void	World::display(Engine &e)
 {
+	this->rearrangeQueues();
 	if (e.isSkybox() && e.getTexture(SKY_T - END_BLOCK_T))
 		e.displaySky(e.getTexture(SKY_T - END_BLOCK_T));
-	for (auto it = this->displayedChunks.begin(); it != this->displayedChunks.end(); it++)
-		this->memoryChunks.at(*it)->displayChunk(e, this->getWorldMat().getMatrix(true));
+	{
+		unique_lock<mutex> lock(this->queueMutex);
+		for (auto it = this->displayedChunks.begin(); it != this->displayedChunks.end(); it++)
+			this->memoryChunks.at(*it)->displayChunk(e, this->getWorldMat().getMatrix(true));
+	}
+}
+
+void	World::rearrangeQueues()
+{
+	static ChunkPos pos;
+	ChunkPos newPos = this->getCameraChunkPos();
+	printf("%d %d\n", pos[0], pos[1]);
+
+	if (pos == newPos)
+		return ;
+	pos = newPos;
+	for (int i = -CHK_RND_DIST; i < CHK_RND_DIST; i++) {
+		for (int j = -CHK_RND_DIST; j < CHK_RND_DIST; j++){
+			{
+				unique_lock<mutex> lock(this->queueMutex);
+				this->loadQueue.insert(pos + (int[]){i, j});
+			}
+		}
+	}
+}
+
+ChunkPos	World::getCameraChunkPos()
+{
+	glm::vec3 mat = this->getWorldMat().getTranslate();
+	float test[] = {-mat.x / 16, -mat.z / 16};
+	if (test[0] < 0)
+		test[0] -= 1.0;
+	if (test[1] < 0)
+		test[1] -= 1.0;
+	return (int[]){(int)test[0], (int)test[1]};
 }
 
 
@@ -90,9 +160,15 @@ void	World::loadChunk(ChunkPos cp)
 	{
 		Chunk	*newChunk = new Chunk(this, cp);
 		this->worldGen.genChunk(newChunk);
-		this->memoryChunks[cp] = newChunk;
+		{
+			unique_lock<mutex> lock(this->queueMutex);
+			this->memoryChunks[cp] = newChunk;
+		}
 		this->memoryChunks[cp]->updateFenced(1);
-		this->pushInDisplay(newChunk);
+		{
+			unique_lock<mutex> lock(this->queueMutex);
+			this->pushInDisplay(newChunk);
+		}
 	}
 }
 

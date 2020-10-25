@@ -6,7 +6,7 @@
 /*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:08:20 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/09 16:58:03 by karldouveno      ###   ########.fr       */
+/*   Updated: 2020/10/25 23:44:28 by karldouveno      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,14 @@
 # include <string>
 # include <unordered_set>
 # include <vector>
-# include <queue>
+# include <set>
+# include <thread>
+# include <mutex>
 
 # include "Chunk.hpp"
 # include "WorldGenerator.hpp"
+# define CHK_RND_DIST 2
+# define CHK_DEL_DIST 32
 
 using namespace std;
 using ChunkPos = Coords::Coords<int, 2>;
@@ -30,19 +34,28 @@ class Engine;
 class World
 {
 	private:
-		queue<ChunkPos>				loadQueue;
-		map<ChunkPos, Chunk*>		memoryChunks;
-		queue<ChunkPos>				graphicQueue;
-		unordered_set<ChunkPos>		displayedChunks;
-		WorldGenerator				worldGen;
-		Mat							worldMatrix;
-		string						path;
+		bool					queueOn;
+		thread					queueThread;
+		mutex					queueMutex;
+		set<ChunkPos, function<bool (ChunkPos, ChunkPos)>>	loadQueue;
+		map<ChunkPos, Chunk*>	memoryChunks;
+		set<ChunkPos>			graphicQueue;
+		unordered_set<ChunkPos>	displayedChunks;
+		WorldGenerator			worldGen;
+		Mat						worldMatrix;
+		string					path;
 	public:
 							World(unsigned long* = NULL);
 							World(string&, unsigned long* = NULL);
 							// World(string pathStr, );
 							// World(string )
 							~World();
+
+	
+	void					initQueueThread();
+	void					initQueueSorter();
+	ChunkPos				getCameraChunkPos();
+	void					rearrangeQueues();
 	void					display(Engine &e);
 	void					pushInDisplay(Chunk* chunk);
 	void					loadChunk(ChunkPos);
