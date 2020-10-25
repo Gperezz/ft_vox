@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Coords.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 20:07:59 by gperez            #+#    #+#             */
-/*   Updated: 2020/08/04 18:39:27 by gperez           ###   ########.fr       */
+/*   Updated: 2020/10/25 23:25:27 by karldouveno      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,8 +38,9 @@ namespace Coords{
 				
 				for (unsigned i = 0; i < dims; i++)
 				{
-					out += toMesure;
+					out += (this->get(i) - toMesure.get(i)) * (this->get(i) - toMesure.get(i));
 				}
+				return sqrt(out);
 			}
 
 			T&			get(const unsigned i)
