@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Chunk.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:17:27 by gperez            #+#    #+#             */
-/*   Updated: 2020/09/22 17:47:42 by gperez           ###   ########.fr       */
+/*   Updated: 2020/11/02 20:22:44 by karldouveno      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include "Engine.hpp"
 # include <vector>
 # include <map>
+# include <mutex>
 
 class World;
 
@@ -54,6 +55,7 @@ enum ChunkState : char{
 
 class Chunk{
 	private:
+		std::mutex							validMutex;
 		Block							blocks[16][16][16][16]; // [meshIdx_y][Mesh_relative_x][Mesh_relative_y][mesh_relative_z]
 		unsigned int					tabVao[16];
 		unsigned int					tabVbo[16];

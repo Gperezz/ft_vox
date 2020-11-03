@@ -6,7 +6,7 @@
 /*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:08:20 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/25 23:44:28 by karldouveno      ###   ########.fr       */
+/*   Updated: 2020/11/03 01:58:56 by karldouveno      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 
 # include "Chunk.hpp"
 # include "WorldGenerator.hpp"
-# define CHK_RND_DIST 2
+# define CHK_RND_DIST 16
 # define CHK_DEL_DIST 32
 
 using namespace std;
@@ -37,6 +37,9 @@ class World
 		bool					queueOn;
 		thread					queueThread;
 		mutex					queueMutex;
+		mutex					matMutex;
+		mutex					memoryMutex;
+		mutex					displayedMutex;
 		set<ChunkPos, function<bool (ChunkPos, ChunkPos)>>	loadQueue;
 		map<ChunkPos, Chunk*>	memoryChunks;
 		set<ChunkPos>			graphicQueue;
@@ -54,6 +57,7 @@ class World
 	
 	void					initQueueThread();
 	void					initQueueSorter();
+	bool					LoadNextQueuedChunk();
 	ChunkPos				getCameraChunkPos();
 	void					rearrangeQueues();
 	void					display(Engine &e);
@@ -65,6 +69,7 @@ class World
 	Chunk					*getMemoryChunk(ChunkPos pos);
 	unordered_set<ChunkPos>	&getDisplayedChunks(void);
 	Chunk					*operator[](ChunkPos);
+	mutex					&getMatMutex();
 }; 
 
 #endif

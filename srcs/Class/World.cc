@@ -6,7 +6,7 @@
 /*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/26 00:23:05 by karldouveno      ###   ########.fr       */
+/*   Updated: 2020/11/03 01:55:59 by karldouveno      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ World::World(unsigned long *seed)
 {
 	this->queueOn = true;
 	this->initQueueSorter();
-	this->initQueueThread();
+	//this->initQueueThread();
 	this->worldGen.configure(seed);
 }
 
@@ -26,7 +26,7 @@ World::World(string& path, unsigned long *seed)
 {
 	this->queueOn = true;
 	this->initQueueSorter();
-	this->initQueueThread();
+	//this->initQueueThread();
 	this->path = path;
 	this->worldGen.configure(seed);
 }
@@ -39,7 +39,7 @@ World::~World()
 		delete it->second;
 		it++;
 	}
-	
+	this->queueOn = false;
 	queueThread.join();
 }
 
@@ -49,25 +49,36 @@ void	World::initQueueSorter()
 		ChunkPos center = this->getCameraChunkPos();
 		float da = a.distance(center);
 		float db = b.distance(center);
+		if (da == db)
+			return a < b;
 		return da < db;
 	};
 	this->loadQueue = set<ChunkPos, function<bool (ChunkPos, ChunkPos)>>(cmp);
+}
+
+bool	World::LoadNextQueuedChunk(){
+	size_t size;
+	{	unique_lock<mutex> lock(this->queueMutex);
+		size = this->loadQueue.size(); 
+	}
+	if (size){
+		printf("something's up");
+		decltype(this->loadQueue.begin()) pos;
+		{	unique_lock<mutex> lock(this->queueMutex);
+			pos = this->loadQueue.begin();
+			this->loadQueue.erase(pos);
+		}
+		this->loadChunk(*pos);
+		return true;
+	}
+	return false;
 }
 
 void	World::initQueueThread()
 {
 	auto queueLoop = [this]() {
 		while (this->queueOn){
-			if (this->loadQueue.size()){
-				printf("something's up");
-				decltype(this->loadQueue.begin()) pos;
-				{
-					unique_lock<mutex> lock(this->queueMutex);
-					pos = this->loadQueue.begin();
-					this->loadQueue.erase(pos);
-				}
-				this->loadChunk(*pos);
-			}
+			this->LoadNextQueuedChunk();
 		}
 	};
 	this->queueThread = thread(queueLoop);
@@ -76,37 +87,44 @@ void	World::initQueueThread()
 void	World::display(Engine &e)
 {
 	this->rearrangeQueues();
+	while (this->LoadNextQueuedChunk());
 	if (e.isSkybox() && e.getTexture(SKY_T - END_BLOCK_T))
 		e.displaySky(e.getTexture(SKY_T - END_BLOCK_T));
-	{
-		unique_lock<mutex> lock(this->queueMutex);
-		for (auto it = this->displayedChunks.begin(); it != this->displayedChunks.end(); it++)
-			this->memoryChunks.at(*it)->displayChunk(e, this->getWorldMat().getMatrix(true));
-	}
+	unique_lock<mutex> lock(this->displayedMutex);
+	unique_lock<mutex> lock2(this->matMutex);
+	unique_lock<mutex> lock3(this->memoryMutex);
+	for (auto it = this->displayedChunks.begin(); it != this->displayedChunks.end(); it++)
+		this->memoryChunks.at(*it)->displayChunk(e, this->getWorldMat().getMatrix(true));
 }
 
 void	World::rearrangeQueues()
 {
 	static ChunkPos pos;
 	ChunkPos newPos = this->getCameraChunkPos();
-	printf("%d %d\n", pos[0], pos[1]);
+	printf("cur pos: %d %d\n", pos[0], pos[1]);
 
 	if (pos == newPos)
 		return ;
 	pos = newPos;
-	for (int i = -CHK_RND_DIST; i < CHK_RND_DIST; i++) {
-		for (int j = -CHK_RND_DIST; j < CHK_RND_DIST; j++){
-			{
-				unique_lock<mutex> lock(this->queueMutex);
-				this->loadQueue.insert(pos + (int[]){i, j});
-			}
+	unique_lock<mutex> lock(this->queueMutex);
+	for (int i = -CHK_RND_DIST; i < CHK_RND_DIST + 1; i++) {
+		for (int j = -CHK_RND_DIST; j < CHK_RND_DIST + 1; j++){
+			ChunkPos cp(pos + (int[]){i, j});
+			printf("surrounding pos: %d %d, %d, %d,   %lu\n", j, i, cp[0], cp[1], this->loadQueue.size());
+
+			this->loadQueue.insert(cp);
 		}
 	}
 }
 
 ChunkPos	World::getCameraChunkPos()
 {
-	glm::vec3 mat = this->getWorldMat().getTranslate();
+
+	glm::vec3 mat;
+	{
+		unique_lock<mutex> lock(this->matMutex);
+		mat = this->getWorldMat().getTranslate();
+	}
 	float test[] = {-mat.x / 16, -mat.z / 16};
 	if (test[0] < 0)
 		test[0] -= 1.0;
@@ -118,6 +136,7 @@ ChunkPos	World::getCameraChunkPos()
 
 Chunk	*World::get(ChunkPos cp)
 {
+	unique_lock<mutex> lock(this->memoryMutex);
 	if (this->memoryChunks.count(cp) == 0)
 		return NULL;
 	return this->memoryChunks.at(cp); // Potentiellement optimisable
@@ -131,12 +150,16 @@ Chunk	*World::operator[](ChunkPos cp)
 void	World::pushInDisplay(Chunk* chunk)
 {
 	Chunk*	tmp;
+	this->displayedMutex.lock();
 	pair<unordered_set<ChunkPos>::iterator, bool> ret(this->getDisplayedChunks().begin(), false);
+	this->displayedMutex.unlock();
 	int		i = 0;
 
 	if (chunk->getFenced())
 	{
-		ret = this->displayedChunks.insert(chunk->getPos()); // displayQueue
+		{	unique_lock<mutex> lock(this->displayedMutex);
+			ret = this->displayedChunks.insert(chunk->getPos()); 
+		}
 		if (ret.second)
 			chunk->generateGraphics();
 	}
@@ -145,7 +168,9 @@ void	World::pushInDisplay(Chunk* chunk)
 		tmp = chunk->getNeighboor((Direction)i);
 		if (tmp && tmp->getFenced())
 		{
-			ret = this->displayedChunks.insert(tmp->getPos());
+			{	unique_lock<mutex> lock(this->displayedMutex);
+				ret = this->displayedChunks.insert(tmp->getPos());
+			}
 			if (ret.second)
 				tmp->generateGraphics();
 		}
@@ -156,19 +181,20 @@ void	World::pushInDisplay(Chunk* chunk)
 void	World::loadChunk(ChunkPos cp)
 {
 	printf(YELLOW "%d %d\n" NA, cp.get(0), cp.get(1));
-	if (this->memoryChunks.count(cp) == 0)
+	bool count;
+	{	unique_lock<mutex> lock(this->memoryMutex);
+		count = this->memoryChunks.count(cp);
+	}
+	if (count == 0)
 	{
 		Chunk	*newChunk = new Chunk(this, cp);
 		this->worldGen.genChunk(newChunk);
 		{
-			unique_lock<mutex> lock(this->queueMutex);
+			unique_lock<mutex> lock(this->memoryMutex);
 			this->memoryChunks[cp] = newChunk;
 		}
 		this->memoryChunks[cp]->updateFenced(1);
-		{
-			unique_lock<mutex> lock(this->queueMutex);
-			this->pushInDisplay(newChunk);
-		}
+		this->pushInDisplay(newChunk);
 	}
 }
 
@@ -191,3 +217,8 @@ Mat		&World::getWorldMat(void)
 {
 	return (this->worldMatrix);
 }
+
+mutex	&World::getMatMutex()
+{
+	return this->matMutex;
+}	

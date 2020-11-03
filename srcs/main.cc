@@ -6,7 +6,7 @@
 /*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/25 23:54:52 by karldouveno      ###   ########.fr       */
+/*   Updated: 2020/10/27 19:43:30 by karldouveno      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,8 +52,10 @@ void	exec(World &world, Engine &env)
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	key(env, world.getWorldMat());
+	{
+		unique_lock<mutex> lock(world.getMatMutex());
+		key(env, world.getWorldMat());
+	}
 	world.display(env);
 	glfwSwapBuffers(env.getWindow());
 	glfwPollEvents();

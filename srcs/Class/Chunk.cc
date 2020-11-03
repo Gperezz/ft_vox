@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Chunk.cc                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2020/09/22 17:47:29 by gperez           ###   ########.fr       */
+/*   Updated: 2020/11/02 20:21:33 by karldouveno      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ bool		Chunk::canPrintBlock(vector<vbo_type> &tempVbo, BlockPos posInMesh)
 		if (!tmp || (tmp->getInfo().id == 0))
 		{
 			dir += 1 << i; //Faces visibles
-			fillTempVbo(tempVbo, (t_direction_consts)g_dir_c[i], posInMesh,
+			this->fillTempVbo(tempVbo, (t_direction_consts)g_dir_c[i], posInMesh,
 				this->getBlock(posInMesh).getInfo().id);
 		}
 		i++;
@@ -115,11 +115,12 @@ void		Chunk::validateMesh(char meshIdx)
 	BlockPos				pos; // [meshY][x][y][z]
 	bool					validateValue;
 	vector<vbo_type>		tempVbo;
-
-	if (this->valid.find(meshIdx) != Chunk::valid.end())
-	{
-		this->valid.erase(meshIdx);
-		deleteVbo(meshIdx);
+	{	unique_lock<mutex> lock(this->validMutex);
+		if (this->valid.find(meshIdx) != Chunk::valid.end())
+		{
+			this->valid.erase(meshIdx);
+			deleteVbo(meshIdx);
+		}
 	}
 	validateValue = 0;
 	pos[MY] = meshIdx;
@@ -143,6 +144,7 @@ void		Chunk::validateMesh(char meshIdx)
 	{
 		generateVbo(meshIdx, tempVbo);
 		ft_printf(GREEN "generate VBO (Mesh %d) %d points (%d floats)\n" NA, meshIdx, tempVbo.size(), tempVbo.size() * 3);
+		unique_lock<mutex> lock(this->validMutex);
 		this->valid.insert({meshIdx, tempVbo.size()});
 	}
 }
@@ -271,13 +273,13 @@ void		Chunk::generateGraphics(void)
 	ft_printf(ORANGE "Validating Chunk %d %d\n" NA, this->pos.get(0), this->pos.get(1));
 	for (unsigned i = 0; i < 16; i++)
 	{
-		ft_printf(ORANGE "Validating Mesh %d\n" NA, i);
 		validateMesh(i);
 	}
 }
 
 void		Chunk::displayChunk(Engine &e, glm::mat4 world)
 {
+	unique_lock<mutex>						lock(this->validMutex);
 	std::map<char, unsigned int>::iterator	it = this->valid.begin();
 	Shader&									shader(e.getShader());
 	Textures								*t;
