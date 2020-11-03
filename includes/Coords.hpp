@@ -6,7 +6,7 @@
 /*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 20:07:59 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/25 23:25:27 by karldouveno      ###   ########.fr       */
+/*   Updated: 2020/11/03 15:30:41 by karldouveno      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,11 +53,11 @@ namespace Coords{
 				return (this->attr[i]);
 			}
 
-			T&			operator[](const unsigned i)
+			T&						operator[](const unsigned i)
 			{
 				return this->get(i);
 			}
-			Coords<T, dims> add(Coords<T, dims> a)
+			Coords<T, dims>			add(Coords<T, dims> a)
 			{
 				Coords<T, dims> out(*this);
 				for (unsigned i = 0; i < dims; i++)
@@ -66,12 +66,31 @@ namespace Coords{
 				}
 				return out;
 			}
-			inline		Coords<T, dims> operator+(Coords<T, dims> a)
+			inline Coords<T, dims>	operator+(Coords<T, dims> a)
 			{
 				return (this->add(a));
 			}
-
-			inline bool	operator<(const Coords<T, dims>& a) const
+			template<typename Number>
+			Coords<T, dims> 		operator/(Number a)
+			{
+				Coords<T, dims> out(*this);
+				for (unsigned i = 0; i < dims; i++)
+				{
+					out[i] /= a;
+				}
+				return out;
+			}
+			template<typename Number>
+			Coords<T, dims> 		operator*(Number a)
+			{
+				Coords<T, dims> out(*this);
+				for (unsigned i = 0; i < dims; i++)
+				{
+					out[i] *= a;
+				}
+				return out;
+			}
+			inline bool				operator<(const Coords<T, dims>& a) const
 			{
 				for (unsigned int i = 0; i < dims; i++)
 				{

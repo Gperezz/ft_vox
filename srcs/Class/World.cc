@@ -6,7 +6,7 @@
 /*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2020/11/03 01:55:59 by karldouveno      ###   ########.fr       */
+/*   Updated: 2020/11/03 02:15:13 by karldouveno      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ void	World::initQueueThread()
 void	World::display(Engine &e)
 {
 	this->rearrangeQueues();
-	while (this->LoadNextQueuedChunk());
+	this->LoadNextQueuedChunk();
 	if (e.isSkybox() && e.getTexture(SKY_T - END_BLOCK_T))
 		e.displaySky(e.getTexture(SKY_T - END_BLOCK_T));
 	unique_lock<mutex> lock(this->displayedMutex);
