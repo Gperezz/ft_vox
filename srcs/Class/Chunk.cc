@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/20 16:13:06 by gperez           ###   ########.fr       */
+/*   Updated: 2020/11/05 10:34:28 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,10 @@ void	Chunk::fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, Blo
 		vboType.tab[0] = dir_c.pts[iPt].get(X) + posInMesh.get(X) + this->getPos().get(0) * 16;
 		vboType.tab[1] = dir_c.pts[iPt].get(Y) + posInMesh.get(Y) + posInMesh.get(MY) * 16;
 		vboType.tab[2] = dir_c.pts[iPt].get(Z) + posInMesh.get(Z) + this->getPos().get(1) * 16;
+
+		vboType.normal[0] = dir_c.pts[iPt].get(X) - LENGTH_BLOCK / 2; // On pourra le mettre en brut dans le header
+		vboType.normal[1] = dir_c.pts[iPt].get(X) - LENGTH_BLOCK / 2;
+		vboType.normal[2] = dir_c.pts[iPt].get(X) - LENGTH_BLOCK / 2;
 
 		vboType.meta = dir_c.axis < 0 ? dir_c.axis + 7 : dir_c.axis;
 		idBitwise = id << 8;
@@ -104,10 +108,12 @@ void		Chunk::generateVbo(char index, vector<vbo_type> tempVbo)
 	glBindBuffer(GL_ARRAY_BUFFER, tabVbo[(int)index]);
 	glBufferData(GL_ARRAY_BUFFER, tempVbo.size() * sizeof(vbo_type), &tempVbo[0], GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3 + sizeof(float), (void*)0);
-	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 3 + sizeof(float), (void*)(sizeof(float) * 3));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6 + sizeof(float), (void*)0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6 + sizeof(float), (void*)(sizeof(float) * 3));
+	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 6 + sizeof(float), (void*)(sizeof(float) * 6));
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
 }
 
 void		Chunk::validateMesh(char meshIdx)

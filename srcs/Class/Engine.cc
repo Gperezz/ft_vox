@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/21 17:20:56 by gperez           ###   ########.fr       */
+/*   Updated: 2020/11/05 11:04:08 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,7 @@ void		Engine::genSkybox(void)
 {
 	vector<vbo_type>	tempVbo;
 
-	if (sky || this->shaderSky.loadShader((char*)VERTEX_SKY, (char*)FRAGMENT))
+	if (sky || this->shaderSky.loadShader((char*)VERTEX_SKY, (char*)FRAGMENT_SKY))
 		return;
 	for (int i = 0; i < 6; i++)
 	{
@@ -117,8 +117,8 @@ void		Engine::genSkybox(void)
 	glGenBuffers(1, &this->vboSky);
 	glBindBuffer(GL_ARRAY_BUFFER, this->vboSky);
 	glBufferData(GL_ARRAY_BUFFER, tempVbo.size() * sizeof(vbo_type), &tempVbo[0], GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3 + sizeof(float), (void*)0);
-	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 3 + sizeof(float), (void*)(sizeof(float) * 3));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6 + sizeof(float), (void*)0);
+	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 6 + sizeof(float), (void*)(sizeof(float) * 6));
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	this->sky = true;

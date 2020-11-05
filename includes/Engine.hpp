@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:35:15 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/21 14:06:46 by gperez           ###   ########.fr       */
+/*   Updated: 2020/11/05 11:07:48 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,8 @@ extern "C"
 # define WIDTH 1920
 # define HEIGHT 1080
 # define RENDER_DIST 1000.0f
-# define VERTEX_SKY	"shader/vertexSky.glsl"
+# define VERTEX_SKY "shader/vertexSky.glsl"
+# define FRAGMENT_SKY "shader/fragmentSky.glsl"
 
 # define LENGTH_BLOCK 1
 
@@ -114,6 +115,7 @@ static t_direction_consts	g_dir_c[] = {
 
 struct vbo_type {
 	float			tab[3];
+	float			normal[3];
 	float			meta;
 };
 

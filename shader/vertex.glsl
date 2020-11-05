@@ -1,18 +1,22 @@
 #version 410 core
 layout (location = 0) in vec3 aPos;
-layout (location = 1) in float meta;
+layout (location = 1) in vec3 aNorm;
+layout (location = 2) in float meta;
 
 uniform mat4	view;
 uniform mat4	projection;
 uniform int		nbTxt;
 
-out vec2 tCoords;
+out vec3	normal;
+out vec3	vecToLight;
+out vec2	tCoords;
 
 void main()
 {
 	vec4	pos4;
 	int		dir;
 	int		type;
+	vec3	lightP = vec3(0, 50.0, 0.0);
 
 	dir = int(meta) & 7;
 	type = int(meta) >> 8;
@@ -24,6 +28,8 @@ void main()
 		tCoords = aPos.xz;
 	else
 		tCoords = aPos.xy;
+	normal = aNorm;
+	vecToLight = lightP - aPos;
 	// tCoords.x = mod(tCoords.x, 16);
 	tCoords.y = mod(tCoords.y, 16 / nbTxt);
 	tCoords.y = ((tCoords.y + type) / nbTxt);
