@@ -10,16 +10,16 @@ uniform int		nbTxt;
 out vec3	normal;
 out vec3	vecToLight;
 out vec2	tCoords;
+out float	typeF;
 
 void main()
 {
 	vec4	pos4;
 	int		dir;
-	int		type;
 	vec3	lightP = vec3(0, 50.0, 0.0);
 
 	dir = int(meta) & 7;
-	type = int(meta) >> 8;
+	typeF = int(meta) >> 8;
 	tCoords = aPos.zy;
 	pos4 = vec4(aPos.xyz, 1.0);
 	if (dir == 1 || dir == 6)
@@ -32,6 +32,6 @@ void main()
 	vecToLight = lightP - aPos;
 	// tCoords.x = mod(tCoords.x, 16);
 	tCoords.y = mod(tCoords.y, 16 / nbTxt);
-	tCoords.y = ((tCoords.y + type) / nbTxt);
+	tCoords.y = ((tCoords.y + typeF) / nbTxt);
 	gl_Position = projection * view * pos4;
 }
