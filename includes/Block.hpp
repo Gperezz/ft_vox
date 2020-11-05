@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:14:08 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/17 17:08:57 by gperez           ###   ########.fr       */
+/*   Updated: 2020/11/05 11:41:53 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ class Block {
 						Block();
 						~Block();
 		t_block_info&	getInfo(void);
+		static bool		isTransparentBlock(Block block);
 		void			operator=(t_block_info);
 };
 

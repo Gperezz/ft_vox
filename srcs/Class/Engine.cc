@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2020/11/05 11:04:08 by gperez           ###   ########.fr       */
+/*   Updated: 2020/11/05 11:56:12 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,6 +143,7 @@ void		Engine::displaySky(Textures *t)
 	centerCam.setRotation(this->getCam().getRotation());
 	centerCam.setTranslate(glm::vec3(0.5, 0.5, 0.5));
 	glDepthMask(false);
+	glDisable(GL_CULL_FACE);
 	glBindVertexArray(this->vaoSky);
 	glUseProgram(shader.getProgram());
 	glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),
@@ -153,6 +154,9 @@ void		Engine::displaySky(Textures *t)
 		"basicTexture"), t ? t->getTxt() : 0);
 	glDrawArrays(GL_TRIANGLES, 0, NB_PTS_CUBE);
 	glDepthMask(true);
+	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
 }
 
 Camera&		Engine::getCam(void)

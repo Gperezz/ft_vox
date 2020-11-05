@@ -18,7 +18,7 @@ void	main()
 	diffuse = brightness * lightColor;
 
 	textureColor = texture(basicTexture, tCoords);
-	if (textureColor.w < 0.1)
+	if (textureColor.w < 0.9)
 		discard;
 	FragColor = vec4(diffuse, 1.0) * textureColor;
 }

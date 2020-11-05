@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:35:15 by gperez            #+#    #+#             */
-/*   Updated: 2020/11/05 11:07:48 by gperez           ###   ########.fr       */
+/*   Updated: 2020/11/05 12:35:07 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,8 +85,8 @@ static t_direction_consts	g_dir_c[] = {
 	// SOUTH
 	{BlockPos((int[4]){0,0,0,-1}), ChunkPos((int[2]){0, -1}), -Z,
 		{
-			t_cube_pt[4], t_cube_pt[5], t_cube_pt[6],
-			t_cube_pt[4], t_cube_pt[6], t_cube_pt[7],
+			t_cube_pt[4], t_cube_pt[6], t_cube_pt[5],
+			t_cube_pt[4], t_cube_pt[7], t_cube_pt[6],
 		}
 	},
 	// WEST
@@ -99,8 +99,8 @@ static t_direction_consts	g_dir_c[] = {
 	// UP
 	{BlockPos((int[4]){0,0,1,0}), ChunkPos((int[2]){0, 0}), Y,
 		{
-			t_cube_pt[0], t_cube_pt[4], t_cube_pt[7],
-			t_cube_pt[0], t_cube_pt[7], t_cube_pt[3],
+			t_cube_pt[0], t_cube_pt[7], t_cube_pt[4],
+			t_cube_pt[0], t_cube_pt[3], t_cube_pt[7],
 		}
 	},
 	// DOWN

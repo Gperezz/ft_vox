@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2020/11/05 10:34:28 by gperez           ###   ########.fr       */
+/*   Updated: 2020/11/05 11:47:53 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ bool		Chunk::canPrintBlock(vector<vbo_type> &tempVbo, BlockPos posInMesh)
 	while (i < 6)
 	{
 		Block *tmp = this->getBlockNeighboor(posInMesh, (Direction)i);
-		if (!tmp || (tmp->getInfo().id == AIR))
+		if (!tmp || Block::isTransparentBlock(*tmp))
 		{
 			dir += 1 << i; //Faces visibles
 			fillTempVbo(tempVbo, (t_direction_consts)g_dir_c[i], posInMesh,
