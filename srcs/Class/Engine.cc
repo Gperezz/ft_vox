@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2020/11/05 11:56:12 by gperez           ###   ########.fr       */
+/*   Updated: 2020/11/10 17:37:26 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,10 +87,11 @@ GLFWwindow	*Engine::getWindow(void)
 	return (Engine::window);
 }
 
-static void	fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c)
+static void	fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, unsigned int idxgTxtPath)
 {
 	int			iPt;
 	vbo_type	vboType;
+	short		idBitwise;
 
 	for (iPt = 0; iPt < 6; iPt++)
 	{
@@ -98,19 +99,21 @@ static void	fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c)
 		vboType.tab[1] = dir_c.pts[iPt].get(Y);
 		vboType.tab[2] = dir_c.pts[iPt].get(Z);
 		vboType.meta = dir_c.axis < 0 ? dir_c.axis + 7 : dir_c.axis;
+		idBitwise = (int)g_txt_path[idxgTxtPath].type << 8;
+		vboType.meta = (int)vboType.meta | idBitwise;
 		tempVbo.push_back(vboType);
 	}
 }
 
-void		Engine::genSkybox(void)
+int			Engine::genSkybox(void)
 {
 	vector<vbo_type>	tempVbo;
 
 	if (sky || this->shaderSky.loadShader((char*)VERTEX_SKY, (char*)FRAGMENT_SKY))
-		return;
+		return (1);
 	for (int i = 0; i < 6; i++)
 	{
-		fillTempVbo(tempVbo, g_dir_c[i]);
+		fillTempVbo(tempVbo, g_dir_c[i], i + SKY_FRONT_T);
 	}
 	glGenVertexArrays(1, &this->vaoSky);
 	glBindVertexArray(this->vaoSky);
@@ -122,6 +125,7 @@ void		Engine::genSkybox(void)
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	this->sky = true;
+	return (0);
 }
 
 bool		Engine::isSkybox(void)
@@ -152,6 +156,8 @@ void		Engine::displaySky(Textures *t)
 		"projection"), 1, GL_FALSE, glm::value_ptr(this->getCam().getProjMatrix()));
 	glUniform1i(glGetUniformLocation(shader.getProgram(),
 		"basicTexture"), t ? t->getTxt() : 0);
+	glUniform1i(glGetUniformLocation(shader.getProgram(),
+		"nbTxt"), SKY_BOTTOM_T - END_BLOCK_T);
 	glDrawArrays(GL_TRIANGLES, 0, NB_PTS_CUBE);
 	glDepthMask(true);
 	glFrontFace(GL_CCW);
@@ -181,7 +187,7 @@ void 		Engine::fillTextureVector(size_t start, size_t end, bool load)
 	size_t	len;
 	bool	isPng;
 
-	while (i < end && (!load || textures.size() < 16))
+	while (i < end && (!load || this->textures.size() < 16))
 	{
 		len = ft_strlen(g_txt_path[i].path_txt);
 		str.assign(g_txt_path[i].path_txt, len);
@@ -197,56 +203,67 @@ void 		Engine::fillTextureVector(size_t start, size_t end, bool load)
 	}
 }
 
-static void	fillBuffer(char **buffer, std::vector<Textures*> &textures)
+static void	fillBuffer(char **buffer, std::vector<Textures*> &textures, glm::vec2 len, size_t offset)
 {
-	unsigned int	i;
-	unsigned int	iX;
-	unsigned int	iY;
-	short			lenTxt = 16 * 16 * sizeof(int);
+	unsigned long	i;
+	unsigned long	iX;
+	unsigned long	iY;
+	unsigned long	lenTxt = len.x * len.y * sizeof(int);
 
-	for (unsigned int idxTxt = 0; idxTxt < textures.size(); idxTxt++)
+	for (unsigned long idxTxt = offset; idxTxt < textures.size() && textures[idxTxt]; idxTxt++)
 	{
-		for (iY = 0; iY < (unsigned int)textures[idxTxt]->getHeight(); iY++)
+		for (iY = 0; iY < (unsigned long)textures[idxTxt]->getHeight(); iY++)
 		{
-			for (iX = 0; iX < (unsigned int)textures[idxTxt]->getWidth(); iX++)
+			for (iX = 0; iX < (unsigned long)textures[idxTxt]->getWidth(); iX++)
 			{
-				for (i = 0; i < 4; i++)
+				for (i = 0; i < 4 && textures[idxTxt]->getTxtData(); i++)
 				{
-					(*buffer)[idxTxt * lenTxt
+					if (i >= (unsigned int)textures[idxTxt]->getNrChannels())
+						(*buffer)[(idxTxt - offset) * lenTxt
+						+ iY * textures[idxTxt]->getWidth() * sizeof(int)
+						+ iX * sizeof(int) + i] = (char)255;
+					else
+						(*buffer)[(idxTxt - offset) * lenTxt
 						+ iY * textures[idxTxt]->getWidth() * sizeof(int)
 						+ iX * sizeof(int) + i]
 							= textures[idxTxt]->getTxtData()
-								[iY * textures[idxTxt]->getWidth() * sizeof(int)
-								+ iX * sizeof(int) + i];
+								[iY * textures[idxTxt]->getWidth() * textures[idxTxt]->getNrChannels()
+								+ iX * textures[idxTxt]->getNrChannels() + i];
 				}
 			}
 		}
 	}
 }
 
-void	Engine::genBlocksTextures(void)
+int		Engine::genBlocksTextures(glm::vec2 len, e_txt start, e_txt end, size_t offsetInTexture)
 {
 	// ContextOpenCL	cl;
 	char			*buffer;
 	size_t			size;
 	size_t			size_y;
+	int				nbTxt;
 
-	this->fillTextureVector(DIRT_T, END_BLOCK_T, false);
-	size = 16 * 16 * sizeof(int) * this->textures.size();
+	this->fillTextureVector(start, end, false);
+	nbTxt = this->textures.size() - offsetInTexture;
+	if (nbTxt < 1)
+		return (1);
+	size = len.x * len.y * sizeof(int) * nbTxt;
 	buffer = (char*)ft_memalloc(size);
-	size_y = textures.size() * 16;
+	size_y = nbTxt * len.y;
 	// Recuperer les datas de chaques txt et en faire une et une seule // A FAIRE AVEC CL
 	// if (!cl.initContext())
 	// 	cl.useKernel(buffer, this->textures);
 
 	// ft_printf(RED "Apres Opencl\n" NA);
-	fillBuffer(&buffer, this->textures);
-	for (size_t i = 0; i < this->textures.size(); i++)
-		delete this->textures[i];
-	this->textures.clear();
-
+	fillBuffer(&buffer, this->textures, len, offsetInTexture);
+	for (size_t i = this->textures.size(); i > offsetInTexture ; i--)
+	{
+		delete this->textures[i - 1];
+		this->textures.erase(textures.begin() + i - 1);
+	}
 	// Rajouter la texture generer avec openCL dans le vector textures
-	this->addTexture(buffer, 16, size_y);
+	this->addTexture(buffer, len.x, size_y);
+	return (0);
 }
 
 Textures	*Engine::getTexture(unsigned int t)
@@ -256,10 +273,15 @@ Textures	*Engine::getTexture(unsigned int t)
 	return (NULL);
 }
 
-void		Engine::genTextures(void)
+int			Engine::genTextures(void)
 {
-	this->genBlocksTextures();
-	this->fillTextureVector(END_BLOCK_T + 1, END_T, true);
+	// this->genBlocksTextures();
+	if (this->genBlocksTextures((glm::vec2){16, 16}, DIRT_T, END_BLOCK_T, 0))
+		return (1);
+	if (this->genBlocksTextures((glm::vec2){512, 512}, SKY_FRONT_T, (e_txt)(SKY_BOTTOM_T + 1), 1))
+		return (1);
+	this->fillTextureVector(SKY_T, END_T, true);
+	return (0);
 }
 
 void	Engine::addTexture(char *pathOrBuffer, unsigned long width, unsigned long height)

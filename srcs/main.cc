@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2020/11/05 11:56:21 by gperez           ###   ########.fr       */
+/*   Updated: 2020/11/09 22:48:55 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,8 +83,8 @@ int		main(void)
 		return (1);
 	if (shader.loadShader((char*)VERTEX, (char*)FRAGMENT))
 		return (1);
-	env.genTextures();
-	env.genSkybox();
+	if (env.genTextures() || env.genSkybox())
+		return (1);
 	env.getCam().setProjMatrix(glm::perspective(glm::radians(45.0f),
 		(float)WIDTH / (float)HEIGHT, 0.1f, (float)RENDER_DIST));
 	env.getCam().setTranslate((glm::vec3){7.5, 1, 2});

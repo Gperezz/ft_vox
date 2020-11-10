@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/19 19:56:21 by gperez           ###   ########.fr       */
+/*   Updated: 2020/11/10 21:32:35 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,8 @@ World::~World()
 
 void	World::display(Engine &e, float currentFrameTime)
 {
-	if (e.isSkybox() && e.getTexture(SKY_T - END_BLOCK_T))
-		e.displaySky(e.getTexture(SKY_T - END_BLOCK_T));
+	if (e.isSkybox() && e.getTexture(1))
+		e.displaySky(e.getTexture(1));
 	for (auto it = this->displayedChunks.begin(); it != this->displayedChunks.end(); it++)
 		this->memoryChunks.at(*it)->displayChunk(e);
 	this->deltaFrameTime = currentFrameTime - this->lastFrameTime;

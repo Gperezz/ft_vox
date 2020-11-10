@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:35:15 by gperez            #+#    #+#             */
-/*   Updated: 2020/11/05 12:35:07 by gperez           ###   ########.fr       */
+/*   Updated: 2020/11/09 22:48:22 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,17 +141,17 @@ class Engine
 		Engine();
 		int			initWindow(void);
 		GLFWwindow	*getWindow(void);
-		void		genSkybox(void);
+		int			genSkybox(void);
 		bool		isSkybox(void);
 		Shader&		getShaderSky(void);
 		void		displaySky(Textures *t);
 		Camera&		getCam(void);
 		void		setCam(Camera cam);
 		Shader&		getShader(void);
-		void		genTextures(void);
+		int			genTextures(void);
 		Textures	*getTexture(unsigned int t);
 		void 		fillTextureVector(size_t start, size_t end, bool load);
-		void		genBlocksTextures(void);
+		int			genBlocksTextures(glm::vec2 len, e_txt start, e_txt end, size_t offsetInTexture);
 		void		addTexture(char *pathOrBuffer, unsigned long width, unsigned long height);
 		glm::vec2	getMouseLastPos(void);
 		void		setMouseLastPos(glm::vec2 v);

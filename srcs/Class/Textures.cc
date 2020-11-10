@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/13 17:54:04 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/10 19:03:42 by gperez           ###   ########.fr       */
+/*   Updated: 2020/11/09 22:20:31 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,11 @@ int				Textures::getWidth(void) const
 int				Textures::getHeight(void) const
 {
 	return (this->height);
+}
+
+int				Textures::getNrChannels(void) const
+{
+	return (this->nrChannels);
 }
 
 void			Textures::setTxt(unsigned int t)

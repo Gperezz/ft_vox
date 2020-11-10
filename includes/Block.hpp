@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:14:08 by gperez            #+#    #+#             */
-/*   Updated: 2020/11/05 11:41:53 by gperez           ###   ########.fr       */
+/*   Updated: 2020/11/10 16:08:33 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,15 @@ enum	e_BlockType : char {
 	// GOLD_ORE,
 	// DIAMOND_ORE,
 	// COBBLESTONE
+};
+
+enum	e_SkyDir : char {
+	SKY_DIR_FRONT,
+	SKY_DIR_RIGHT,
+	SKY_DIR_LEFT,
+	SKY_DIR_BACK,
+	SKY_DIR_UP,
+	SKY_DIR_DOWN,
 };
 
 typedef struct		block_info{
