@@ -6,7 +6,7 @@
 /*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/02 08:06:26 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/17 11:58:39 by karldouveno      ###   ########.fr       */
+/*   Updated: 2020/11/24 16:39:10 by karldouveno      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,8 +55,8 @@ void	WorldGenerator::genChunk(Chunk *chunk)
 	for (int x = 0; x < 16; x++){
 		for (int z = 0; z < 16; z++){
 			ChunkPos pos = chunk->getPos();
-			float perlinNoise = tP(0.0f, pos[0] * 16.0 + x, pos[1] * 16.0 + z);
-			int height = (int)((perlinNoise + 1.0f) * 10) + 100;
+			float perlinNoise = tP(0.0f, pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX);
+			int height = (int)((perlinNoise + 1.0f) * 10) + 20;
 			int y = 0;
 			for (; y < height; y++) {
 				chunk->setBlock(BlockPos((int[4]){y / 16, x, y % 16, z}),
@@ -64,7 +64,6 @@ void	WorldGenerator::genChunk(Chunk *chunk)
 			}
 		}
 	}
-	(void)chunk;
 }
 
 void	WorldGenerator::configure(unsigned long* seed)
