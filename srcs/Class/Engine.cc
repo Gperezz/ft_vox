@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2020/09/18 19:09:29 by gperez           ###   ########.fr       */
+/*   Updated: 2020/11/10 17:37:26 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,28 @@ using namespace std;
 Engine::Engine()
 {
 	this->sky = false;
+	this->firstMouse = true;
+}
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+	Engine		*engine = (Engine*)glfwGetWindowUserPointer(window);
+	glm::vec2	offsetMouse;
+	glm::vec2	lastMousePos;
+
+	if (!engine)
+		return ;
+	if (engine->isFirst())
+	{
+		engine->setMouseLastPos(glm::vec2(xpos, ypos));
+		engine->setFirst(false);
+	}
+	lastMousePos = engine->getMouseLastPos();
+	offsetMouse.y = xpos - lastMousePos.x;
+	offsetMouse.x = ypos - lastMousePos.y;
+	engine->setMouseLastPos(glm::vec2(xpos, ypos));
+	offsetMouse *= SENSITIVITY;
+	engine->getCam().rotate(glm::vec3(offsetMouse.x, offsetMouse.y, 0.0));
 }
 
 static void	framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -36,20 +58,26 @@ int			Engine::initWindow(void)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	Engine::window = glfwCreateWindow(WIDTH, HEIGHT, "ft_vox", NULL, NULL);
-	if (Engine::window == NULL)
+
+	// glfwWindowHint(GLFW_AUTO_ICONIFY, GL_TRUE);
+	// this->window = glfwCreateWindow(WIDTH, HEIGHT, "ft_vox", glfwGetPrimaryMonitor(), NULL);
+	this->window = glfwCreateWindow(WIDTH, HEIGHT, "ft_vox", NULL, NULL);
+	if (this->window == NULL)
 	{
 		cout << "Failed to create GLFW window" << endl;
 		glfwTerminate();
 		return (-1);
 	}
-	glfwMakeContextCurrent(Engine::window);
+	glfwMakeContextCurrent(this->window);
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
 		cout << "Failed to initialize GLAD" << endl;
 		return (-1);
 	}
-	glfwSetFramebufferSizeCallback(Engine::window, framebuffer_size_callback);
+	glfwSetCursorPosCallback(this->window, mouse_callback);
+	glfwSetFramebufferSizeCallback(this->window, framebuffer_size_callback);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetWindowUserPointer(window, this);
 	glfwSwapInterval(1);
 	return (0);
 }
@@ -59,10 +87,11 @@ GLFWwindow	*Engine::getWindow(void)
 	return (Engine::window);
 }
 
-static void	fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c)
+static void	fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, unsigned int idxgTxtPath)
 {
 	int			iPt;
 	vbo_type	vboType;
+	short		idBitwise;
 
 	for (iPt = 0; iPt < 6; iPt++)
 	{
@@ -70,30 +99,33 @@ static void	fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c)
 		vboType.tab[1] = dir_c.pts[iPt].get(Y);
 		vboType.tab[2] = dir_c.pts[iPt].get(Z);
 		vboType.meta = dir_c.axis < 0 ? dir_c.axis + 7 : dir_c.axis;
+		idBitwise = (int)g_txt_path[idxgTxtPath].type << 8;
+		vboType.meta = (int)vboType.meta | idBitwise;
 		tempVbo.push_back(vboType);
 	}
 }
 
-void		Engine::genSkybox(void)
+int			Engine::genSkybox(void)
 {
 	vector<vbo_type>	tempVbo;
 
-	if (sky || this->shaderSky.loadShader((char*)VERTEX_SKY, (char*)FRAGMENT))
-		return;
+	if (sky || this->shaderSky.loadShader((char*)VERTEX_SKY, (char*)FRAGMENT_SKY))
+		return (1);
 	for (int i = 0; i < 6; i++)
 	{
-		fillTempVbo(tempVbo, g_dir_c[i]);
+		fillTempVbo(tempVbo, g_dir_c[i], i + SKY_FRONT_T);
 	}
 	glGenVertexArrays(1, &this->vaoSky);
 	glBindVertexArray(this->vaoSky);
 	glGenBuffers(1, &this->vboSky);
 	glBindBuffer(GL_ARRAY_BUFFER, this->vboSky);
 	glBufferData(GL_ARRAY_BUFFER, tempVbo.size() * sizeof(vbo_type), &tempVbo[0], GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3 + sizeof(float), (void*)0);
-	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 3 + sizeof(float), (void*)(sizeof(float) * 3));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6 + sizeof(float), (void*)0);
+	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 6 + sizeof(float), (void*)(sizeof(float) * 6));
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	this->sky = true;
+	return (0);
 }
 
 bool		Engine::isSkybox(void)
@@ -108,25 +140,36 @@ Shader&		Engine::getShaderSky(void)
 
 void		Engine::displaySky(Textures *t)
 {
-	Shader	&shader = this->shaderSky;
-
+	Shader		&shader = this->shaderSky;
+	Camera		centerCam;
+	
+	this->getCam().look();
+	centerCam.setRotation(this->getCam().getRotation());
+	centerCam.setTranslate(glm::vec3(0.5, 0.5, 0.5));
 	glDepthMask(false);
+	glDisable(GL_CULL_FACE);
 	glBindVertexArray(this->vaoSky);
 	glUseProgram(shader.getProgram());
 	glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),
-		"view"), 1, GL_FALSE, glm::value_ptr(this->getCam().getMatrix(true)));
+		"view"), 1, GL_FALSE, glm::value_ptr(centerCam.getMatrix(true)));
 	glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),
 		"projection"), 1, GL_FALSE, glm::value_ptr(this->getCam().getProjMatrix()));
 	glUniform1i(glGetUniformLocation(shader.getProgram(),
 		"basicTexture"), t ? t->getTxt() : 0);
-	glDrawArrays(GL_TRIANGLES, 0, NB_TRIANGLES_CUBE);
+	glUniform1i(glGetUniformLocation(shader.getProgram(),
+		"nbTxt"), SKY_BOTTOM_T - END_BLOCK_T);
+	glDrawArrays(GL_TRIANGLES, 0, NB_PTS_CUBE);
 	glDepthMask(true);
+	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
 }
 
 Camera&		Engine::getCam(void)
 {
 	return (Engine::camera);
 }
+
 void		Engine::setCam(Camera cam)
 {
 	Engine::camera = cam;
@@ -144,7 +187,7 @@ void 		Engine::fillTextureVector(size_t start, size_t end, bool load)
 	size_t	len;
 	bool	isPng;
 
-	while (i < end && (!load || textures.size() < 16))
+	while (i < end && (!load || this->textures.size() < 16))
 	{
 		len = ft_strlen(g_txt_path[i].path_txt);
 		str.assign(g_txt_path[i].path_txt, len);
@@ -160,56 +203,67 @@ void 		Engine::fillTextureVector(size_t start, size_t end, bool load)
 	}
 }
 
-static void	fillBuffer(char **buffer, std::vector<Textures*> &textures)
+static void	fillBuffer(char **buffer, std::vector<Textures*> &textures, glm::vec2 len, size_t offset)
 {
-	unsigned int	i;
-	unsigned int	iX;
-	unsigned int	iY;
-	short			lenTxt = 16 * 16 * sizeof(int);
+	unsigned long	i;
+	unsigned long	iX;
+	unsigned long	iY;
+	unsigned long	lenTxt = len.x * len.y * sizeof(int);
 
-	for (unsigned int idxTxt = 0; idxTxt < textures.size(); idxTxt++)
+	for (unsigned long idxTxt = offset; idxTxt < textures.size() && textures[idxTxt]; idxTxt++)
 	{
-		for (iY = 0; iY < (unsigned int)textures[idxTxt]->getHeight(); iY++)
+		for (iY = 0; iY < (unsigned long)textures[idxTxt]->getHeight(); iY++)
 		{
-			for (iX = 0; iX < (unsigned int)textures[idxTxt]->getWidth(); iX++)
+			for (iX = 0; iX < (unsigned long)textures[idxTxt]->getWidth(); iX++)
 			{
-				for (i = 0; i < 4; i++)
+				for (i = 0; i < 4 && textures[idxTxt]->getTxtData(); i++)
 				{
-					(*buffer)[idxTxt * lenTxt
+					if (i >= (unsigned int)textures[idxTxt]->getNrChannels())
+						(*buffer)[(idxTxt - offset) * lenTxt
+						+ iY * textures[idxTxt]->getWidth() * sizeof(int)
+						+ iX * sizeof(int) + i] = (char)255;
+					else
+						(*buffer)[(idxTxt - offset) * lenTxt
 						+ iY * textures[idxTxt]->getWidth() * sizeof(int)
 						+ iX * sizeof(int) + i]
 							= textures[idxTxt]->getTxtData()
-								[iY * textures[idxTxt]->getWidth() * sizeof(int)
-								+ iX * sizeof(int) + i];
+								[iY * textures[idxTxt]->getWidth() * textures[idxTxt]->getNrChannels()
+								+ iX * textures[idxTxt]->getNrChannels() + i];
 				}
 			}
 		}
 	}
 }
 
-void	Engine::genBlocksTextures(void)
+int		Engine::genBlocksTextures(glm::vec2 len, e_txt start, e_txt end, size_t offsetInTexture)
 {
 	// ContextOpenCL	cl;
 	char			*buffer;
 	size_t			size;
 	size_t			size_y;
+	int				nbTxt;
 
-	this->fillTextureVector(DIRT_T, END_BLOCK_T, false);
-	size = 16 * 16 * sizeof(int) * this->textures.size();
+	this->fillTextureVector(start, end, false);
+	nbTxt = this->textures.size() - offsetInTexture;
+	if (nbTxt < 1)
+		return (1);
+	size = len.x * len.y * sizeof(int) * nbTxt;
 	buffer = (char*)ft_memalloc(size);
-	size_y = textures.size() * 16;
+	size_y = nbTxt * len.y;
 	// Recuperer les datas de chaques txt et en faire une et une seule // A FAIRE AVEC CL
 	// if (!cl.initContext())
 	// 	cl.useKernel(buffer, this->textures);
 
 	// ft_printf(RED "Apres Opencl\n" NA);
-	fillBuffer(&buffer, this->textures);
-	for (size_t i = 0; i < this->textures.size(); i++)
-		delete this->textures[i];
-	this->textures.clear();
-
+	fillBuffer(&buffer, this->textures, len, offsetInTexture);
+	for (size_t i = this->textures.size(); i > offsetInTexture ; i--)
+	{
+		delete this->textures[i - 1];
+		this->textures.erase(textures.begin() + i - 1);
+	}
 	// Rajouter la texture generer avec openCL dans le vector textures
-	this->addTexture(buffer, 16, size_y);
+	this->addTexture(buffer, len.x, size_y);
+	return (0);
 }
 
 Textures	*Engine::getTexture(unsigned int t)
@@ -219,10 +273,15 @@ Textures	*Engine::getTexture(unsigned int t)
 	return (NULL);
 }
 
-void		Engine::genTextures(void)
+int			Engine::genTextures(void)
 {
-	this->genBlocksTextures();
-	this->fillTextureVector(END_BLOCK_T + 1, END_T, true);
+	// this->genBlocksTextures();
+	if (this->genBlocksTextures((glm::vec2){16, 16}, DIRT_T, END_BLOCK_T, 0))
+		return (1);
+	if (this->genBlocksTextures((glm::vec2){512, 512}, SKY_FRONT_T, (e_txt)(SKY_BOTTOM_T + 1), 1))
+		return (1);
+	this->fillTextureVector(SKY_T, END_T, true);
+	return (0);
 }
 
 void	Engine::addTexture(char *pathOrBuffer, unsigned long width, unsigned long height)
@@ -246,6 +305,26 @@ void	Engine::addTexture(char *pathOrBuffer, unsigned long width, unsigned long h
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, t->getWidth(), t->getHeight(), 0,
 		GL_RGBA, GL_UNSIGNED_BYTE, t->getTxtData());
 	glGenerateMipmap(GL_TEXTURE_2D);
+}
+
+glm::vec2	Engine::getMouseLastPos(void)
+{
+	return (this->mouseLastPos);
+}
+
+void		Engine::setMouseLastPos(glm::vec2 v)
+{
+	this->mouseLastPos = v;
+}
+
+bool		Engine::isFirst(void)
+{
+	return (this->firstMouse);
+}
+
+void		Engine::setFirst(bool f)
+{
+	this->firstMouse = f;
 }
 
 Engine::~Engine()

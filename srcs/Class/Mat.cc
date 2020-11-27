@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/04 23:19:34 by gperez            #+#    #+#             */
-/*   Updated: 2020/05/05 12:39:02 by gperez           ###   ########.fr       */
+/*   Updated: 2020/10/20 03:40:53 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,11 @@ Mat::Mat()
 	Mat::trans = glm::vec3(0.0, 0.0, 0.0);
 	Mat::rot = glm::vec3(0.0, 0.0, 0.0);
 	Mat::sc = glm::vec3(1.0, 1.0, 1.0);
+}
+
+glm::mat4	Mat::getMatrix(void)
+{
+	return (this->matrix);
 }
 
 glm::mat4	Mat::getMatrix(bool calc)
@@ -104,6 +109,11 @@ glm::vec3	Mat::getTranslate(void)
 void		Mat::rotate(glm::vec3 v)
 {
 	Mat::rot += v;
+}
+
+void	Mat::setRotation(glm::vec3 v)
+{
+	this->rot = v;
 }
 
 glm::vec3	Mat::getRotation(void)

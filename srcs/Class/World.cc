@@ -6,7 +6,7 @@
 /*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2020/11/03 02:15:13 by karldouveno      ###   ########.fr       */
+/*   Updated: 2020/11/27 16:22:18 by karldouveno      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@ World::World(unsigned long *seed)
 	this->initQueueSorter();
 	//this->initQueueThread();
 	this->worldGen.configure(seed);
+	this->deltaFrameTime = 0.0;
+	this->lastFrameTime = 0.0;
 }
 
 World::World(string& path, unsigned long *seed)
@@ -84,17 +86,20 @@ void	World::initQueueThread()
 	this->queueThread = thread(queueLoop);
 }
 
-void	World::display(Engine &e)
+void	World::display(Engine &e, float currentFrameTime)
 {
 	this->rearrangeQueues();
 	this->LoadNextQueuedChunk();
-	if (e.isSkybox() && e.getTexture(SKY_T - END_BLOCK_T))
-		e.displaySky(e.getTexture(SKY_T - END_BLOCK_T));
+	if (e.isSkybox() && e.getTexture(1))
+		e.displaySky(e.getTexture(1));
 	unique_lock<mutex> lock(this->displayedMutex);
 	unique_lock<mutex> lock2(this->matMutex);
 	unique_lock<mutex> lock3(this->memoryMutex);
+	
 	for (auto it = this->displayedChunks.begin(); it != this->displayedChunks.end(); it++)
-		this->memoryChunks.at(*it)->displayChunk(e, this->getWorldMat().getMatrix(true));
+		this->memoryChunks.at(*it)->displayChunk(e);
+	this->deltaFrameTime = currentFrameTime - this->lastFrameTime;
+	this->lastFrameTime = currentFrameTime;
 }
 
 void	World::rearrangeQueues()
@@ -210,15 +215,10 @@ unordered_set<ChunkPos>	&World::getDisplayedChunks(void)
 
 void	World::loadChunk(int x, int z)
 {
-	return this->loadChunk(ChunkPos((int[2]){x, z}));
+	return (this->loadChunk(ChunkPos((int[2]){x, z})));
 }
 
-Mat		&World::getWorldMat(void)
+float	World::getDeltaFrameTime(void) const
 {
-	return (this->worldMatrix);
+	return (this->deltaFrameTime);
 }
-
-mutex	&World::getMatMutex()
-{
-	return this->matMutex;
-}	

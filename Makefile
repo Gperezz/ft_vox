@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+         #
+#    By: gperez <gperez@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2020/01/06 13:36:11 by gperez            #+#    #+#              #
-#    Updated: 2020/10/09 16:53:18 by karldouveno      ###   ########.fr        #
+#    Created: 2020/10/10 18:22:58 by gperez            #+#    #+#              #
+#    Updated: 2020/10/19 19:56:51 by gperez           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -33,6 +33,7 @@ SRC =	srcs/main.cc \
 		srcs/Class/Block.cc \
 		srcs/Class/WorldGenerator.cc \
 		srcs/Class/ContextOpenCL.cc \
+		srcs/Class/TimeMs.cc \
 
 NC = \033[0m
 BOLD =\033[1m
@@ -79,6 +80,7 @@ LIBS = $(addprefix -I,$(LIBS_H))
 INC =	includes/ft_vox.hpp \
 		includes/Coords.hpp \
 		includes/Chunk.hpp \
+		includes/TimeMs.hpp \
 
 OBJ = $(SRC:.cc=.o)
 

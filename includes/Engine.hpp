@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:35:15 by gperez            #+#    #+#             */
-/*   Updated: 2020/09/15 19:05:34 by gperez           ###   ########.fr       */
+/*   Updated: 2020/11/09 22:48:22 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,10 +31,11 @@ extern "C"
 # include <iostream>
 # include <vector>
 
-# define WIDTH 800
-# define HEIGHT 600
+# define WIDTH 1920
+# define HEIGHT 1080
 # define RENDER_DIST 1000.0f
-# define VERTEX_SKY	"shader/vertexSky.glsl"
+# define VERTEX_SKY "shader/vertexSky.glsl"
+# define FRAGMENT_SKY "shader/fragmentSky.glsl"
 
 # define LENGTH_BLOCK 1
 
@@ -64,7 +65,7 @@ typedef struct	s_direction_consts{
 	BlockPos	pts[6];
 }				t_direction_consts;
 
-# define NB_TRIANGLES_CUBE 12
+# define NB_PTS_CUBE 36
 
 static t_direction_consts	g_dir_c[] = {
 	// NORTH
@@ -84,8 +85,8 @@ static t_direction_consts	g_dir_c[] = {
 	// SOUTH
 	{BlockPos((int[4]){0,0,0,-1}), ChunkPos((int[2]){0, -1}), -Z,
 		{
-			t_cube_pt[4], t_cube_pt[5], t_cube_pt[6],
-			t_cube_pt[4], t_cube_pt[6], t_cube_pt[7],
+			t_cube_pt[4], t_cube_pt[6], t_cube_pt[5],
+			t_cube_pt[4], t_cube_pt[7], t_cube_pt[6],
 		}
 	},
 	// WEST
@@ -98,8 +99,8 @@ static t_direction_consts	g_dir_c[] = {
 	// UP
 	{BlockPos((int[4]){0,0,1,0}), ChunkPos((int[2]){0, 0}), Y,
 		{
-			t_cube_pt[0], t_cube_pt[4], t_cube_pt[7],
-			t_cube_pt[0], t_cube_pt[7], t_cube_pt[3],
+			t_cube_pt[0], t_cube_pt[7], t_cube_pt[4],
+			t_cube_pt[0], t_cube_pt[3], t_cube_pt[7],
 		}
 	},
 	// DOWN
@@ -114,6 +115,7 @@ static t_direction_consts	g_dir_c[] = {
 
 struct vbo_type {
 	float			tab[3];
+	float			normal[3];
 	float			meta;
 };
 
@@ -133,22 +135,28 @@ class Engine
 		unsigned				vboSky;
 		unsigned				vaoSky;
 		bool					sky;
+		glm::vec2				mouseLastPos;
+		bool					firstMouse;
 	public:
 		Engine();
 		int			initWindow(void);
 		GLFWwindow	*getWindow(void);
-		void		genSkybox(void);
+		int			genSkybox(void);
 		bool		isSkybox(void);
 		Shader&		getShaderSky(void);
 		void		displaySky(Textures *t);
 		Camera&		getCam(void);
 		void		setCam(Camera cam);
 		Shader&		getShader(void);
-		void		genTextures(void);
+		int			genTextures(void);
 		Textures	*getTexture(unsigned int t);
 		void 		fillTextureVector(size_t start, size_t end, bool load);
-		void		genBlocksTextures(void);
+		int			genBlocksTextures(glm::vec2 len, e_txt start, e_txt end, size_t offsetInTexture);
 		void		addTexture(char *pathOrBuffer, unsigned long width, unsigned long height);
+		glm::vec2	getMouseLastPos(void);
+		void		setMouseLastPos(glm::vec2 v);
+		bool		isFirst(void);
+		void		setFirst(bool f);
 		~Engine();
 };
 

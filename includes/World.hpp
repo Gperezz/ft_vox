@@ -6,7 +6,7 @@
 /*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:08:20 by gperez            #+#    #+#             */
-/*   Updated: 2020/11/03 01:58:56 by karldouveno      ###   ########.fr       */
+/*   Updated: 2020/11/27 16:12:04 by karldouveno      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,9 @@ class World
 		set<ChunkPos>			graphicQueue;
 		unordered_set<ChunkPos>	displayedChunks;
 		WorldGenerator			worldGen;
-		Mat						worldMatrix;
 		string					path;
+		float						deltaFrameTime;
+		float						lastFrameTime;
 	public:
 							World(unsigned long* = NULL);
 							World(string&, unsigned long* = NULL);
@@ -60,14 +61,14 @@ class World
 	bool					LoadNextQueuedChunk();
 	ChunkPos				getCameraChunkPos();
 	void					rearrangeQueues();
-	void					display(Engine &e);
+	void					display(Engine &e, float currentFrameTime);
 	void					pushInDisplay(Chunk* chunk);
 	void					loadChunk(ChunkPos);
 	void					loadChunk(int x, int z);
-	Mat						&getWorldMat(void);
 	Chunk					*get(ChunkPos);
 	Chunk					*getMemoryChunk(ChunkPos pos);
 	unordered_set<ChunkPos>	&getDisplayedChunks(void);
+	float					getDeltaFrameTime(void) const;
 	Chunk					*operator[](ChunkPos);
 	mutex					&getMatMutex();
 }; 

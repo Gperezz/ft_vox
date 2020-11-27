@@ -6,7 +6,7 @@
 /*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2020/11/02 20:21:33 by karldouveno      ###   ########.fr       */
+/*   Updated: 2020/11/27 16:18:03 by karldouveno      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,10 @@ void	Chunk::fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, Blo
 		vboType.tab[1] = dir_c.pts[iPt].get(Y) + posInMesh.get(Y) + posInMesh.get(MY) * 16;
 		vboType.tab[2] = dir_c.pts[iPt].get(Z) + posInMesh.get(Z) + this->getPos().get(1) * 16;
 
+		vboType.normal[0] = dir_c.pts[iPt].get(X) - LENGTH_BLOCK / 2; // On pourra le mettre en brut dans le header
+		vboType.normal[1] = dir_c.pts[iPt].get(X) - LENGTH_BLOCK / 2;
+		vboType.normal[2] = dir_c.pts[iPt].get(X) - LENGTH_BLOCK / 2;
+
 		vboType.meta = dir_c.axis < 0 ? dir_c.axis + 7 : dir_c.axis;
 		idBitwise = id << 8;
 		vboType.meta = (int)vboType.meta | idBitwise;
@@ -75,11 +79,11 @@ bool		Chunk::canPrintBlock(vector<vbo_type> &tempVbo, BlockPos posInMesh)
 	while (i < 6)
 	{
 		Block *tmp = this->getBlockNeighboor(posInMesh, (Direction)i);
-		if (!tmp || (tmp->getInfo().id == 0))
+		if (!tmp || Block::isTransparentBlock(*tmp))
 		{
 			dir += 1 << i; //Faces visibles
 			this->fillTempVbo(tempVbo, (t_direction_consts)g_dir_c[i], posInMesh,
-				this->getBlock(posInMesh).getInfo().id);
+				Textures::getIndexTxt((e_BlockType)this->getBlock(posInMesh).getInfo().id));
 		}
 		i++;
 	}
@@ -104,10 +108,12 @@ void		Chunk::generateVbo(char index, vector<vbo_type> tempVbo)
 	glBindBuffer(GL_ARRAY_BUFFER, tabVbo[(int)index]);
 	glBufferData(GL_ARRAY_BUFFER, tempVbo.size() * sizeof(vbo_type), &tempVbo[0], GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3 + sizeof(float), (void*)0);
-	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 3 + sizeof(float), (void*)(sizeof(float) * 3));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6 + sizeof(float), (void*)0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6 + sizeof(float), (void*)(sizeof(float) * 3));
+	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 6 + sizeof(float), (void*)(sizeof(float) * 6));
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
 }
 
 void		Chunk::validateMesh(char meshIdx)
@@ -277,7 +283,7 @@ void		Chunk::generateGraphics(void)
 	}
 }
 
-void		Chunk::displayChunk(Engine &e, glm::mat4 world)
+void		Chunk::displayChunk(Engine &e)
 {
 	unique_lock<mutex>						lock(this->validMutex);
 	std::map<char, unsigned int>::iterator	it = this->valid.begin();
@@ -291,9 +297,7 @@ void		Chunk::displayChunk(Engine &e, glm::mat4 world)
 		glBindVertexArray(this->tabVao[(int)it->first]);
 		glUseProgram(shader.getProgram());
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),
-			"world"), 1, GL_FALSE, glm::value_ptr(world));
-		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),
-			"view"), 1, GL_FALSE, glm::value_ptr(e.getCam().getMatrix(true)));
+			"view"), 1, GL_FALSE, glm::value_ptr(e.getCam().getMatrix(false)));
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),
 			"projection"), 1, GL_FALSE, glm::value_ptr(e.getCam().getProjMatrix()));
 		glUniform1i(glGetUniformLocation(shader.getProgram(),
