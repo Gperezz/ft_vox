@@ -6,7 +6,7 @@
 /*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2020/11/27 16:22:18 by karldouveno      ###   ########.fr       */
+/*   Updated: 2020/12/04 23:55:56 by karldouveno      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,22 +14,28 @@
 #include <iostream>
 using namespace std;
 
-World::World(unsigned long *seed)
+World::World(Engine& engine, unsigned long *seed)
+:
+	queueOn(true),
+	enginePtr(engine),
+	deltaFrameTime(0.0),
+	lastFrameTime(0.0)
 {
-	this->queueOn = true;
 	this->initQueueSorter();
-	//this->initQueueThread();
+	// this->initQueueThread();
 	this->worldGen.configure(seed);
-	this->deltaFrameTime = 0.0;
-	this->lastFrameTime = 0.0;
 }
 
-World::World(string& path, unsigned long *seed)
+World::World(Engine& engine, string& path, unsigned long *seed)
+:
+	queueOn(true),
+	enginePtr(engine),
+	path(path),
+	deltaFrameTime(0.0),
+	lastFrameTime(0.0)
 {
-	this->queueOn = true;
 	this->initQueueSorter();
-	//this->initQueueThread();
-	this->path = path;
+	// this->initQueueThread();
 	this->worldGen.configure(seed);
 }
 
@@ -38,6 +44,7 @@ World::~World()
 	std::map<ChunkPos, Chunk*>::iterator it = memoryChunks.begin();
 	while (it != memoryChunks.end())
 	{
+
 		delete it->second;
 		it++;
 	}
@@ -49,6 +56,7 @@ void	World::initQueueSorter()
 {
 	auto cmp = [this](ChunkPos a, ChunkPos b)->bool{
 		ChunkPos center = this->getCameraChunkPos();
+		printf("center : %d, %d\n", center[0], center[1]);
 		float da = a.distance(center);
 		float db = b.distance(center);
 		if (da == db)
@@ -64,7 +72,6 @@ bool	World::LoadNextQueuedChunk(){
 		size = this->loadQueue.size(); 
 	}
 	if (size){
-		printf("something's up");
 		decltype(this->loadQueue.begin()) pos;
 		{	unique_lock<mutex> lock(this->queueMutex);
 			pos = this->loadQueue.begin();
@@ -89,12 +96,14 @@ void	World::initQueueThread()
 void	World::display(Engine &e, float currentFrameTime)
 {
 	this->rearrangeQueues();
+			printf("text\n");
+
 	this->LoadNextQueuedChunk();
 	if (e.isSkybox() && e.getTexture(1))
 		e.displaySky(e.getTexture(1));
-	unique_lock<mutex> lock(this->displayedMutex);
-	unique_lock<mutex> lock2(this->matMutex);
-	unique_lock<mutex> lock3(this->memoryMutex);
+	unique_lock<mutex> lk(this->displayedMutex);
+	unique_lock<mutex> lk2(this->deltaFTMutex);
+	unique_lock<mutex> lk3(this->memoryMutex);
 	
 	for (auto it = this->displayedChunks.begin(); it != this->displayedChunks.end(); it++)
 		this->memoryChunks.at(*it)->displayChunk(e);
@@ -106,7 +115,7 @@ void	World::rearrangeQueues()
 {
 	static ChunkPos pos;
 	ChunkPos newPos = this->getCameraChunkPos();
-	printf("cur pos: %d %d\n", pos[0], pos[1]);
+	printf("cur pos: %d %d\n", newPos[0], newPos[1]);
 
 	if (pos == newPos)
 		return ;
@@ -124,13 +133,9 @@ void	World::rearrangeQueues()
 
 ChunkPos	World::getCameraChunkPos()
 {
-
 	glm::vec3 mat;
-	{
-		unique_lock<mutex> lock(this->matMutex);
-		mat = this->getWorldMat().getTranslate();
-	}
-	float test[] = {-mat.x / 16, -mat.z / 16};
+	mat = this->enginePtr.getCam().getTranslate();
+	float test[] = {mat.x / 16, mat.z / 16};
 	if (test[0] < 0)
 		test[0] -= 1.0;
 	if (test[1] < 0)
@@ -218,7 +223,8 @@ void	World::loadChunk(int x, int z)
 	return (this->loadChunk(ChunkPos((int[2]){x, z})));
 }
 
-float	World::getDeltaFrameTime(void) const
+float	World::getDeltaFrameTime(void)
 {
+	unique_lock<mutex> lk(this->deltaFTMutex);
 	return (this->deltaFrameTime);
 }

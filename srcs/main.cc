@@ -6,13 +6,13 @@
 /*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2020/11/27 16:15:44 by karldouveno      ###   ########.fr       */
+/*   Updated: 2020/11/28 01:27:12 by karldouveno      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_vox.hpp"
 
-void	key(Engine &env, const float deltaFrameTime)
+void	key(Engine &env, float deltaFrameTime)
 {
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(env.getWindow(), true);
@@ -73,7 +73,7 @@ static void	recLoad(World &w, int x, int y, int rec)
 int		main(void)
 {
 	Engine			env;
-	World			world;
+	World			world(env);
 	Shader&			shader(env.getShader());
 	TimeMs			time;
 

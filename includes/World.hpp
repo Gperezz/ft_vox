@@ -6,7 +6,7 @@
 /*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:08:20 by gperez            #+#    #+#             */
-/*   Updated: 2020/11/27 16:12:04 by karldouveno      ###   ########.fr       */
+/*   Updated: 2020/11/28 00:35:07 by karldouveno      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,6 @@ class World
 		bool					queueOn;
 		thread					queueThread;
 		mutex					queueMutex;
-		mutex					matMutex;
 		mutex					memoryMutex;
 		mutex					displayedMutex;
 		set<ChunkPos, function<bool (ChunkPos, ChunkPos)>>	loadQueue;
@@ -45,12 +44,14 @@ class World
 		set<ChunkPos>			graphicQueue;
 		unordered_set<ChunkPos>	displayedChunks;
 		WorldGenerator			worldGen;
+		Engine&					enginePtr;
 		string					path;
-		float						deltaFrameTime;
-		float						lastFrameTime;
+		float					deltaFrameTime;
+		float					lastFrameTime;
+		mutex					deltaFTMutex;
 	public:
-							World(unsigned long* = NULL);
-							World(string&, unsigned long* = NULL);
+							World(Engine& engine, unsigned long* = NULL);
+							World(Engine& engine, string&, unsigned long* = NULL);
 							// World(string pathStr, );
 							// World(string )
 							~World();
@@ -68,9 +69,8 @@ class World
 	Chunk					*get(ChunkPos);
 	Chunk					*getMemoryChunk(ChunkPos pos);
 	unordered_set<ChunkPos>	&getDisplayedChunks(void);
-	float					getDeltaFrameTime(void) const;
+	float					getDeltaFrameTime(void);
 	Chunk					*operator[](ChunkPos);
-	mutex					&getMatMutex();
 }; 
 
 #endif

@@ -3,15 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   Mat.cc                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/04 23:19:34 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/20 03:40:53 by gperez           ###   ########.fr       */
+/*   Updated: 2020/11/28 16:13:26 by karldouveno      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Mat.hpp"
-
 Mat::Mat()
 {
 	Mat::matrix = glm::mat4(1.0f);
@@ -19,6 +18,15 @@ Mat::Mat()
 	Mat::rot = glm::vec3(0.0, 0.0, 0.0);
 	Mat::sc = glm::vec3(1.0, 1.0, 1.0);
 }
+
+Mat::Mat(Mat& copy)
+:
+	matrix(copy.matrix),
+	trans(copy.trans),
+	rot(copy.rot),
+	sc(copy.sc),
+	translateMutex()
+{}
 
 glm::mat4	Mat::getMatrix(void)
 {
@@ -93,17 +101,22 @@ void		Mat::printMatrix(bool calc)
 
 void		Mat::translate(glm::vec3 v)
 {
+	std::unique_lock<std::mutex> lk(this->translateMutex);
 	Mat::trans += v;
 }
 
 void		Mat::setTranslate(glm::vec3 v)
 {
+	std::unique_lock<std::mutex> lk(this->translateMutex);
 	Mat::trans = v;
 }
 
 glm::vec3	Mat::getTranslate(void)
 {
-	return (Mat::trans);
+	glm::vec3 out;
+	std::unique_lock<std::mutex> lk(this->translateMutex);
+	out = Mat::trans;
+	return (out);
 }
 
 void		Mat::rotate(glm::vec3 v)
@@ -134,6 +147,16 @@ void		Mat::scale(glm::vec3 s)
 glm::vec3	Mat::getScale(void)
 {
 	return (Mat::sc);
+}
+
+void	Mat::operator=(Mat& copy)
+{
+	this->matrix = copy.matrix;
+	this->trans = copy.trans;
+	this->rot = copy.rot;
+	this->sc = copy.sc;
+
+	return ;
 }
 
 Mat::~Mat()
