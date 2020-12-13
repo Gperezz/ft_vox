@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/13 17:54:04 by gperez            #+#    #+#             */
-/*   Updated: 2020/11/09 22:20:31 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/13 16:19:49 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,17 +17,17 @@
 
 Textures::Textures()
 {
+	this->load = false;
 	this->width = 0;
 	this->height = 0;
 	this->nrChannels = 0;
-	this->txt = -1;
+	this->txt = 0;
 	this->txtData = NULL;
 }
 
 Textures::Textures(char *txtPath)
 {
-	stbi_set_flip_vertically_on_load(true);
-	this->txtData = stbi_load(txtPath, &width, &height, &nrChannels, 0);
+	this->loadTexture(txtPath);
 }
 
 Textures::Textures(char *buffer, unsigned long width, unsigned long height)
@@ -35,7 +35,18 @@ Textures::Textures(char *buffer, unsigned long width, unsigned long height)
 	this->txtData = (unsigned char*)buffer;
 	this->width = width;
 	this->height = height;
+	this->load = true;
 }
+
+void	Textures::loadTexture(char *txtPath)
+{
+	if (this->load)
+		return;
+	stbi_set_flip_vertically_on_load(true);
+	this->txtData = stbi_load(txtPath, &width, &height, &nrChannels, 0);
+	this->load = true;
+}
+
 
 int				Textures::getWidth(void) const
 {

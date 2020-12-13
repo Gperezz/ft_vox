@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   World.cc                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
+/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/04 23:55:56 by karldouveno      ###   ########.fr       */
+/*   Updated: 2020/12/13 16:07:12 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,14 +49,14 @@ World::~World()
 		it++;
 	}
 	this->queueOn = false;
-	queueThread.join();
+	// queueThread.join();
 }
 
 void	World::initQueueSorter()
 {
 	auto cmp = [this](ChunkPos a, ChunkPos b)->bool{
 		ChunkPos center = this->getCameraChunkPos();
-		printf("center : %d, %d\n", center[0], center[1]);
+		// printf("center : %d, %d\n", center[0], center[1]);
 		float da = a.distance(center);
 		float db = b.distance(center);
 		if (da == db)
@@ -96,7 +96,7 @@ void	World::initQueueThread()
 void	World::display(Engine &e, float currentFrameTime)
 {
 	this->rearrangeQueues();
-			printf("text\n");
+			// printf("text\n");
 
 	this->LoadNextQueuedChunk();
 	if (e.isSkybox() && e.getTexture(1))
@@ -115,7 +115,7 @@ void	World::rearrangeQueues()
 {
 	static ChunkPos pos;
 	ChunkPos newPos = this->getCameraChunkPos();
-	printf("cur pos: %d %d\n", newPos[0], newPos[1]);
+	// printf("cur pos: %d %d\n", newPos[0], newPos[1]);
 
 	if (pos == newPos)
 		return ;
@@ -124,7 +124,7 @@ void	World::rearrangeQueues()
 	for (int i = -CHK_RND_DIST; i < CHK_RND_DIST + 1; i++) {
 		for (int j = -CHK_RND_DIST; j < CHK_RND_DIST + 1; j++){
 			ChunkPos cp(pos + (int[]){i, j});
-			printf("surrounding pos: %d %d, %d, %d,   %lu\n", j, i, cp[0], cp[1], this->loadQueue.size());
+			// printf("surrounding pos: %d %d, %d, %d,   %lu\n", j, i, cp[0], cp[1], this->loadQueue.size());
 
 			this->loadQueue.insert(cp);
 		}
@@ -190,7 +190,7 @@ void	World::pushInDisplay(Chunk* chunk)
 
 void	World::loadChunk(ChunkPos cp)
 {
-	printf(YELLOW "%d %d\n" NA, cp.get(0), cp.get(1));
+	// printf(YELLOW "%d %d\n" NA, cp.get(0), cp.get(1));
 	bool count;
 	{	unique_lock<mutex> lock(this->memoryMutex);
 		count = this->memoryChunks.count(cp);

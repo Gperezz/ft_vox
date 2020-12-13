@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Chunk.cc                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
+/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2020/11/27 16:18:03 by karldouveno      ###   ########.fr       */
+/*   Updated: 2020/12/12 19:18:28 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,7 +149,7 @@ void		Chunk::validateMesh(char meshIdx)
 	if (validateValue && tempVbo.size())
 	{
 		generateVbo(meshIdx, tempVbo);
-		ft_printf(GREEN "generate VBO (Mesh %d) %d points (%d floats)\n" NA, meshIdx, tempVbo.size(), tempVbo.size() * 3);
+		// ft_printf(GREEN "generate VBO (Mesh %d) %d points (%d floats)\n" NA, meshIdx, tempVbo.size(), tempVbo.size() * 3);
 		unique_lock<mutex> lock(this->validMutex);
 		this->valid.insert({meshIdx, tempVbo.size()});
 	}
@@ -276,7 +276,7 @@ Block		*Chunk::getBlockNeighboor(BlockPos pos, Direction dir) // Fonction peut e
 
 void		Chunk::generateGraphics(void)
 {
-	ft_printf(ORANGE "Validating Chunk %d %d\n" NA, this->pos.get(0), this->pos.get(1));
+	// ft_printf(ORANGE "Validating Chunk %d %d\n" NA, this->pos.get(0), this->pos.get(1));
 	for (unsigned i = 0; i < 16; i++)
 	{
 		validateMesh(i);

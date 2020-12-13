@@ -6,7 +6,7 @@
 #    By: gperez <gperez@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/10/10 18:22:58 by gperez            #+#    #+#              #
-#    Updated: 2020/10/19 19:56:51 by gperez           ###   ########.fr        #
+#    Updated: 2020/12/12 23:36:37 by gperez           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -34,6 +34,8 @@ SRC =	srcs/main.cc \
 		srcs/Class/WorldGenerator.cc \
 		srcs/Class/ContextOpenCL.cc \
 		srcs/Class/TimeMs.cc \
+		srcs/Class/Hud.cc \
+		srcs/Class/Element.cc \
 
 NC = \033[0m
 BOLD =\033[1m

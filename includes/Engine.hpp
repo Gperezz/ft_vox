@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:35:15 by gperez            #+#    #+#             */
-/*   Updated: 2020/11/09 22:48:22 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/13 17:15:34 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ extern "C"
 # include "Coords.hpp"
 # include "Shader.hpp"
 # include "Camera.hpp"
-# include "Textures.hpp"
+# include "Hud.hpp"
 # include <iostream>
 # include <vector>
 
@@ -39,6 +39,7 @@ extern "C"
 
 # define LENGTH_BLOCK 1
 
+enum e_vsync {VSYNC_OFF, VSYNC_ON};
 enum xz_vec {XZ_X, XZ_Z};
 enum xyz_vec {MY, X, Y, Z};
 
@@ -137,10 +138,12 @@ class Engine
 		bool					sky;
 		glm::vec2				mouseLastPos;
 		bool					firstMouse;
+		Hud						hud;
 	public:
 		Engine();
 		int			initWindow(void);
 		GLFWwindow	*getWindow(void);
+		Hud&		getHud(void);
 		int			genSkybox(void);
 		bool		isSkybox(void);
 		Shader&		getShaderSky(void);
@@ -150,6 +153,7 @@ class Engine
 		Shader&		getShader(void);
 		int			genTextures(void);
 		Textures	*getTexture(unsigned int t);
+		unsigned int	getNbTextures(void);
 		void 		fillTextureVector(size_t start, size_t end, bool load);
 		int			genBlocksTextures(glm::vec2 len, e_txt start, e_txt end, size_t offsetInTexture);
 		void		addTexture(char *pathOrBuffer, unsigned long width, unsigned long height);

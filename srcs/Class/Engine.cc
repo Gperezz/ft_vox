@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2020/11/10 17:37:26 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/13 17:16:15 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,13 +78,18 @@ int			Engine::initWindow(void)
 	glfwSetFramebufferSizeCallback(this->window, framebuffer_size_callback);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetWindowUserPointer(window, this);
-	glfwSwapInterval(1);
+	glfwSwapInterval(VSYNC_OFF);
 	return (0);
 }
 
 GLFWwindow	*Engine::getWindow(void)
 {
 	return (Engine::window);
+}
+
+Hud&		Engine::getHud()
+{
+	return (this->hud);
 }
 
 static void	fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, unsigned int idxgTxtPath)
@@ -273,14 +278,18 @@ Textures	*Engine::getTexture(unsigned int t)
 	return (NULL);
 }
 
+unsigned int Engine::getNbTextures(void)
+{
+	return (textures.size());
+}
+
 int			Engine::genTextures(void)
 {
-	// this->genBlocksTextures();
 	if (this->genBlocksTextures((glm::vec2){16, 16}, DIRT_T, END_BLOCK_T, 0))
 		return (1);
-	if (this->genBlocksTextures((glm::vec2){512, 512}, SKY_FRONT_T, (e_txt)(SKY_BOTTOM_T + 1), 1))
+	if (this->genBlocksTextures((glm::vec2){512, 512}, SKY_FRONT_T, (e_txt)(SKY_T), 1))
 		return (1);
-	this->fillTextureVector(SKY_T, END_T, true);
+	this->fillTextureVector(SKY_T + 1, END_T, true);
 	return (0);
 }
 

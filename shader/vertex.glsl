@@ -1,4 +1,7 @@
 #version 410 core
+
+#define DIRT 0
+
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNorm;
 layout (location = 2) in float meta;
@@ -20,6 +23,10 @@ void main()
 
 	dir = int(meta) & 7;
 	typeF = int(meta) >> 8;
+	if (typeF == DIRT && dir == 2)
+		typeF++;
+	if (typeF == DIRT && dir != 2 && dir != -2)
+		typeF += 2;
 	tCoords = aPos.zy;
 	pos4 = vec4(aPos.xyz, 1.0);
 	if (dir == 1 || dir == 6)
@@ -33,5 +40,6 @@ void main()
 	// tCoords.x = mod(tCoords.x, 16);
 	tCoords.y = mod(tCoords.y, 16 / nbTxt);
 	tCoords.y = ((tCoords.y + typeF) / nbTxt);
+	// tCoords.y += typeF * 16;
 	gl_Position = projection * view * pos4;
 }

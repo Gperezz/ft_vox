@@ -8,6 +8,11 @@ out vec4	FragColor;
 
 uniform sampler2D	basicTexture;
 
+vec3	convertRGB(vec3 rgb)
+{
+	return (rgb /= 255.0);
+}
+
 void	main()
 {
 	float	brightness;
@@ -22,7 +27,7 @@ void	main()
 	textureColor = texture(basicTexture, tCoords);
 	if (textureColor.w < 0.9)
 		discard;
-	if (int(typeF) == 3)
-		colorAddedTexture = vec3(0.0, 1.0, 0.0);
+	if (int(typeF) == 3 || int(typeF) == 1)
+		colorAddedTexture = convertRGB(vec3(84, 255, 0));
 	FragColor = vec4(diffuse, 1.0) * vec4(colorAddedTexture, 1.0) * textureColor;
 }

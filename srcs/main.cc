@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cc                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
+/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2020/11/28 01:27:12 by karldouveno      ###   ########.fr       */
+/*   Updated: 2020/12/13 16:39:15 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,11 +50,29 @@ void	key(Engine &env, float deltaFrameTime)
 
 void	exec(World &world, Engine &env, TimeMs time)
 {
+	static int		iImg;
+	static float	timeForFps;
+	static int		imgNb;
+	Textures		*t;
+	int				idx;
+
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	iImg++;
+	timeForFps += world.getDeltaFrameTime();
 	key(env, world.getDeltaFrameTime());
 	world.display(env, time.getTimeSeconds());
+	idx = env.getNbTextures() - 1;
+	t = env.getTexture(idx);
+	env.getHud().display(imgNb, t ? t->getTxt() : 0);
+	if (timeForFps > 1.0f - PREC)
+	{
+		imgNb = iImg;
+		ft_printf(BLUE "FPS: %d\n" NA, imgNb);
+		timeForFps = 0.0;
+		iImg = 0;
+	}
 	glfwSwapBuffers(env.getWindow());
 	glfwPollEvents();
 }
@@ -76,17 +94,20 @@ int		main(void)
 	World			world(env);
 	Shader&			shader(env.getShader());
 	TimeMs			time;
+	glm::mat4		mat;
 
 	// ft_printf(RED"%ld\n" NA, sizeof(block.getInfo()));
 
+	mat = glm::perspective(glm::radians(45.0f),
+		(float)WIDTH / (float)HEIGHT, 0.1f, (float)RENDER_DIST);
 	if (env.initWindow() == -1)
 		return (1);
 	if (shader.loadShader((char*)VERTEX, (char*)FRAGMENT))
 		return (1);
-	if (env.genTextures() || env.genSkybox())
+	if (env.genTextures() || env.genSkybox()
+		|| env.getHud().init(glm::mat4(1)))
 		return (1);
-	env.getCam().setProjMatrix(glm::perspective(glm::radians(45.0f),
-		(float)WIDTH / (float)HEIGHT, 0.1f, (float)RENDER_DIST));
+	env.getCam().setProjMatrix(mat);
 	env.getCam().setTranslate((glm::vec3){7.5, 1, 2});
 
 	ft_printf(MAGENTA "Cam Matrix\n" NA);
