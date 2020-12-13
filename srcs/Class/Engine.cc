@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/13 17:16:15 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/13 18:40:46 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -338,11 +338,15 @@ void		Engine::setFirst(bool f)
 
 Engine::~Engine()
 {
-	int	i;
+	int				i;
+	int				t;
 
 	i = 0;
 	while ((unsigned int)i < this->textures.size())
 	{
+		t = this->textures[i]->getTxt();
+		if (t != -1)
+			glDeleteTextures(1, (GLuint*)&t);
 		delete this->textures[i];
 		i++;
 	}

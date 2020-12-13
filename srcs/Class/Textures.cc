@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/13 17:54:04 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/13 16:19:49 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/13 18:51:57 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ Textures::Textures()
 	this->width = 0;
 	this->height = 0;
 	this->nrChannels = 0;
-	this->txt = 0;
+	this->txt = -1;
 	this->txtData = NULL;
 }
 
@@ -68,7 +68,7 @@ void			Textures::setTxt(unsigned int t)
 	this->txt = t;
 }
 
-unsigned int	Textures::getTxt(void)
+int				Textures::getTxt(void)
 {
 	return (this->txt);
 }

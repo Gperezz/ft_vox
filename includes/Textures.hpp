@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/13 17:42:19 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/12 19:30:47 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/13 18:51:43 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ class Textures
 		int				getHeight(void) const;
 		int				getNrChannels(void) const;
 		void			setTxt(unsigned int t);
-		unsigned int	getTxt(void);
+		int				getTxt(void);
 		unsigned char	*getTxtData(void);
 		static e_txt	getIndexTxt(e_BlockType type);
 		~Textures();
@@ -65,7 +65,7 @@ class Textures
 		int				width;
 		int				height;
 		int				nrChannels;
-		unsigned int	txt;
+		int				txt;
 		unsigned char	*txtData;
 };
 
