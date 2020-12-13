@@ -6,7 +6,7 @@
 #    By: gperez <gperez@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/10/10 18:22:58 by gperez            #+#    #+#              #
-#    Updated: 2020/12/12 23:36:37 by gperez           ###   ########.fr        #
+#    Updated: 2020/12/13 18:59:27 by gperez           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,7 @@ NAME = ft_vox
 
 FLAGCPP = -std=c++11
 
-FLAG = -Wall -Werror -Wextra
+FLAG = -Wall -Werror -Wextra -fsanitize=address
 
 FLAG_OPENGL = -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo
 

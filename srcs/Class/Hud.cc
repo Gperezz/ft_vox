@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/03 20:12:28 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/13 17:13:49 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/13 19:08:08 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,12 +83,11 @@ void		Hud::newElement(void)
 	glEnableVertexAttribArray(0);
 	element->setVbo(vbo);
 	element->setVao(vao);
-	element->setScale(glm::vec3(0.05, 0.1, 0.0));
+	element->setScale(glm::vec3(0.02, 0.05, 0.0));
 	element->setTranslate(glm::vec3(1 - (element->getScale().x + 0.01)
 		- (element->getScale().x + 0.05) * (float)this->hudElements.size(),
 		1 - (element->getScale().y + 0.01), 0.0));
 	this->hudElements.push_back(element);
-	ft_printf(GREEN "New Element Added\n" NA);
 	glBindVertexArray(0);
 }
 
@@ -119,6 +118,7 @@ void		Hud::deleteElement(unsigned int i)
 	if (i >= this->hudElements.size())
 		return ;
 	delete this->hudElements[i];
+	this->hudElements.pop_back();
 }
 
 Hud::~Hud()
