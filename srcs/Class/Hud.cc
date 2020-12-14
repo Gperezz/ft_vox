@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/03 20:12:28 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/13 19:08:08 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/14 21:14:16 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,7 +118,7 @@ void		Hud::deleteElement(unsigned int i)
 	if (i >= this->hudElements.size())
 		return ;
 	delete this->hudElements[i];
-	this->hudElements.pop_back();
+	this->hudElements.erase(this->hudElements.begin() + i);
 }
 
 Hud::~Hud()
