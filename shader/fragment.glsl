@@ -23,11 +23,10 @@ void	main()
 
 	brightness = max(dot(normalize(vecToLight), normalize(normal)), 0.2);
 	diffuse = brightness * lightColor;
-
 	textureColor = texture(basicTexture, tCoords);
 	if (textureColor.w < 0.9)
 		discard;
 	if (int(typeF) == 3 || int(typeF) == 1)
-		colorAddedTexture = convertRGB(vec3(84, 255, 0));
+		colorAddedTexture = convertRGB(vec3(176, 252, 113));
 	FragColor = vec4(diffuse, 1.0) * vec4(colorAddedTexture, 1.0) * textureColor;
 }

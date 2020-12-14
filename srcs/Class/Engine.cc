@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/13 18:40:46 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/14 21:02:13 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,6 +104,21 @@ static void	fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, uns
 		vboType.tab[1] = dir_c.pts[iPt].get(Y);
 		vboType.tab[2] = dir_c.pts[iPt].get(Z);
 		vboType.meta = dir_c.axis < 0 ? dir_c.axis + 7 : dir_c.axis;
+		if (vboType.meta == 1 || vboType.meta == 6)
+		{
+			vboType.coords[0] = dir_c.pts[iPt].get(Z);
+			vboType.coords[1] = dir_c.pts[iPt].get(Y);
+		}
+		else if (vboType.meta == 2 || vboType.meta == 5)
+		{
+			vboType.coords[0] = dir_c.pts[iPt].get(X);
+			vboType.coords[1] = dir_c.pts[iPt].get(Z);
+		}
+		else
+		{
+			vboType.coords[0] = dir_c.pts[iPt].get(X);
+			vboType.coords[1] = dir_c.pts[iPt].get(Y);
+		}
 		idBitwise = (int)g_txt_path[idxgTxtPath].type << 8;
 		vboType.meta = (int)vboType.meta | idBitwise;
 		tempVbo.push_back(vboType);
@@ -124,11 +139,13 @@ int			Engine::genSkybox(void)
 	glBindVertexArray(this->vaoSky);
 	glGenBuffers(1, &this->vboSky);
 	glBindBuffer(GL_ARRAY_BUFFER, this->vboSky);
-	glBufferData(GL_ARRAY_BUFFER, tempVbo.size() * sizeof(vbo_type), &tempVbo[0], GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6 + sizeof(float), (void*)0);
-	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 6 + sizeof(float), (void*)(sizeof(float) * 6));
+	glBufferData(GL_ARRAY_BUFFER, tempVbo.size() * (sizeof(float) * 9), &tempVbo[0], GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8 + sizeof(float), (void*)0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8 + sizeof(float), (void*)(sizeof(float) * 6));
+	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 8 + sizeof(float), (void*)(sizeof(float) * 8));
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
 	this->sky = true;
 	return (0);
 }

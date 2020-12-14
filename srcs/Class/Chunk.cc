@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/12 19:18:28 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/14 20:42:23 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,8 +58,24 @@ void	Chunk::fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, Blo
 		vboType.normal[0] = dir_c.pts[iPt].get(X) - LENGTH_BLOCK / 2; // On pourra le mettre en brut dans le header
 		vboType.normal[1] = dir_c.pts[iPt].get(X) - LENGTH_BLOCK / 2;
 		vboType.normal[2] = dir_c.pts[iPt].get(X) - LENGTH_BLOCK / 2;
-
+	
 		vboType.meta = dir_c.axis < 0 ? dir_c.axis + 7 : dir_c.axis;
+
+		if (vboType.meta == 1 || vboType.meta == 6)
+		{
+			vboType.coords[0] = dir_c.pts[iPt].get(Z);
+			vboType.coords[1] = dir_c.pts[iPt].get(Y);
+		}
+		else if (vboType.meta == 2 || vboType.meta == 5)
+		{
+			vboType.coords[0] = dir_c.pts[iPt].get(X);
+			vboType.coords[1] = dir_c.pts[iPt].get(Z);
+		}
+		else
+		{
+			vboType.coords[0] = dir_c.pts[iPt].get(X);
+			vboType.coords[1] = dir_c.pts[iPt].get(Y);
+		}
 		idBitwise = id << 8;
 		vboType.meta = (int)vboType.meta | idBitwise;
 		tempVbo.push_back(vboType);
@@ -108,12 +124,14 @@ void		Chunk::generateVbo(char index, vector<vbo_type> tempVbo)
 	glBindBuffer(GL_ARRAY_BUFFER, tabVbo[(int)index]);
 	glBufferData(GL_ARRAY_BUFFER, tempVbo.size() * sizeof(vbo_type), &tempVbo[0], GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6 + sizeof(float), (void*)0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6 + sizeof(float), (void*)(sizeof(float) * 3));
-	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 6 + sizeof(float), (void*)(sizeof(float) * 6));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8 + sizeof(float), (void*)0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8 + sizeof(float), (void*)(sizeof(float) * 3));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8 + sizeof(float), (void*)(sizeof(float) * 6));
+	glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 8 + sizeof(float), (void*)(sizeof(float) * 8));
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(3);
 }
 
 void		Chunk::validateMesh(char meshIdx)
