@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Chunk.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
+/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:17:27 by gperez            #+#    #+#             */
-/*   Updated: 2020/11/27 16:09:03 by karldouveno      ###   ########.fr       */
+/*   Updated: 2020/12/15 20:47:57 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,10 @@
 # define _CHUNK_HPP_
 
 # include "Block.hpp"
-# include "Engine.hpp"
+# include "StructBlock.hpp"
+# include "Camera.hpp"
+# include "Shader.hpp"
+# include "Textures.hpp"
 # include <vector>
 # include <map>
 # include <mutex>
@@ -55,7 +58,7 @@ enum ChunkState : char{
 
 class Chunk{
 	private:
-		std::mutex							validMutex;
+		std::mutex						validMutex;
 		Block							blocks[16][16][16][16]; // [meshIdx_y][Mesh_relative_x][Mesh_relative_y][mesh_relative_z]
 		unsigned int					tabVao[16];
 		unsigned int					tabVbo[16];
@@ -91,7 +94,7 @@ class Chunk{
 		Block							*getBlockNeighboor(BlockPos, Direction);
 
 		void							generateGraphics(void);
-		void							displayChunk(Engine &e);
+		void							displayChunk(Camera cam, Shader shader, Textures *t);
 
 		Block&							operator[](BlockPos);
 		void							operator=(const Chunk	&copy);

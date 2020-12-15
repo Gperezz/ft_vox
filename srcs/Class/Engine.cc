@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/15 12:41:10 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/15 21:00:56 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,6 +85,44 @@ int			Engine::initWindow(void)
 GLFWwindow	*Engine::getWindow(void)
 {
 	return (Engine::window);
+}
+
+void		Engine::rayCasting(Chunk *chunk)
+{
+	glm::vec3	ray;
+	ChunkPos	chunkP;
+
+	chunkP = chunk->getPos();
+	ft_printf(BOLD_YELLOW "ChunkPos %d %d\n" NA, chunkP.get(0), chunkP.get(1));
+	ray = this->camera.createRay(this->getMouseLastPos(), WIDTH, HEIGHT);
+}
+
+int			Engine::setButton(unsigned int b, bool value)
+{
+	return (this->setButton(b, value, NULL));
+}
+
+int			Engine::setButton(unsigned int b, bool value, Chunk *chunk)
+{
+	if (b == GLFW_MOUSE_BUTTON_1 && value == true)
+	{
+		if (!chunk)
+		{
+			this->buttons[b] = value;
+			return (0);
+		}
+		this->rayCasting(chunk);
+		ft_printf(GREEN "Ray casted\n" NA);
+	}
+	this->buttons[b] = value;
+	return (0);
+}
+
+bool		Engine::getButton(unsigned int k)
+{
+	if (k >= GLFW_MOUSE_BUTTON_LAST)
+		return (false);
+	return (this->buttons[k]);
 }
 
 Hud&		Engine::getHud()

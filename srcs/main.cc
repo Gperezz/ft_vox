@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/13 16:39:15 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/15 20:59:13 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,17 @@ void	key(Engine &env, float deltaFrameTime)
 	}
 }
 
+static int	checkMouse(Engine &env, unsigned int b, Chunk *chunk)
+{
+	if (glfwGetMouseButton(env.getWindow(), b) == GLFW_PRESS
+		&& env.getButton(b) == false)
+		return (env.setButton(b, true, chunk));
+	else if (glfwGetMouseButton(env.getWindow(), b) == GLFW_RELEASE
+		&& env.getButton(b) == true)
+		return (env.setButton(b, false));
+	return (0);
+}
+
 void	exec(World &world, Engine &env, TimeMs time)
 {
 	static int		iImg;
@@ -62,6 +73,9 @@ void	exec(World &world, Engine &env, TimeMs time)
 	iImg++;
 	timeForFps += world.getDeltaFrameTime();
 	key(env, world.getDeltaFrameTime());
+	if (checkMouse(env, GLFW_MOUSE_BUTTON_1,
+		world.getMemoryChunk(env.getCam().getCurrentChunkPos())))
+		return ;
 	world.display(env, time.getTimeSeconds());
 	idx = env.getNbTextures() - 1;
 	t = env.getTexture(idx);

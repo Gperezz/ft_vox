@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   World.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
+/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:08:20 by gperez            #+#    #+#             */
-/*   Updated: 2020/11/28 00:35:07 by karldouveno      ###   ########.fr       */
+/*   Updated: 2020/12/15 20:51:46 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 # include <thread>
 # include <mutex>
 
+# include "Engine.hpp"
 # include "Chunk.hpp"
 # include "WorldGenerator.hpp"
 # define CHK_RND_DIST 16

@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/13 16:07:12 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/15 20:52:37 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,7 @@ void	World::display(Engine &e, float currentFrameTime)
 	unique_lock<mutex> lk3(this->memoryMutex);
 	
 	for (auto it = this->displayedChunks.begin(); it != this->displayedChunks.end(); it++)
-		this->memoryChunks.at(*it)->displayChunk(e);
+		this->memoryChunks.at(*it)->displayChunk(e.getCam(), e.getShader(), e.getTexture(0));
 	this->deltaFrameTime = currentFrameTime - this->lastFrameTime;
 	this->lastFrameTime = currentFrameTime;
 }

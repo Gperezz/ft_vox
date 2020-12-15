@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/14 20:42:23 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/15 20:55:03 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -301,23 +301,20 @@ void		Chunk::generateGraphics(void)
 	}
 }
 
-void		Chunk::displayChunk(Engine &e)
+void		Chunk::displayChunk(Camera cam, Shader shader, Textures *t)
 {
 	unique_lock<mutex>						lock(this->validMutex);
 	std::map<char, unsigned int>::iterator	it = this->valid.begin();
-	Shader&									shader(e.getShader());
-	Textures								*t;
 
-	t = e.getTexture(0);
 	while (it != this->valid.end())
 	{
 		// ft_printf(CYAN "%d %u\n" NA, it->first, it->second);
 		glBindVertexArray(this->tabVao[(int)it->first]);
 		glUseProgram(shader.getProgram());
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),
-			"view"), 1, GL_FALSE, glm::value_ptr(e.getCam().getMatrix(false)));
+			"view"), 1, GL_FALSE, glm::value_ptr(cam.getMatrix(false)));
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),
-			"projection"), 1, GL_FALSE, glm::value_ptr(e.getCam().getProjMatrix()));
+			"projection"), 1, GL_FALSE, glm::value_ptr(cam.getProjMatrix()));
 		glUniform1i(glGetUniformLocation(shader.getProgram(),
 			"nbTxt"), END_BLOCK_T);
 		glUniform1i(glGetUniformLocation(shader.getProgram(),

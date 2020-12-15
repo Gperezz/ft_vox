@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/04 23:48:55 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/20 16:10:22 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/15 20:54:35 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,6 +86,29 @@ float	Camera::getEuler(e_rot euler)
 void	Camera::setCameraFront(glm::vec3 front)
 {
 	this->cameraFront = front;
+}
+
+glm::vec3	Camera::getCameraFront(void)
+{
+	return (this->cameraFront);
+}
+
+glm::vec3	Camera::createRay(glm::vec2 pos, float width, float height)
+{
+	pos.x = pos.x / (width * 0.5) - 1.0f;
+	pos.y = 2 - (pos.y / (height * 0.5)) - 1.0f;
+	glm::vec4	screenPos = glm::vec4(pos.x, pos.y, 1.0, 1.0);
+	this->look();
+	glm::mat4 invVP = glm::inverse(this->getProjMatrix() * this->getMatrix());
+	return (glm::normalize(glm::vec3(invVP * screenPos)));
+
+}
+
+ChunkPos	Camera::getCurrentChunkPos()
+{
+	glm::vec3	pos = this->getTranslate();
+
+	return (ChunkPos((int[2]){(int)pos.x / 16, (int)pos.z / 16}));
 }
 
 glm::mat4	Camera::calcMatrix(void)
