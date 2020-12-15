@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/14 21:02:13 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/15 12:41:10 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -259,7 +259,6 @@ static void	fillBuffer(char **buffer, std::vector<Textures*> &textures, glm::vec
 
 int		Engine::genBlocksTextures(glm::vec2 len, e_txt start, e_txt end, size_t offsetInTexture)
 {
-	// ContextOpenCL	cl;
 	char			*buffer;
 	size_t			size;
 	size_t			size_y;
@@ -272,18 +271,12 @@ int		Engine::genBlocksTextures(glm::vec2 len, e_txt start, e_txt end, size_t off
 	size = len.x * len.y * sizeof(int) * nbTxt;
 	buffer = (char*)ft_memalloc(size);
 	size_y = nbTxt * len.y;
-	// Recuperer les datas de chaques txt et en faire une et une seule // A FAIRE AVEC CL
-	// if (!cl.initContext())
-	// 	cl.useKernel(buffer, this->textures);
-
-	// ft_printf(RED "Apres Opencl\n" NA);
 	fillBuffer(&buffer, this->textures, len, offsetInTexture);
 	for (size_t i = this->textures.size(); i > offsetInTexture ; i--)
 	{
 		delete this->textures[i - 1];
 		this->textures.erase(textures.begin() + i - 1);
 	}
-	// Rajouter la texture generer avec openCL dans le vector textures
 	this->addTexture(buffer, len.x, size_y);
 	return (0);
 }
@@ -326,8 +319,16 @@ void	Engine::addTexture(char *pathOrBuffer, unsigned long width, unsigned long h
 	glBindTexture(GL_TEXTURE_2D, t->getTxt());
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	if (this->textures.size() == 1 || this->textures.size() == 2)
+	{
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	}
+	else
+	{
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	}
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, t->getWidth(), t->getHeight(), 0,
 		GL_RGBA, GL_UNSIGNED_BYTE, t->getTxtData());
 	glGenerateMipmap(GL_TEXTURE_2D);

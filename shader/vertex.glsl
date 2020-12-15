@@ -30,7 +30,7 @@ void main()
 		typeF += 2;
 	pos4 = vec4(aPos.xyz, 1.0);
 	tCoords = aCoords;
-	tCoords.y = tCoords.y / nbTxt + (1.0 / nbTxt) * typeF;
+	tCoords.y = (tCoords.y / nbTxt) + (1.0 / nbTxt) * typeF;
 	normal = aNorm;
 	vecToLight = lightP - aPos;
 	gl_Position = projection * view * pos4;
