@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/04 23:48:55 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/15 20:54:35 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/15 22:05:45 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ void		Camera::translate(e_axes axe, float speed)
 	else if (axe == E_UP)
 		this->setTranslate(this->getTranslate() + cameraUp * speed);
 	else
-		this->setTranslate(this->getTranslate() + cameraFront * speed);
+		this->setTranslate(this->getTranslate() + glm::normalize(glm::vec3(cameraFront.x, 0, cameraFront.z)) * speed);
 }
 
 void	Camera::rotate(glm::vec3 rotEuler)
@@ -104,11 +104,24 @@ glm::vec3	Camera::createRay(glm::vec2 pos, float width, float height)
 
 }
 
-ChunkPos	Camera::getCurrentChunkPos()
+ChunkPos	Camera::getCurrentChunkPos(void)
 {
 	glm::vec3	pos = this->getTranslate();
 
-	return (ChunkPos((int[2]){(int)pos.x / 16, (int)pos.z / 16}));
+	return (ChunkPos((int[2]){(int)(pos.x / 16), (int)(pos.z / 16)}));
+}
+
+glm::vec2	Camera::getCurrentOffset(void)
+{
+	glm::vec3	pos = this->getTranslate();
+	glm::vec2	offset;
+
+	offset = (glm::vec2){pos.x / 16.0 - (int)(pos.x / 16),
+		pos.z / 16.0 - (int)(pos.z / 16)};
+	offset.x = offset.x < 0.0 ? 1 + offset.x : offset.x;
+	offset.y = offset.y < 0.0 ? 1 + offset.y : offset.y;
+	offset *= 16;
+	return (offset);
 }
 
 glm::mat4	Camera::calcMatrix(void)

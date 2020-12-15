@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/15 21:00:56 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/15 21:59:17 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,9 +91,12 @@ void		Engine::rayCasting(Chunk *chunk)
 {
 	glm::vec3	ray;
 	ChunkPos	chunkP;
+	glm::vec2	offset;
 
 	chunkP = chunk->getPos();
+	offset = this->camera.getCurrentOffset();
 	ft_printf(BOLD_YELLOW "ChunkPos %d %d\n" NA, chunkP.get(0), chunkP.get(1));
+	ft_printf(BOLD_BLUE "ChunkOffset %f %f\n" NA, offset.x, offset.y);
 	ray = this->camera.createRay(this->getMouseLastPos(), WIDTH, HEIGHT);
 }
 
