@@ -203,7 +203,7 @@ void	World::loadChunk(ChunkPos cp)
 			unique_lock<mutex> lock(this->memoryMutex);
 			this->memoryChunks[cp] = newChunk;
 		}
-		this->memoryChunks[cp]->updateFenced(1);
+		newChunk->updateFenced(1);
 		this->pushInDisplay(newChunk);
 	}
 }

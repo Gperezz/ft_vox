@@ -6,7 +6,7 @@
 /*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2020/11/27 16:18:03 by karldouveno      ###   ########.fr       */
+/*   Updated: 2020/12/17 13:25:45 by karldouveno      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,23 +17,27 @@ using namespace std;
 
 Chunk::Chunk()
 {
-	this->state = UNFENCED;
+	
 	bzero(this->blocks, sizeof(this->blocks));
+	unique_lock<mutex>	lk(this->stateMutex);
+	this->state = UNFENCED;
 }
 
 Chunk::Chunk(World *w)
 {
-	this->state = UNFENCED,
 	this->world = w;
 	bzero(this->blocks, sizeof(this->blocks));
+	unique_lock<mutex>	lk(this->stateMutex);
+	this->state = UNFENCED;
 }
 
 Chunk::Chunk(World *w, ChunkPos pos)
 {
-	this->state = UNFENCED,
 	this->pos = pos;
 	this->world = w;
 	bzero(this->blocks, sizeof(this->blocks));
+	unique_lock<mutex>	lk(this->stateMutex);
+	this->state = UNFENCED;
 }
 
 Chunk::Chunk(const Chunk& copy)
@@ -102,12 +106,15 @@ bool		Chunk::conditionValidate(vector<vbo_type> &tempVbo, BlockPos posInMesh, bo
 
 void		Chunk::generateVbo(char index, vector<vbo_type> tempVbo)
 {
-	glGenVertexArrays(1, &(Chunk::tabVao[(int)index]));
-	glBindVertexArray(tabVao[(int)index]);
-	glGenBuffers(1, &(Chunk::tabVbo[(int)index]));
-	glBindBuffer(GL_ARRAY_BUFFER, tabVbo[(int)index]);
-	glBufferData(GL_ARRAY_BUFFER, tempVbo.size() * sizeof(vbo_type), &tempVbo[0], GL_STATIC_DRAW);
-
+	{	unique_lock<mutex>	lk(this->vaoMutex);
+		glGenVertexArrays(1, &(Chunk::tabVao[(int)index]));
+		glBindVertexArray(tabVao[(int)index]);
+	}
+	{	unique_lock<mutex>	lk2(this->vboMutex);
+		glGenBuffers(1, &(Chunk::tabVbo[(int)index]));
+		glBindBuffer(GL_ARRAY_BUFFER, tabVbo[(int)index]);
+		glBufferData(GL_ARRAY_BUFFER, tempVbo.size() * sizeof(vbo_type), &tempVbo[0], GL_STATIC_DRAW);
+	}
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6 + sizeof(float), (void*)0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6 + sizeof(float), (void*)(sizeof(float) * 3));
 	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 6 + sizeof(float), (void*)(sizeof(float) * 6));
@@ -157,6 +164,8 @@ void		Chunk::validateMesh(char meshIdx)
 
 void		Chunk::deleteVbo(char index)
 {
+	unique_lock<mutex>	lk(this->vaoMutex);
+	unique_lock<mutex>	lk2(this->vboMutex);
 	glDeleteBuffers(1, &(Chunk::tabVbo[(int)index]));
 	glDeleteVertexArrays(1, &(Chunk::tabVao[(int)index]));
 }
@@ -206,6 +215,7 @@ ChunkPos	Chunk::getPos(void)
 
 bool	Chunk::getFenced(void)
 {
+	unique_lock<mutex>	lk(this->stateMutex);
 	return (this->state);
 }
 
@@ -223,6 +233,7 @@ void		Chunk::updateFenced(int source)
 		if ((tmp = this->getNeighboor(WEST)))
 			tmp->updateFenced(0);
 	}
+	unique_lock<mutex>	lk(this->stateMutex);
 	if (this->getNeighboor(NORTH) && this->getNeighboor(SOUTH) && this->getNeighboor(EAST) && this->getNeighboor(WEST))
 		this->state = FENCED;
 	else
@@ -294,7 +305,9 @@ void		Chunk::displayChunk(Engine &e)
 	while (it != this->valid.end())
 	{
 		// ft_printf(CYAN "%d %u\n" NA, it->first, it->second);
-		glBindVertexArray(this->tabVao[(int)it->first]);
+		{	unique_lock<mutex>	lk(this->vaoMutex);
+			glBindVertexArray(this->tabVao[(int)it->first]);
+		}
 		glUseProgram(shader.getProgram());
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),
 			"view"), 1, GL_FALSE, glm::value_ptr(e.getCam().getMatrix(false)));

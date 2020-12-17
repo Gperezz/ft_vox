@@ -6,7 +6,7 @@
 /*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:17:27 by gperez            #+#    #+#             */
-/*   Updated: 2020/11/27 16:09:03 by karldouveno      ###   ########.fr       */
+/*   Updated: 2020/12/16 23:15:28 by karldouveno      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,11 @@ enum ChunkState : char{
 
 class Chunk{
 	private:
-		std::mutex							validMutex;
+		std::mutex						validMutex;
+		std::mutex						stateMutex;
+		std::mutex						vaoMutex;
+		std::mutex						vboMutex;
+
 		Block							blocks[16][16][16][16]; // [meshIdx_y][Mesh_relative_x][Mesh_relative_y][mesh_relative_z]
 		unsigned int					tabVao[16];
 		unsigned int					tabVbo[16];
