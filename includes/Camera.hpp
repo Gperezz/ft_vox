@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/04 23:49:41 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/15 21:20:33 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/17 13:17:53 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,8 @@ class	Camera : public Mat
 		glm::vec3			getCameraFront(void);
 		glm::vec3			createRay(glm::vec2 pos, float width, float height);
 		ChunkPos			getCurrentChunkPos(void);
-		glm::vec2			getCurrentOffset(void);
+		glm::vec3			getCurrentOffset(void);
+		static glm::vec3	getCurrentOffset(glm::vec3 pos);
 		virtual				~Camera();
 	private:
 		Mat					projection;

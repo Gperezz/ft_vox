@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/04 23:48:55 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/15 22:05:45 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/17 13:38:54 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,17 +111,16 @@ ChunkPos	Camera::getCurrentChunkPos(void)
 	return (ChunkPos((int[2]){(int)(pos.x / 16), (int)(pos.z / 16)}));
 }
 
-glm::vec2	Camera::getCurrentOffset(void)
+glm::vec3	Camera::getCurrentOffset(void)
 {
-	glm::vec3	pos = this->getTranslate();
-	glm::vec2	offset;
+	return (this->getCurrentOffset(this->getTranslate()));
+}
 
-	offset = (glm::vec2){pos.x / 16.0 - (int)(pos.x / 16),
-		pos.z / 16.0 - (int)(pos.z / 16)};
-	offset.x = offset.x < 0.0 ? 1 + offset.x : offset.x;
-	offset.y = offset.y < 0.0 ? 1 + offset.y : offset.y;
-	offset *= 16;
-	return (offset);
+glm::vec3	Camera::getCurrentOffset(glm::vec3 pos)
+{
+	return ((glm::vec3){pos.x / 16.0 - (int)(pos.x / 16),
+		pos.y / 16.0 - (int)(pos.y / 16),
+		pos.z / 16.0 - (int)(pos.z / 16)});
 }
 
 glm::mat4	Camera::calcMatrix(void)

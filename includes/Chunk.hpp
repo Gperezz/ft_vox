@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:17:27 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/15 20:47:57 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/17 21:38:52 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,7 @@ class Chunk{
 		Block							*getBlockNeighboor(BlockPos, Direction);
 
 		void							generateGraphics(void);
+		void							generateGraphics(unsigned int mesh);
 		void							displayChunk(Camera cam, Shader shader, Textures *t);
 
 		Block&							operator[](BlockPos);

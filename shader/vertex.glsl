@@ -26,7 +26,7 @@ void main()
 	typeF = int(meta) >> 8;
 	if (typeF == DIRT && dir == 2)
 		typeF++;
-	if (typeF == DIRT && dir != 2 && dir != -2)
+	if (typeF == DIRT && dir != 2 && dir != 5)
 		typeF += 2;
 	pos4 = vec4(aPos.xyz, 1.0);
 	tCoords = aCoords;

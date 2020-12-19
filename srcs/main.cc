@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/15 20:59:13 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/19 22:51:46 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,8 @@ void	exec(World &world, Engine &env, TimeMs time)
 	timeForFps += world.getDeltaFrameTime();
 	key(env, world.getDeltaFrameTime());
 	if (checkMouse(env, GLFW_MOUSE_BUTTON_1,
+		world.getMemoryChunk(env.getCam().getCurrentChunkPos()))
+		|| checkMouse(env, GLFW_MOUSE_BUTTON_2,
 		world.getMemoryChunk(env.getCam().getCurrentChunkPos())))
 		return ;
 	world.display(env, time.getTimeSeconds());
@@ -83,7 +85,6 @@ void	exec(World &world, Engine &env, TimeMs time)
 	if (timeForFps > 1.0f - PREC)
 	{
 		imgNb = iImg;
-		ft_printf(BLUE "FPS: %d\n" NA, imgNb);
 		timeForFps = 0.0;
 		iImg = 0;
 	}

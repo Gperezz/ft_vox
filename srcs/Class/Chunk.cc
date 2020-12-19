@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/15 20:55:03 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/17 21:39:05 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -290,6 +290,11 @@ Block		*Chunk::getBlockNeighboor(BlockPos pos, Direction dir) // Fonction peut e
 		return NULL;
 	}
 	return &this->getBlock(pos + c.block_vec);
+}
+
+void		Chunk::generateGraphics(unsigned int mesh)
+{
+	validateMesh(mesh);
 }
 
 void		Chunk::generateGraphics(void)

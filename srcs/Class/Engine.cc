@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/15 21:59:17 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/19 22:50:38 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,17 +87,121 @@ GLFWwindow	*Engine::getWindow(void)
 	return (Engine::window);
 }
 
-void		Engine::rayCasting(Chunk *chunk)
+static bool	switchedBlock(int startPos[3], glm::vec3 pos)
 {
-	glm::vec3	ray;
-	ChunkPos	chunkP;
-	glm::vec2	offset;
+	return (!(startPos[0] == (int)pos.x
+		&& startPos[1] == (int)pos.y
+		&& startPos[2] == (int)pos.z));
+}
+static void	stepLoop(glm::vec3 &pos, glm::vec3 ray)
+{
+	int			startPos[3] = {(int)pos.x, (int)pos.y, (int)pos.z};
+	float		step = 0.02;
 
-	chunkP = chunk->getPos();
-	offset = this->camera.getCurrentOffset();
-	ft_printf(BOLD_YELLOW "ChunkPos %d %d\n" NA, chunkP.get(0), chunkP.get(1));
-	ft_printf(BOLD_BLUE "ChunkOffset %f %f\n" NA, offset.x, offset.y);
-	ray = this->camera.createRay(this->getMouseLastPos(), WIDTH, HEIGHT);
+	do
+	{
+		pos += ray * step;
+	}	while (!switchedBlock(startPos, pos));
+}
+
+static bool isInAirBlock(Block currentBlock)
+{
+	return (currentBlock.getInfo().id == AIR);
+}
+
+static void	switchChunk(Chunk **chunk, glm::vec4 &bP)
+{
+	if (bP.x + PREC < 0.0)
+	{
+		(*chunk)->getNeighboor(WEST);
+		bP.x = 1 + bP.x;
+	}
+	else if (bP.x - PREC > 1.0)
+	{
+		(*chunk)->getNeighboor(EAST);
+		bP.x = bP.x - 1;
+	}
+	if (bP.z + PREC < 0.0)
+	{
+		(*chunk)->getNeighboor(SOUTH);
+		bP.z = 1 + bP.z;
+	}
+	else if (bP.z - PREC > 1.0)
+	{
+		(*chunk)->getNeighboor(NORTH);
+		bP.z = bP.z - 1;
+	}
+	if (bP.y + PREC < 0.0)
+	{
+		if (bP.w - PREC > 1.0)
+		{
+			bP.y = 1 + bP.y;
+			bP.w -= 1.0;
+		}
+		else
+			(*chunk) = NULL;
+	}
+	else if (bP.y - PREC > 1.0)
+	{
+		if (bP.w + PREC < 14.0)
+		{
+			bP.y = bP.y - 1;
+			bP.w += 1.0;
+		}
+		else
+			(*chunk) = NULL;
+	}
+}
+
+static Block *getBlockFromPos(Chunk **chunk, glm::vec3 pos, glm::vec4 &bP)
+{
+	Block *block;
+
+	bP = glm::vec4(Camera::getCurrentOffset(pos), (int)(pos.y / 16));
+	switchChunk(chunk, bP);
+	bP.x *= 16.0;
+	bP.y *= 16.0;
+	bP.z *= 16.0;
+	if (!(*chunk))
+		return (NULL);
+	block = &(*chunk)->getBlock(bP.w, bP.x, bP.y, bP.z);
+	return (block);
+}
+
+void		Engine::rayCasting(Chunk *chunk, bool isAdd)
+{
+	glm::vec3		ray;
+	glm::vec3		pos = this->camera.getTranslate();
+	unsigned int	distBlock = 6;
+	Block			*currentBlock;
+	glm::vec4		currentBP;
+	glm::vec4		saveBP;
+
+	currentBlock = getBlockFromPos(&chunk, pos, currentBP);
+	if (!currentBlock || !isInAirBlock(*currentBlock) || chunk->getFenced() == UNFENCED)
+		return;
+	ray = this->camera.createRay(glm::vec2(WIDTH / 2.0, HEIGHT / 2.0), WIDTH, HEIGHT);
+	for (unsigned int i = 0; currentBlock && i < distBlock && isInAirBlock(*currentBlock); i++)
+	{
+		saveBP = currentBP;
+		stepLoop(pos, ray);
+		currentBlock = getBlockFromPos(&chunk, pos, currentBP);
+	}
+	if (!isInAirBlock(*currentBlock))
+	{
+		if (isAdd)
+		{
+			chunk->setBlock((int[4]){(int)saveBP.w, (int)saveBP.x, (int)saveBP.y, (int)saveBP.z},
+				(t_block_info){STONE, 0, 0, 0});
+			chunk->generateGraphics(saveBP.w);
+		}
+		else
+		{
+			chunk->setBlock((int[4]){(int)currentBP.w, (int)currentBP.x, (int)currentBP.y, (int)currentBP.z},
+				(t_block_info){AIR, 0, 0, 0});
+			chunk->generateGraphics(currentBP.w);
+		}
+	}
 }
 
 int			Engine::setButton(unsigned int b, bool value)
@@ -114,8 +218,16 @@ int			Engine::setButton(unsigned int b, bool value, Chunk *chunk)
 			this->buttons[b] = value;
 			return (0);
 		}
-		this->rayCasting(chunk);
-		ft_printf(GREEN "Ray casted\n" NA);
+		this->rayCasting(chunk, true);
+	}
+	if (b == GLFW_MOUSE_BUTTON_2 && value == true)
+	{
+		if (!chunk)
+		{
+			this->buttons[b] = value;
+			return (0);
+		}
+		this->rayCasting(chunk, false);
 	}
 	this->buttons[b] = value;
 	return (0);

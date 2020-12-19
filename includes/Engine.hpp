@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:35:15 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/15 20:43:21 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/19 22:48:48 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ class Engine
 		glm::vec2				mouseLastPos;
 		bool					firstMouse;
 		Hud						hud;
-		void					rayCasting(Chunk *chunk);
+		void					rayCasting(Chunk *chunk, bool isAdd);
 	public:
 		Engine();
 		int				initWindow(void);
