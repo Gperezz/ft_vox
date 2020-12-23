@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/23 22:31:22 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/23 22:46:46 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,7 +134,7 @@ static Block *getBlockFromPos(Chunk **chunk, glm::vec3 pos, glm::vec4 &bP, std::
 static void	setGenBlock(glm::vec4 posB, Chunk *chunk, e_BlockType type)
 {
 	chunk->setBlock((int[4]){(int)posB.w, (int)posB.x, (int)posB.y, (int)posB.z},
-		(t_block_info){type, 0, 0, 0});
+		(t_block_info){(unsigned char)type, 0, 0, 0});
 	chunk->generateGraphics(posB.w);
 	if ((int)posB.x == 0)
 		chunk->getNeighboor(WEST)->generateGraphics(posB.w);
