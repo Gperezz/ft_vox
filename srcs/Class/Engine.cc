@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/19 22:50:38 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/23 22:31:22 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ Engine::Engine()
 {
 	this->sky = false;
 	this->firstMouse = true;
+	this->lockRay = false;
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
@@ -109,127 +110,98 @@ static bool isInAirBlock(Block currentBlock)
 	return (currentBlock.getInfo().id == AIR);
 }
 
-static void	switchChunk(Chunk **chunk, glm::vec4 &bP)
-{
-	if (bP.x + PREC < 0.0)
-	{
-		(*chunk)->getNeighboor(WEST);
-		bP.x = 1 + bP.x;
-	}
-	else if (bP.x - PREC > 1.0)
-	{
-		(*chunk)->getNeighboor(EAST);
-		bP.x = bP.x - 1;
-	}
-	if (bP.z + PREC < 0.0)
-	{
-		(*chunk)->getNeighboor(SOUTH);
-		bP.z = 1 + bP.z;
-	}
-	else if (bP.z - PREC > 1.0)
-	{
-		(*chunk)->getNeighboor(NORTH);
-		bP.z = bP.z - 1;
-	}
-	if (bP.y + PREC < 0.0)
-	{
-		if (bP.w - PREC > 1.0)
-		{
-			bP.y = 1 + bP.y;
-			bP.w -= 1.0;
-		}
-		else
-			(*chunk) = NULL;
-	}
-	else if (bP.y - PREC > 1.0)
-	{
-		if (bP.w + PREC < 14.0)
-		{
-			bP.y = bP.y - 1;
-			bP.w += 1.0;
-		}
-		else
-			(*chunk) = NULL;
-	}
-}
-
-static Block *getBlockFromPos(Chunk **chunk, glm::vec3 pos, glm::vec4 &bP)
+static Block *getBlockFromPos(Chunk **chunk, glm::vec3 pos, glm::vec4 &bP, std::map<ChunkPos, Chunk*> memory)
 {
 	Block *block;
 
+	(*chunk) = memory.at(Camera::getCurrentChunkPos(pos));
 	bP = glm::vec4(Camera::getCurrentOffset(pos), (int)(pos.y / 16));
-	switchChunk(chunk, bP);
+	if (bP.x + PREC < 0.0)
+		bP.x = 1 + bP.x;
+	if (bP.z + PREC < 0.0)
+		bP.z = 1 + bP.z;
 	bP.x *= 16.0;
 	bP.y *= 16.0;
 	bP.z *= 16.0;
 	if (!(*chunk))
 		return (NULL);
 	block = &(*chunk)->getBlock(bP.w, bP.x, bP.y, bP.z);
+	ft_printf(RED "ChunkPos %d %d\n" NA, (*chunk)->getPos().get(0), (*chunk)->getPos().get(1));
+	ft_printf(ORANGE "Bp %f %f %f\n" NA, bP.x, bP.y, bP.z);
 	return (block);
 }
 
-void		Engine::rayCasting(Chunk *chunk, bool isAdd)
+static void	setGenBlock(glm::vec4 posB, Chunk *chunk, e_BlockType type)
+{
+	chunk->setBlock((int[4]){(int)posB.w, (int)posB.x, (int)posB.y, (int)posB.z},
+		(t_block_info){type, 0, 0, 0});
+	chunk->generateGraphics(posB.w);
+	if ((int)posB.x == 0)
+		chunk->getNeighboor(WEST)->generateGraphics(posB.w);
+	else if ((int)posB.x == 15)
+		chunk->getNeighboor(EAST)->generateGraphics(posB.w);
+	if ((int)posB.z == 0)
+		chunk->getNeighboor(SOUTH)->generateGraphics(posB.w);
+	else if ((int)posB.z == 15)
+		chunk->getNeighboor(NORTH)->generateGraphics(posB.w);
+	if ((int)posB.y == 0 && (int)posB.w > 0)
+		chunk->generateGraphics(posB.w - 1);
+	else if ((int)posB.y == 15 && (int)posB.w < 15)
+		chunk->generateGraphics(posB.w + 1);
+}
+
+void		Engine::rayCasting(Chunk *chunk, map<ChunkPos, Chunk*> &memory)
 {
 	glm::vec3		ray;
 	glm::vec3		pos = this->camera.getTranslate();
-	unsigned int	distBlock = 6;
+	unsigned int	distBlock = 9;
 	Block			*currentBlock;
 	glm::vec4		currentBP;
 	glm::vec4		saveBP;
+	unsigned int	i;
 
-	currentBlock = getBlockFromPos(&chunk, pos, currentBP);
-	if (!currentBlock || !isInAirBlock(*currentBlock) || chunk->getFenced() == UNFENCED)
+	if (!chunk)
+		return;
+	if (glfwGetKey(this->window, GLFW_KEY_LEFT_CONTROL) == GLFW_RELEASE)
+	{
+		this->getHud().setCursorColor(WHITE_CURSOR);
+		return ;
+	}
+	// ft_printf(BOLD_MAGENTA "Chunk %d %d\n" NA, chunk->getPos().get(0), chunk->getPos().get(1));
+	// ft_printf(MAGENTA "Cam %f %f\n" NA, this->camera.getTranslate().x, this->camera.getTranslate().z);
+	currentBlock = getBlockFromPos(&chunk, pos, currentBP, memory);
+	if (!currentBlock || !chunk || !isInAirBlock(*currentBlock) || chunk->getFenced() == UNFENCED)
 		return;
 	ray = this->camera.createRay(glm::vec2(WIDTH / 2.0, HEIGHT / 2.0), WIDTH, HEIGHT);
-	for (unsigned int i = 0; currentBlock && i < distBlock && isInAirBlock(*currentBlock); i++)
+	for (i = 0; currentBlock && i < distBlock && isInAirBlock(*currentBlock); i++)
 	{
 		saveBP = currentBP;
 		stepLoop(pos, ray);
-		currentBlock = getBlockFromPos(&chunk, pos, currentBP);
+		currentBlock = getBlockFromPos(&chunk, pos, currentBP, memory);
 	}
-	if (!isInAirBlock(*currentBlock))
+	if (i == distBlock)
+		this->getHud().setCursorColor(RED_CURSOR);
+	else
+		this->getHud().setCursorColor(GREEN_CURSOR);
+
+	if (this->getButton(GLFW_MOUSE_BUTTON_1) == false && this->getButton(GLFW_MOUSE_BUTTON_2) == false)
+		return ;
+
+	if (!this->lockRay && i != distBlock && currentBlock && !isInAirBlock(*currentBlock) && chunk)
 	{
-		if (isAdd)
-		{
-			chunk->setBlock((int[4]){(int)saveBP.w, (int)saveBP.x, (int)saveBP.y, (int)saveBP.z},
-				(t_block_info){STONE, 0, 0, 0});
-			chunk->generateGraphics(saveBP.w);
-		}
+		if (this->getButton(GLFW_MOUSE_BUTTON_1) == true)
+			setGenBlock(saveBP, chunk, STONE);
 		else
-		{
-			chunk->setBlock((int[4]){(int)currentBP.w, (int)currentBP.x, (int)currentBP.y, (int)currentBP.z},
-				(t_block_info){AIR, 0, 0, 0});
-			chunk->generateGraphics(currentBP.w);
-		}
+			setGenBlock(currentBP, chunk, AIR);
+		this->lockRay = true;
 	}
 }
 
 int			Engine::setButton(unsigned int b, bool value)
 {
-	return (this->setButton(b, value, NULL));
-}
-
-int			Engine::setButton(unsigned int b, bool value, Chunk *chunk)
-{
-	if (b == GLFW_MOUSE_BUTTON_1 && value == true)
-	{
-		if (!chunk)
-		{
-			this->buttons[b] = value;
-			return (0);
-		}
-		this->rayCasting(chunk, true);
-	}
-	if (b == GLFW_MOUSE_BUTTON_2 && value == true)
-	{
-		if (!chunk)
-		{
-			this->buttons[b] = value;
-			return (0);
-		}
-		this->rayCasting(chunk, false);
-	}
 	this->buttons[b] = value;
+	if (!value)
+		this->lockRay = false;
 	return (0);
 }
 
@@ -378,7 +350,7 @@ void 		Engine::fillTextureVector(size_t start, size_t end, bool load)
 	}
 }
 
-static void	fillBuffer(char **buffer, std::vector<Textures*> &textures, glm::vec2 len, size_t offset)
+static int	fillBuffer(char **buffer, std::vector<Textures*> &textures, glm::vec2 len, size_t offset)
 {
 	unsigned long	i;
 	unsigned long	iX;
@@ -387,6 +359,12 @@ static void	fillBuffer(char **buffer, std::vector<Textures*> &textures, glm::vec
 
 	for (unsigned long idxTxt = offset; idxTxt < textures.size() && textures[idxTxt]; idxTxt++)
 	{
+		// ft_printf(RED "Boucle %d Height:%d Width%d\n" NA, idxTxt, textures[idxTxt]->getHeight(), textures[idxTxt]->getWidth());
+		if (textures[idxTxt]->getHeight() != (int)len.y || textures[idxTxt]->getWidth() != (int)len.x)
+		{
+			ft_printf(RED "Wrong size of a texture\n" NA);
+			return (1);
+		}
 		for (iY = 0; iY < (unsigned long)textures[idxTxt]->getHeight(); iY++)
 		{
 			for (iX = 0; iX < (unsigned long)textures[idxTxt]->getWidth(); iX++)
@@ -408,6 +386,7 @@ static void	fillBuffer(char **buffer, std::vector<Textures*> &textures, glm::vec
 			}
 		}
 	}
+	return (0);
 }
 
 int		Engine::genBlocksTextures(glm::vec2 len, e_txt start, e_txt end, size_t offsetInTexture)
@@ -417,20 +396,34 @@ int		Engine::genBlocksTextures(glm::vec2 len, e_txt start, e_txt end, size_t off
 	size_t			size_y;
 	int				nbTxt;
 
+	// ft_printf(RED "Avant fillTexture\n" NA);
 	this->fillTextureVector(start, end, false);
+	for (int i = 0; i < (int)this->textures.size(); i++)
+	{
+		ft_printf(BLUE "Height:%d Width%d\n" NA, textures[i]->getHeight(), textures[i]->getWidth());
+	}
+	// ft_printf(RED "Apres fillTexture\n" NA);
 	nbTxt = this->textures.size() - offsetInTexture;
 	if (nbTxt < 1)
 		return (1);
 	size = len.x * len.y * sizeof(int) * nbTxt;
 	buffer = (char*)ft_memalloc(size);
 	size_y = nbTxt * len.y;
-	fillBuffer(&buffer, this->textures, len, offsetInTexture);
-	for (size_t i = this->textures.size(); i > offsetInTexture ; i--)
+	if (!buffer)
+		return (1);
+	// ft_printf(RED "Avant fillBuffer\n" NA);
+	if (fillBuffer(&buffer, this->textures, len, offsetInTexture))
+		return (1);
+	// ft_printf(RED "AVANT\n" NA);
+	for (int i = (int)this->textures.size(); i > (int)offsetInTexture; i--)
 	{
+		// ft_printf(YELLOW "Idx:%d Size:%d\n" NA, i - 1, this->textures.size());
 		delete this->textures[i - 1];
-		this->textures.erase(textures.begin() + i - 1);
+		this->textures.pop_back();
 	}
+	// ft_printf(RED "APRES\n" NA);
 	this->addTexture(buffer, len.x, size_y);
+	// ft_printf(RED "Apres addTexture\n" NA);
 	return (0);
 }
 
@@ -521,6 +514,8 @@ Engine::~Engine()
 		delete this->textures[i];
 		i++;
 	}
+	if (this->shader.getProgram())
+		this->shader.freeProgram();
 }
 
 ///////////////Private///////////////

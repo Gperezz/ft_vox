@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/03 20:12:28 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/14 21:14:16 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/23 04:24:26 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ Hud::Hud()
 {
 	this->projection = glm::mat4(1);
 	this->isInit = false;
+	this->cursorColor = WHITE_CURSOR;
 }
 
 void		Hud::setProjection(glm::mat4 proj)
@@ -28,6 +29,16 @@ glm::mat4	Hud::getProjection(void)
 	return (this->projection);
 }
 
+void		Hud::setCursorColor(char color)
+{
+	this->cursorColor = color;
+}
+
+char		Hud::getCursorColor(void)
+{
+	return (this->cursorColor);
+}
+
 int			Hud::init(glm::mat4 proj)
 {
 	if (isInit)
@@ -36,6 +47,9 @@ int			Hud::init(glm::mat4 proj)
 	if (this->shader.loadShader((char*)VERTEX_HUD, (char*)FRAGMENT_HUD))
 		return (1);
 	this->isInit = true;
+	newElement();
+	this->hudElements[0]->setOffsetTxt(11);
+	this->hudElements[0]->setTranslate((glm::vec3){0.0, 0.0, 0.0});
 	return (0);
 }
 
@@ -43,7 +57,7 @@ void		Hud::fillElements(std::vector<char> unitsValue, unsigned int units)
 {
 	unsigned int iValue = 0;
 
-	for (unsigned int i = 0; i < units && iValue < unitsValue.size(); i++)
+	for (unsigned int i = 1; i < units + 1 && iValue < unitsValue.size(); i++)
 	{
 		this->hudElements[i]->setOffsetTxt(unitsValue[iValue++]);
 	}
@@ -60,9 +74,9 @@ void		Hud::syncFpsToElements(int fps)
 		unitsValue.push_back(nb % 10);
 		nb /= 10;
 	}
-	while (hudElements.size() < units)
+	while (hudElements.size() < units + 1)
 		newElement();
-	while (hudElements.size() > units)
+	while (hudElements.size() > units + 1)
 		deleteElement(hudElements.size() - 1);
 	fillElements(unitsValue, units);
 }
@@ -85,7 +99,7 @@ void		Hud::newElement(void)
 	element->setVao(vao);
 	element->setScale(glm::vec3(0.02, 0.05, 0.0));
 	element->setTranslate(glm::vec3(1 - (element->getScale().x + 0.01)
-		- (element->getScale().x + 0.05) * (float)this->hudElements.size(),
+		- (element->getScale().x + 0.05) * ((float)this->hudElements.size() - 1),
 		1 - (element->getScale().y + 0.01), 0.0));
 	this->hudElements.push_back(element);
 	glBindVertexArray(0);
@@ -106,6 +120,8 @@ void		Hud::display(int fps, unsigned int txt)
 		glUniform1i(glGetUniformLocation(this->shader.getProgram(),
 			"number"), this->hudElements[i]->getOffsetTxt());
 		glUniform1i(glGetUniformLocation(this->shader.getProgram(),
+			"cursorColor"), this->cursorColor);
+		glUniform1i(glGetUniformLocation(this->shader.getProgram(),
 			"basicTexture"), txt);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, SQUARE_PTS);
 		glBindVertexArray(0);
@@ -119,6 +135,11 @@ void		Hud::deleteElement(unsigned int i)
 		return ;
 	delete this->hudElements[i];
 	this->hudElements.erase(this->hudElements.begin() + i);
+}
+
+Shader&		Hud::getShader(void)
+{
+	return (this->shader);
 }
 
 Hud::~Hud()

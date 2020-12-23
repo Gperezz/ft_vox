@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/13 17:42:19 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/13 18:51:43 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/22 22:29:00 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ class Textures
 	public:
 		Textures();
 		Textures(char *txtPath);
-		Textures(char *buffer, unsigned long width, unsigned long height);
+		Textures(char *buffer, unsigned long w, unsigned long h);
 		void			loadTexture(char *txtPath);
 		int				getWidth(void) const;
 		int				getHeight(void) const;

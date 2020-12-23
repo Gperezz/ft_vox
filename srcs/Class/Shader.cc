@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 17:47:10 by gperez            #+#    #+#             */
-/*   Updated: 2020/06/04 21:26:34 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/22 16:03:11 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 Shader::Shader(void)
 {
+	this->shaderProgram = 0;
 }
 
 static void			freeTShader(t_shader &shader)
@@ -129,7 +130,10 @@ int				Shader::loadShader(char *vertexPath, char *fragPath)
 
 void			Shader::freeProgram(void)
 {
+	if (this->shaderProgram == 0)
+		return;
 	glDeleteProgram(Shader::shaderProgram);
+	this->shaderProgram = 0;
 }
 
 Shader::~Shader()

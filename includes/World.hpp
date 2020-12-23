@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:08:20 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/15 20:51:46 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/23 02:25:03 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ class World
 	void					loadChunk(ChunkPos);
 	void					loadChunk(int x, int z);
 	Chunk					*get(ChunkPos);
+	map<ChunkPos, Chunk*>	&getMapMemory(void);
 	Chunk					*getMemoryChunk(ChunkPos pos);
 	unordered_set<ChunkPos>	&getDisplayedChunks(void);
 	float					getDeltaFrameTime(void);

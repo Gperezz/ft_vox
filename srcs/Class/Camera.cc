@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/04 23:48:55 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/17 13:38:54 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/23 02:54:04 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,11 +104,20 @@ glm::vec3	Camera::createRay(glm::vec2 pos, float width, float height)
 
 }
 
+ChunkPos	Camera::getCurrentChunkPos(glm::vec3 pos)
+{
+	glm::vec2	chunkPos = (glm::vec2){pos.x / 16.0, pos.z / 16.0};
+
+	if (chunkPos.x + PREC < 0.0)
+		chunkPos.x--;
+	if (chunkPos.y + PREC < 0.0)
+		chunkPos.y--;
+	return ((int[2]){(int)chunkPos.x, (int)chunkPos.y});
+}
+
 ChunkPos	Camera::getCurrentChunkPos(void)
 {
-	glm::vec3	pos = this->getTranslate();
-
-	return (ChunkPos((int[2]){(int)(pos.x / 16), (int)(pos.z / 16)}));
+	return (this->getCurrentChunkPos(this->getTranslate()));
 }
 
 glm::vec3	Camera::getCurrentOffset(void)

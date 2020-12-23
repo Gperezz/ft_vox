@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/15 20:52:37 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/23 02:34:11 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,7 +143,6 @@ ChunkPos	World::getCameraChunkPos()
 	return (int[]){(int)test[0], (int)test[1]};
 }
 
-
 Chunk	*World::get(ChunkPos cp)
 {
 	unique_lock<mutex> lock(this->memoryMutex);
@@ -206,6 +205,11 @@ void	World::loadChunk(ChunkPos cp)
 		this->memoryChunks[cp]->updateFenced(1);
 		this->pushInDisplay(newChunk);
 	}
+}
+
+map<ChunkPos, Chunk*>	&World::getMapMemory(void)
+{
+	return (this->memoryChunks);
 }
 
 Chunk	*World::getMemoryChunk(ChunkPos pos)

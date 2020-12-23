@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/19 22:51:46 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/23 21:37:51 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,11 +48,11 @@ void	key(Engine &env, float deltaFrameTime)
 	}
 }
 
-static int	checkMouse(Engine &env, unsigned int b, Chunk *chunk)
+static int	checkMouse(Engine &env, unsigned int b)
 {
 	if (glfwGetMouseButton(env.getWindow(), b) == GLFW_PRESS
 		&& env.getButton(b) == false)
-		return (env.setButton(b, true, chunk));
+		return (env.setButton(b, true));
 	else if (glfwGetMouseButton(env.getWindow(), b) == GLFW_RELEASE
 		&& env.getButton(b) == true)
 		return (env.setButton(b, false));
@@ -73,11 +73,11 @@ void	exec(World &world, Engine &env, TimeMs time)
 	iImg++;
 	timeForFps += world.getDeltaFrameTime();
 	key(env, world.getDeltaFrameTime());
-	if (checkMouse(env, GLFW_MOUSE_BUTTON_1,
-		world.getMemoryChunk(env.getCam().getCurrentChunkPos()))
-		|| checkMouse(env, GLFW_MOUSE_BUTTON_2,
-		world.getMemoryChunk(env.getCam().getCurrentChunkPos())))
+	if (checkMouse(env, GLFW_MOUSE_BUTTON_1)
+		|| checkMouse(env, GLFW_MOUSE_BUTTON_2))
 		return ;
+	env.rayCasting(world.getMapMemory().at(env.getCam().getCurrentChunkPos()),
+		world.getMapMemory());
 	world.display(env, time.getTimeSeconds());
 	idx = env.getNbTextures() - 1;
 	t = env.getTexture(idx);
@@ -111,25 +111,29 @@ int		main(void)
 	TimeMs			time;
 	glm::mat4		mat;
 
-	// ft_printf(RED"%ld\n" NA, sizeof(block.getInfo()));
-
 	mat = glm::perspective(glm::radians(45.0f),
 		(float)WIDTH / (float)HEIGHT, 0.1f, (float)RENDER_DIST);
 	if (env.initWindow() == -1)
 		return (1);
+	// ft_printf(GREEN "Avant loadShader\n" NA);
 	if (shader.loadShader((char*)VERTEX, (char*)FRAGMENT))
 		return (1);
-	if (env.genTextures() || env.genSkybox()
-		|| env.getHud().init(glm::mat4(1)))
+	// ft_printf(GREEN "Apres loadShader\n" NA);
+	// if (env.genTextures() || env.genSkybox()
+	// 	|| env.getHud().init(glm::mat4(1)))
+	// 	return (1);
+	if (env.genTextures())
 		return (1);
+	// ft_printf(GREEN "Apres Textures\n" NA);
+	if (env.genSkybox())
+		return (1);
+	// ft_printf(GREEN "Apres Skybox\n" NA);
+	if (env.getHud().init(glm::mat4(1)))
+		return (1);
+	// ft_printf(GREEN "Apres init\n" NA);
 	env.getCam().setProjMatrix(mat);
-	env.getCam().setTranslate((glm::vec3){7.5, 1, 2});
+	env.getCam().setTranslate((glm::vec3){7.5, 35, 7.5});
 
-	ft_printf(MAGENTA "Cam Matrix\n" NA);
-	env.getCam().printMatrix(true);
-
-	ft_printf(MAGENTA "Projection Matrix\n" NA);
-	env.getCam().printProjectionMatrix();
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -137,8 +141,6 @@ int		main(void)
 	glFrontFace(GL_CCW);
 	glCullFace(GL_BACK);
 	glEnable(GL_CULL_FACE);
-
-	ft_printf(MAGENTA"Ceci est Ft_vox:\n" NA);
 
 	// int lim = 1;
 
@@ -154,11 +156,9 @@ int		main(void)
 
 	recLoad(world, 0, 0, 0);
 
-
 	time.setTime();
 	while(!glfwWindowShouldClose(env.getWindow()))
 		exec(world, env, time);
-	shader.freeProgram();
 	glfwDestroyWindow(env.getWindow());
 	glfwTerminate();
 	return (0);
