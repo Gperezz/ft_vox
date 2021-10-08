@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 17:47:10 by gperez            #+#    #+#             */
-/*   Updated: 2021/10/08 18:49:11 by gperez           ###   ########.fr       */
+/*   Updated: 2021/10/08 18:42:18 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,78 +17,69 @@ Shader::Shader(void)
 	this->shaderProgram = 0;
 }
 
-static int		readShader(t_shader &shader, const std::string fileName, char glsl)
+static void			freeTShader(t_shader &shader)
 {
-	std::string		line;
-	std::ifstream	file(fileName);
-	std::string		output;
+	ft_memdel((void**)&(shader.vertex));
+	ft_memdel((void**)&(shader.fragment));
+}
 
-	if (file.is_open())
+static int				readShader(t_shader &shader, const char file[], char glsl)
+{
+	t_lst_str	*lst_str;
+
+	if (!(lst_str = ft_parse_file((char*)file)))
+		return (1);
+	if (stock_file(lst_str, (glsl == 'v'
+		? &(shader.vertex) : &(shader.fragment)), 1))
 	{
-		while (std::getline(file, line))
-			output += line + "\n";
-		if (glsl == 'v')
-			shader.vertex = output;
-		else
-			shader.fragment = output;
-		return (0);
+		free_lst_str(lst_str);
+		return (1);
 	}
-	return (1);
+	free_lst_str(lst_str);
+	return (0);
 }
 
-static int		shaderError(int i_s, std::string error_msg)
+static int			shaderError(t_shader &sh, int i_s, char *info, char *error_msg)
 {
-	char	info[1024];
-
-	glGetProgramInfoLog(i_s, 1024, NULL, info);
 	glGetShaderInfoLog(i_s, 1024, NULL, info);
-	std::cout << error_msg << "\n";
-	std::cout << info << "\n";
+	freeTShader(sh);
+	ft_putendl(error_msg);
+	ft_putendl(info);
 	return (1);
 }
 
-unsigned int	Shader::getProgram(void)
-{
-	return (Shader::shaderProgram);
-}
-
-void			Shader::setProgram(unsigned int p)
-{
-	this->shaderProgram = p;
-}
-
-int				Shader::createShader(const std::string vertex_path, const std::string frag_path)
+int				Shader::createShader(char *info, const char *vertex_path,
+	const char *frag_path)
 {
 	t_shader		shader;
 	int				success;
 
+	bzero(&shader, sizeof(t_shader));
 	if (readShader(shader, vertex_path, 'v')
 		|| readShader(shader, frag_path, 'f'))
 	{
-		std::cout << FAILED_READ_SHADER << "\n";
+		freeTShader(shader);
 		return (1);
 	}
 	shader.i_v = glCreateShader(GL_VERTEX_SHADER);
-
-	const char *fileV = shader.vertex.c_str();
-	glShaderSource(shader.i_v, 1, &fileV, NULL);
+	glShaderSource(shader.i_v, 1, (const char *const *)(&(shader.vertex)),
+		NULL);
 	glCompileShader(shader.i_v);
 	glGetShaderiv(shader.i_v, GL_COMPILE_STATUS, &success);
 	if (!success)
 	{
-		shaderError(shader.i_v, (char*)VERTEX_FAILED);
+		shaderError(shader, shader.i_v, info, (char*)VERTEX_FAILED);
 		glDeleteShader(shader.i_v);
 		return (1);
 	}
 	shader.i_f = glCreateShader(GL_FRAGMENT_SHADER);
-
-	const char *fileF = shader.fragment.c_str();
-	glShaderSource(shader.i_f, 1, &fileF, NULL);
+	glShaderSource(shader.i_f, 1, (const char *const *)(&(shader.fragment)),
+		NULL);
 	glCompileShader(shader.i_f);
 	glGetShaderiv(shader.i_f, GL_COMPILE_STATUS, &success);
 	if (!success)
 	{
-		shaderError(shader.i_f, (char*)FRAGMENT_FAILED);
+		shaderError(shader, shader.i_f, info, (char*)FRAGMENT_FAILED);
 		glDeleteShader(shader.i_v);
 		glDeleteShader(shader.i_f);
 		return (1);
@@ -100,35 +91,51 @@ int				Shader::createShader(const std::string vertex_path, const std::string fra
 	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
 	if (!success)
 	{
-		shaderError(shaderProgram, (char*)LINK_SHADER_FAILED);
+		shaderError(shader, shaderProgram, info, (char*)LINK_SHADER_FAILED);
 		glDeleteShader(shader.i_v);
 		glDeleteShader(shader.i_f);
 		return (1);
 	}
 	glDeleteShader(shader.i_v);
 	glDeleteShader(shader.i_f);
+	freeTShader(shader);
 	return (0);
 }
 
-int				Shader::loadShader(std::string vertexPath, std::string fragPath)
+
+unsigned int	Shader::getProgram(void)
 {
-	std::cout << vertexPath << " " << fragPath << "\n";
-	if (vertexPath.size() && fragPath.size())
+	return (Shader::shaderProgram);
+}
+
+int				Shader::loadShader(char *vertexPath, char *fragPath)
+{
+	char			*info;
+
+	info = NULL;
+	if (!(info = (char*)ft_memalloc(1024)))
+		return (1);
+
+	if (vertexPath && fragPath)
 	{
-		if (createShader(vertexPath, fragPath))
+		if (createShader(info, vertexPath, fragPath))
+		{
+			ft_memdel((void**)&info);
 			return (1);
+		}
 	}
+	ft_memdel((void**)&info);
 	return (0);
 }
 
 void			Shader::freeProgram(void)
 {
-	glDeleteProgram(this->shaderProgram);
+	if (this->shaderProgram == 0)
+		return;
+	glDeleteProgram(Shader::shaderProgram);
 	this->shaderProgram = 0;
 }
 
-Shader::~Shader() // A REMETTRE !!!
+Shader::~Shader()
 {
-	// if (this->shaderProgram)
-	// 	this->freeProgram();
 }
