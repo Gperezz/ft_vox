@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/17 21:39:05 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/23 23:27:05 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -294,7 +294,8 @@ Block		*Chunk::getBlockNeighboor(BlockPos pos, Direction dir) // Fonction peut e
 
 void		Chunk::generateGraphics(unsigned int mesh)
 {
-	validateMesh(mesh);
+	if (this->state == FENCED && mesh < 16)
+		validateMesh(mesh);
 }
 
 void		Chunk::generateGraphics(void)

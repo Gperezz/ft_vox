@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/03 20:12:28 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/23 04:24:26 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/24 00:00:03 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ int			Hud::init(glm::mat4 proj)
 	newElement();
 	this->hudElements[0]->setOffsetTxt(11);
 	this->hudElements[0]->setTranslate((glm::vec3){0.0, 0.0, 0.0});
+	this->hudElements[0]->setScale((glm::vec3){0.02, 0.05, 0.0});
 	return (0);
 }
 

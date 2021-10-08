@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/23 22:46:46 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/24 00:57:17 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,7 @@ static bool	switchedBlock(int startPos[3], glm::vec3 pos)
 static void	stepLoop(glm::vec3 &pos, glm::vec3 ray)
 {
 	int			startPos[3] = {(int)pos.x, (int)pos.y, (int)pos.z};
-	float		step = 0.02;
+	float		step = 0.001;
 
 	do
 	{
@@ -110,44 +110,60 @@ static bool isInAirBlock(Block currentBlock)
 	return (currentBlock.getInfo().id == AIR);
 }
 
-static Block *getBlockFromPos(Chunk **chunk, glm::vec3 pos, glm::vec4 &bP, std::map<ChunkPos, Chunk*> memory)
+Block		*Engine::getBlockFromPos(Chunk **chunk, ChunkPos &prev, glm::vec3 pos, glm::vec4 &bP, std::map<ChunkPos, Chunk*> memory)
 {
-	Block *block;
+	Block		*block;
+	ChunkPos	chunkPos = Camera::getCurrentChunkPos(pos);
 
-	(*chunk) = memory.at(Camera::getCurrentChunkPos(pos));
+	(*chunk) = memory.at(chunkPos);
 	bP = glm::vec4(Camera::getCurrentOffset(pos), (int)(pos.y / 16));
-	if (bP.x + PREC < 0.0)
-		bP.x = 1 + bP.x;
-	if (bP.z + PREC < 0.0)
-		bP.z = 1 + bP.z;
+	if (/*prev.get(0) < chunkPos.get(0) && */bP.x + PREC < 0.0)
+		bP.x = 1.0 + bP.x;
+	if (/*prev.get(1) < chunkPos.get(1) && */bP.z + PREC < 0.0)
+		bP.z = 1.0 + bP.z;
+	
 	bP.x *= 16.0;
 	bP.y *= 16.0;
 	bP.z *= 16.0;
+	prev = chunkPos;
 	if (!(*chunk))
 		return (NULL);
 	block = &(*chunk)->getBlock(bP.w, bP.x, bP.y, bP.z);
-	ft_printf(RED "ChunkPos %d %d\n" NA, (*chunk)->getPos().get(0), (*chunk)->getPos().get(1));
-	ft_printf(ORANGE "Bp %f %f %f\n" NA, bP.x, bP.y, bP.z);
+	if ((this->getButton(GLFW_MOUSE_BUTTON_1) == true || this->getButton(GLFW_MOUSE_BUTTON_2) == true)
+		&& this->lockRay == false)
+	{
+		ft_printf(RED "ChunkPos %d %d\n" NA, (*chunk)->getPos().get(0), (*chunk)->getPos().get(1));
+		ft_printf(ORANGE "Bp %f %f %f\n" NA, bP.x, bP.y, bP.z);
+	}
 	return (block);
+}
+
+static void	genNeighboor(Direction dir, Chunk *chunk, glm::vec4 posB)
+{
+	Chunk	*neighboor;
+
+	neighboor = chunk->getNeighboor(dir);
+	if (neighboor)
+		neighboor->generateGraphics((int)posB.w);
 }
 
 static void	setGenBlock(glm::vec4 posB, Chunk *chunk, e_BlockType type)
 {
 	chunk->setBlock((int[4]){(int)posB.w, (int)posB.x, (int)posB.y, (int)posB.z},
 		(t_block_info){(unsigned char)type, 0, 0, 0});
-	chunk->generateGraphics(posB.w);
+	chunk->generateGraphics((int)posB.w);
 	if ((int)posB.x == 0)
-		chunk->getNeighboor(WEST)->generateGraphics(posB.w);
+		genNeighboor(WEST, chunk, posB);
 	else if ((int)posB.x == 15)
-		chunk->getNeighboor(EAST)->generateGraphics(posB.w);
+		genNeighboor(EAST, chunk, posB);
 	if ((int)posB.z == 0)
-		chunk->getNeighboor(SOUTH)->generateGraphics(posB.w);
+		genNeighboor(SOUTH, chunk, posB);
 	else if ((int)posB.z == 15)
-		chunk->getNeighboor(NORTH)->generateGraphics(posB.w);
+		genNeighboor(NORTH, chunk, posB);
 	if ((int)posB.y == 0 && (int)posB.w > 0)
-		chunk->generateGraphics(posB.w - 1);
+		chunk->generateGraphics((int)posB.w - 1);
 	else if ((int)posB.y == 15 && (int)posB.w < 15)
-		chunk->generateGraphics(posB.w + 1);
+		chunk->generateGraphics((int)posB.w + 1);
 }
 
 void		Engine::rayCasting(Chunk *chunk, map<ChunkPos, Chunk*> &memory)
@@ -158,37 +174,41 @@ void		Engine::rayCasting(Chunk *chunk, map<ChunkPos, Chunk*> &memory)
 	Block			*currentBlock;
 	glm::vec4		currentBP;
 	glm::vec4		saveBP;
+	ChunkPos		prev((int[2]){0, 0});
 	unsigned int	i;
 
 	if (!chunk)
 		return;
-	if (glfwGetKey(this->window, GLFW_KEY_LEFT_CONTROL) == GLFW_RELEASE)
+	if (this->getButton(GLFW_MOUSE_BUTTON_1) == false && this->getButton(GLFW_MOUSE_BUTTON_2) == false)
 	{
 		this->getHud().setCursorColor(WHITE_CURSOR);
 		return ;
 	}
-	// ft_printf(BOLD_MAGENTA "Chunk %d %d\n" NA, chunk->getPos().get(0), chunk->getPos().get(1));
-	// ft_printf(MAGENTA "Cam %f %f\n" NA, this->camera.getTranslate().x, this->camera.getTranslate().z);
-	currentBlock = getBlockFromPos(&chunk, pos, currentBP, memory);
+	currentBlock = getBlockFromPos(&chunk, prev, pos, currentBP, memory);
 	if (!currentBlock || !chunk || !isInAirBlock(*currentBlock) || chunk->getFenced() == UNFENCED)
+	{
+		this->getHud().setCursorColor(RED_CURSOR);
 		return;
+	}
 	ray = this->camera.createRay(glm::vec2(WIDTH / 2.0, HEIGHT / 2.0), WIDTH, HEIGHT);
 	for (i = 0; currentBlock && i < distBlock && isInAirBlock(*currentBlock); i++)
 	{
 		saveBP = currentBP;
 		stepLoop(pos, ray);
-		currentBlock = getBlockFromPos(&chunk, pos, currentBP, memory);
+		currentBlock = getBlockFromPos(&chunk, prev, pos, currentBP, memory);
 	}
 	if (i == distBlock)
 		this->getHud().setCursorColor(RED_CURSOR);
 	else
 		this->getHud().setCursorColor(GREEN_CURSOR);
 
-	if (this->getButton(GLFW_MOUSE_BUTTON_1) == false && this->getButton(GLFW_MOUSE_BUTTON_2) == false)
-		return ;
+	// if (this->getButton(GLFW_MOUSE_BUTTON_1) == false && this->getButton(GLFW_MOUSE_BUTTON_2) == false)
+	// 	return ;
 
 	if (!this->lockRay && i != distBlock && currentBlock && !isInAirBlock(*currentBlock) && chunk)
 	{
+		ft_printf(BOLD_MAGENTA "Chunk %d %d\n" NA, chunk->getPos().get(0), chunk->getPos().get(1));
+		ft_printf(MAGENTA "Cam %f %f\n" NA, this->camera.getTranslate().x, this->camera.getTranslate().z);
 		if (this->getButton(GLFW_MOUSE_BUTTON_1) == true)
 			setGenBlock(saveBP, chunk, STONE);
 		else
