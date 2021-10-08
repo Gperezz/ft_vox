@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:35:15 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/24 00:45:24 by gperez           ###   ########.fr       */
+/*   Updated: 2021/10/08 20:00:26 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 
 extern "C"
 {
-	# include "ft_printf.h"
 	# include "glad.h" // Implementation OpenGl
 }
 
@@ -23,7 +22,6 @@ extern "C"
 # include "stb_image.h" // Load image
 # include "glm.hpp" // Implementation matrices
 
-# include "ContextOpenCL.hpp"
 # include "StructBlock.hpp"
 # include "Shader.hpp"
 # include "Camera.hpp"
@@ -58,6 +56,7 @@ class Engine
 		Hud						hud;
 		bool					lockRay;
 		Block					*getBlockFromPos(Chunk **chunk, ChunkPos &prev, glm::vec3 pos, glm::vec4 &bP, std::map<ChunkPos, Chunk*> memory);
+
 	public:
 		Engine();
 		void			rayCasting(Chunk *chunk, std::map<ChunkPos, Chunk*> &memory);
@@ -78,7 +77,9 @@ class Engine
 		unsigned int	getNbTextures(void);
 		void 			fillTextureVector(size_t start, size_t end, bool load);
 		int				genBlocksTextures(glm::vec2 len, e_txt start, e_txt end, size_t offsetInTexture);
-		void			addTexture(char *pathOrBuffer, unsigned long width, unsigned long height);
+		void			addTexture(char *path);
+		void			addTexture(char *buffer, unsigned long width, unsigned long height);
+		// void			addTexture(std::string buffer, unsigned long width, unsigned long height);
 		glm::vec2		getMouseLastPos(void);
 		void			setMouseLastPos(glm::vec2 v);
 		bool			isFirst(void);

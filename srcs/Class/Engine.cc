@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/24 00:57:17 by gperez           ###   ########.fr       */
+/*   Updated: 2021/10/08 19:59:50 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,8 +132,8 @@ Block		*Engine::getBlockFromPos(Chunk **chunk, ChunkPos &prev, glm::vec3 pos, gl
 	if ((this->getButton(GLFW_MOUSE_BUTTON_1) == true || this->getButton(GLFW_MOUSE_BUTTON_2) == true)
 		&& this->lockRay == false)
 	{
-		ft_printf(RED "ChunkPos %d %d\n" NA, (*chunk)->getPos().get(0), (*chunk)->getPos().get(1));
-		ft_printf(ORANGE "Bp %f %f %f\n" NA, bP.x, bP.y, bP.z);
+		printf(RED "ChunkPos %d %d\n" NA, (*chunk)->getPos().get(0), (*chunk)->getPos().get(1));
+		printf(ORANGE "Bp %f %f %f\n" NA, bP.x, bP.y, bP.z);
 	}
 	return (block);
 }
@@ -207,8 +207,8 @@ void		Engine::rayCasting(Chunk *chunk, map<ChunkPos, Chunk*> &memory)
 
 	if (!this->lockRay && i != distBlock && currentBlock && !isInAirBlock(*currentBlock) && chunk)
 	{
-		ft_printf(BOLD_MAGENTA "Chunk %d %d\n" NA, chunk->getPos().get(0), chunk->getPos().get(1));
-		ft_printf(MAGENTA "Cam %f %f\n" NA, this->camera.getTranslate().x, this->camera.getTranslate().z);
+		printf(BOLD_MAGENTA "Chunk %d %d\n" NA, chunk->getPos().get(0), chunk->getPos().get(1));
+		printf(MAGENTA "Cam %f %f\n" NA, this->camera.getTranslate().x, this->camera.getTranslate().z);
 		if (this->getButton(GLFW_MOUSE_BUTTON_1) == true)
 			setGenBlock(saveBP, chunk, STONE);
 		else
@@ -356,11 +356,11 @@ void 		Engine::fillTextureVector(size_t start, size_t end, bool load)
 
 	while (i < end && (!load || this->textures.size() < 16))
 	{
-		len = ft_strlen(g_txt_path[i].path_txt);
+		len = strlen(g_txt_path[i].path_txt);
 		str.assign(g_txt_path[i].path_txt, len);
 		isPng = str.find(".png") == (len - 4);
 		if (len && load && isPng)
-			this->addTexture((char*)g_txt_path[i].path_txt, 0, 0);
+			this->addTexture((char*)g_txt_path[i].path_txt);
 		else if (!load && isPng)
 			this->textures.push_back(new Textures((char*)g_txt_path[i].path_txt));
 		else if (!isPng)
@@ -370,7 +370,7 @@ void 		Engine::fillTextureVector(size_t start, size_t end, bool load)
 	}
 }
 
-static int	fillBuffer(char **buffer, std::vector<Textures*> &textures, glm::vec2 len, size_t offset)
+static int	fillBuffer(std::string &buffer, std::vector<Textures*> &textures, glm::vec2 len, size_t offset)
 {
 	unsigned long	i;
 	unsigned long	iX;
@@ -379,10 +379,10 @@ static int	fillBuffer(char **buffer, std::vector<Textures*> &textures, glm::vec2
 
 	for (unsigned long idxTxt = offset; idxTxt < textures.size() && textures[idxTxt]; idxTxt++)
 	{
-		// ft_printf(RED "Boucle %d Height:%d Width%d\n" NA, idxTxt, textures[idxTxt]->getHeight(), textures[idxTxt]->getWidth());
+		// printf(RED "Boucle %d Height:%d Width%d\n" NA, idxTxt, textures[idxTxt]->getHeight(), textures[idxTxt]->getWidth());
 		if (textures[idxTxt]->getHeight() != (int)len.y || textures[idxTxt]->getWidth() != (int)len.x)
 		{
-			ft_printf(RED "Wrong size of a texture\n" NA);
+			printf(RED "Wrong size of a texture\n" NA);
 			return (1);
 		}
 		for (iY = 0; iY < (unsigned long)textures[idxTxt]->getHeight(); iY++)
@@ -392,11 +392,11 @@ static int	fillBuffer(char **buffer, std::vector<Textures*> &textures, glm::vec2
 				for (i = 0; i < 4 && textures[idxTxt]->getTxtData(); i++)
 				{
 					if (i >= (unsigned int)textures[idxTxt]->getNrChannels())
-						(*buffer)[(idxTxt - offset) * lenTxt
+						(buffer)[(idxTxt - offset) * lenTxt
 						+ iY * textures[idxTxt]->getWidth() * sizeof(int)
 						+ iX * sizeof(int) + i] = (char)255;
 					else
-						(*buffer)[(idxTxt - offset) * lenTxt
+						(buffer)[(idxTxt - offset) * lenTxt
 						+ iY * textures[idxTxt]->getWidth() * sizeof(int)
 						+ iX * sizeof(int) + i]
 							= textures[idxTxt]->getTxtData()
@@ -411,39 +411,39 @@ static int	fillBuffer(char **buffer, std::vector<Textures*> &textures, glm::vec2
 
 int		Engine::genBlocksTextures(glm::vec2 len, e_txt start, e_txt end, size_t offsetInTexture)
 {
-	char			*buffer;
+	std::string		buffer;
 	size_t			size;
 	size_t			size_y;
 	int				nbTxt;
 
-	// ft_printf(RED "Avant fillTexture\n" NA);
+	// printf(RED "Avant fillTexture\n" NA);
 	this->fillTextureVector(start, end, false);
 	for (int i = 0; i < (int)this->textures.size(); i++)
 	{
-		ft_printf(BLUE "Height:%d Width%d\n" NA, textures[i]->getHeight(), textures[i]->getWidth());
+		printf(BLUE "Height:%d Width%d\n" NA, textures[i]->getHeight(), textures[i]->getWidth());
 	}
-	// ft_printf(RED "Apres fillTexture\n" NA);
+	// printf(RED "Apres fillTexture\n" NA);
 	nbTxt = this->textures.size() - offsetInTexture;
 	if (nbTxt < 1)
 		return (1);
 	size = len.x * len.y * sizeof(int) * nbTxt;
-	buffer = (char*)ft_memalloc(size);
+	buffer.resize(size);
 	size_y = nbTxt * len.y;
-	if (!buffer)
+	if (!buffer.size())
 		return (1);
-	// ft_printf(RED "Avant fillBuffer\n" NA);
-	if (fillBuffer(&buffer, this->textures, len, offsetInTexture))
+	// printf(RED "Avant fillBuffer\n" NA);
+	if (fillBuffer(buffer, this->textures, len, offsetInTexture))
 		return (1);
-	// ft_printf(RED "AVANT\n" NA);
+	// printf(RED "AVANT\n" NA);
 	for (int i = (int)this->textures.size(); i > (int)offsetInTexture; i--)
 	{
-		// ft_printf(YELLOW "Idx:%d Size:%d\n" NA, i - 1, this->textures.size());
+		// printf(YELLOW "Idx:%d Size:%d\n" NA, i - 1, this->textures.size());
 		delete this->textures[i - 1];
 		this->textures.pop_back();
 	}
-	// ft_printf(RED "APRES\n" NA);
-	this->addTexture(buffer, len.x, size_y);
-	// ft_printf(RED "Apres addTexture\n" NA);
+	// printf(RED "APRES\n" NA);
+	this->addTexture((char*)buffer.c_str(), len.x, size_y);
+	// printf(RED "Apres addTexture\n" NA);
 	return (0);
 }
 
@@ -469,15 +469,41 @@ int			Engine::genTextures(void)
 	return (0);
 }
 
-void	Engine::addTexture(char *pathOrBuffer, unsigned long width, unsigned long height)
+
+void	Engine::addTexture(char *buffer, unsigned long width, unsigned long height)
 {
 	unsigned int	textIdx;
 	Textures		*t;
 
-	if (width == 0 && height == 0)
-		this->textures.push_back(new Textures(pathOrBuffer));
+	this->textures.push_back(new Textures(buffer, width, height));
+	glGenTextures(1, &textIdx);
+	t = this->textures[this->textures.size() - 1];
+	t->setTxt(textIdx);
+	glActiveTexture(GL_TEXTURE0 + this->textures.size());
+	glBindTexture(GL_TEXTURE_2D, t->getTxt());
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	if (this->textures.size() == 1 || this->textures.size() == 2)
+	{
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	}
 	else
-		this->textures.push_back(new Textures(pathOrBuffer, width, height));
+	{
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	}
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, t->getWidth(), t->getHeight(), 0,
+		GL_RGBA, GL_UNSIGNED_BYTE, t->getTxtData());
+	glGenerateMipmap(GL_TEXTURE_2D);
+}
+
+void	Engine::addTexture(char *path)
+{
+	unsigned int	textIdx;
+	Textures		*t;
+
+	this->textures.push_back(new Textures(path));
 	glGenTextures(1, &textIdx);
 	t = this->textures[this->textures.size() - 1];
 	t->setTxt(textIdx);
@@ -536,6 +562,7 @@ Engine::~Engine()
 	}
 	if (this->shader.getProgram())
 		this->shader.freeProgram();
+
 }
 
 ///////////////Private///////////////

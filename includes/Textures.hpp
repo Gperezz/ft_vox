@@ -6,13 +6,16 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/13 17:42:19 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/22 22:29:00 by gperez           ###   ########.fr       */
+/*   Updated: 2021/10/08 19:59:28 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef TEXTURES_HPP
 # define TEXTURES_HPP
+
 # include "Block.hpp"
+# include <iostream>
+# include "str_color.hpp"
 
 enum e_txt {DIRT_T, GRASS_TOP_T, GRASS_SIDE_T, LEAVES_OAK_T, LOG_OAK_T,
 	STONE_T, END_BLOCK_T, SKY_FRONT_T, SKY_LEFT_T, SKY_BACK_T, SKY_RIGHT_T, 
@@ -50,7 +53,8 @@ class Textures
 	public:
 		Textures();
 		Textures(char *txtPath);
-		Textures(char *buffer, unsigned long w, unsigned long h);
+		Textures(char *buf, unsigned long w, unsigned long h);
+		// Textures(std::string buf, unsigned long w, unsigned long h);
 		void			loadTexture(char *txtPath);
 		int				getWidth(void) const;
 		int				getHeight(void) const;
@@ -67,6 +71,8 @@ class Textures
 		int				nrChannels;
 		int				txt;
 		unsigned char	*txtData;
+		bool			isBuffer;
+		// std::string		buffer;
 };
 
 #endif

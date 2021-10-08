@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/23 23:27:05 by gperez           ###   ########.fr       */
+/*   Updated: 2021/10/08 19:00:19 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,12 @@ Chunk::Chunk(World *w, ChunkPos pos)
 Chunk::Chunk(const Chunk& copy)
 {
 	this->operator=(copy);
+}
+
+Chunk::~Chunk()
+{
+	for (int i = 0; i < 16; i++)
+		this->deleteVbo((char)i);
 }
 
 

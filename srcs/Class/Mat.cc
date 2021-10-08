@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Mat.cc                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
+/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/04 23:19:34 by gperez            #+#    #+#             */
-/*   Updated: 2020/11/28 16:13:26 by karldouveno      ###   ########.fr       */
+/*   Updated: 2021/10/08 19:12:35 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,28 +68,27 @@ void		Mat::setMatrix(glm::mat4 mat)
 
 void		Mat::printMatrix(glm::mat4 mat)
 {
-	ft_putchar('\n');
-	ft_printf("|{red}%f {green}%f {bold_blue}%f {na}%f|\n",
+	printf("%f %f %f %f|\n",
 		mat[0][0],
 		mat[1][0],
 		mat[2][0],
 		mat[3][0]);
-	ft_printf("|{red}%f {green}%f {bold_blue}%f {na}%f|\n",
+	printf("%f %f %f %f|\n",
 		mat[0][1],
 		mat[1][1],
 		mat[2][1],
 		mat[3][1]);
-	ft_printf("|{red}%f {green}%f {bold_blue}%f {na}%f|\n",
+	printf("%f %f %f %f|\n",
 		mat[0][2],
 		mat[1][2],
 		mat[2][2],
 		mat[3][2]);
-	ft_printf("|{red}%f {green}%f {bold_blue}%f {na}%f|\n",
+	printf("%f %f %f %f|\n",
 		mat[0][3],
 		mat[1][3],
 		mat[2][3],
 		mat[3][3]);
-	ft_putchar('\n');
+	std::cout << '\n';
 }
 
 void		Mat::printMatrix(bool calc)

@@ -3,21 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   Mat.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
+/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/04 23:29:17 by gperez            #+#    #+#             */
-/*   Updated: 2020/11/28 16:03:45 by karldouveno      ###   ########.fr       */
+/*   Updated: 2021/10/08 19:28:40 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MAT_HPP
 # define MAT_HPP
+
+# define PREC 0.00001
+
+# include <iostream>
 # include <mutex>
 
-extern "C"
-{
-	# include "ft_printf.h"
-}
 # include "glm.hpp"
 # include "matrix_transform.hpp"
 # include "type_ptr.hpp"

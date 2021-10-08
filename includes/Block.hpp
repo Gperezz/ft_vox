@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:14:08 by gperez            #+#    #+#             */
-/*   Updated: 2020/11/10 16:08:33 by gperez           ###   ########.fr       */
+/*   Updated: 2021/10/08 19:03:02 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 
 extern "C"
 {
-	# include "ft_printf.h"
 	# include "glad.h" // Implementation OpenGl
 }
 

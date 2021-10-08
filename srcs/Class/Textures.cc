@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/13 17:54:04 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/22 22:34:51 by gperez           ###   ########.fr       */
+/*   Updated: 2021/10/08 20:01:34 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ Textures::Textures()
 	this->nrChannels = 0;
 	this->txt = -1;
 	this->txtData = NULL;
+	this->isBuffer = false;
 }
 
 Textures::Textures(char *txtPath)
@@ -30,9 +31,12 @@ Textures::Textures(char *txtPath)
 	this->loadTexture(txtPath);
 }
 
-Textures::Textures(char *buffer, unsigned long w, unsigned long h)
+// Textures::Textures(std::string buf, unsigned long w, unsigned long h)
+Textures::Textures(char *buf, unsigned long w, unsigned long h)
 {
-	this->txtData = (unsigned char*)buffer;
+	this->isBuffer = true;
+	this->txtData = (unsigned char*)buf;
+	// this->buffer = buf;
 	this->width = w;
 	this->height = h;
 	this->load = true;
@@ -44,7 +48,7 @@ void	Textures::loadTexture(char *txtPath)
 		return;
 	stbi_set_flip_vertically_on_load(true);
 	this->txtData = stbi_load(txtPath, &this->width, &this->height, &this->nrChannels, 0);
-	ft_printf(CYAN "Height:%d Width%d\n" NA, height, width);
+	printf(CYAN "Height:%d Width%d\n" NA, height, width);
 	this->load = true;
 }
 
@@ -97,6 +101,6 @@ e_txt			Textures::getIndexTxt(e_BlockType type)
 
 Textures::~Textures()
 {
-	if (this->txtData)
+	if (this->txtData && !isBuffer)
 		stbi_image_free(this->txtData);
 }
