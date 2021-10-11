@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2021/10/08 19:59:50 by gperez           ###   ########.fr       */
+/*   Updated: 2021/10/11 20:49:56 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -416,13 +416,9 @@ int		Engine::genBlocksTextures(glm::vec2 len, e_txt start, e_txt end, size_t off
 	size_t			size_y;
 	int				nbTxt;
 
-	// printf(RED "Avant fillTexture\n" NA);
 	this->fillTextureVector(start, end, false);
-	for (int i = 0; i < (int)this->textures.size(); i++)
-	{
+	for (int i = offsetInTexture; i < (int)this->textures.size(); i++)
 		printf(BLUE "Height:%d Width%d\n" NA, textures[i]->getHeight(), textures[i]->getWidth());
-	}
-	// printf(RED "Apres fillTexture\n" NA);
 	nbTxt = this->textures.size() - offsetInTexture;
 	if (nbTxt < 1)
 		return (1);
@@ -431,19 +427,14 @@ int		Engine::genBlocksTextures(glm::vec2 len, e_txt start, e_txt end, size_t off
 	size_y = nbTxt * len.y;
 	if (!buffer.size())
 		return (1);
-	// printf(RED "Avant fillBuffer\n" NA);
 	if (fillBuffer(buffer, this->textures, len, offsetInTexture))
 		return (1);
-	// printf(RED "AVANT\n" NA);
 	for (int i = (int)this->textures.size(); i > (int)offsetInTexture; i--)
 	{
-		// printf(YELLOW "Idx:%d Size:%d\n" NA, i - 1, this->textures.size());
 		delete this->textures[i - 1];
 		this->textures.pop_back();
 	}
-	// printf(RED "APRES\n" NA);
 	this->addTexture((char*)buffer.c_str(), len.x, size_y);
-	// printf(RED "Apres addTexture\n" NA);
 	return (0);
 }
 
@@ -463,7 +454,7 @@ int			Engine::genTextures(void)
 {
 	if (this->genBlocksTextures((glm::vec2){16, 16}, DIRT_T, END_BLOCK_T, 0))
 		return (1);
-	if (this->genBlocksTextures((glm::vec2){512, 512}, SKY_FRONT_T, (e_txt)(SKY_T), 1))
+	if (this->genBlocksTextures((glm::vec2){512, 512}, SKY_FRONT_T, SKY_T, 1))
 		return (1);
 	this->fillTextureVector(SKY_T + 1, END_T, true);
 	return (0);

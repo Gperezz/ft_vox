@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/13 17:54:04 by gperez            #+#    #+#             */
-/*   Updated: 2021/10/08 20:01:34 by gperez           ###   ########.fr       */
+/*   Updated: 2021/10/11 20:43:12 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,10 @@ Textures::Textures()
 
 Textures::Textures(char *txtPath)
 {
+	this->load = false;
+	this->txt = -1;
+	this->txtData = NULL;
+	this->isBuffer = false;
 	this->loadTexture(txtPath);
 }
 
@@ -48,7 +52,7 @@ void	Textures::loadTexture(char *txtPath)
 		return;
 	stbi_set_flip_vertically_on_load(true);
 	this->txtData = stbi_load(txtPath, &this->width, &this->height, &this->nrChannels, 0);
-	printf(CYAN "Height:%d Width%d\n" NA, height, width);
+	printf(CYAN "Height:%d Width%d\n" NA, this->height, this->width);
 	this->load = true;
 }
 
