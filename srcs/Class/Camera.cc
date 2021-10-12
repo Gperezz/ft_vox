@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/04 23:48:55 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/23 02:54:04 by gperez           ###   ########.fr       */
+/*   Updated: 2021/10/12 17:36:52 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,9 +127,9 @@ glm::vec3	Camera::getCurrentOffset(void)
 
 glm::vec3	Camera::getCurrentOffset(glm::vec3 pos)
 {
-	return ((glm::vec3){pos.x / 16.0 - (int)(pos.x / 16),
-		pos.y / 16.0 - (int)(pos.y / 16),
-		pos.z / 16.0 - (int)(pos.z / 16)});
+	return ((glm::vec3){pos.x / 16.0 - (int)(pos.x / 16.),
+		pos.y / 16.0 - (int)(pos.y / 16.),
+		pos.z / 16.0 - (int)(pos.z / 16.)});
 }
 
 glm::mat4	Camera::calcMatrix(void)

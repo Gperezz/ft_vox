@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:35:15 by gperez            #+#    #+#             */
-/*   Updated: 2021/10/08 20:00:26 by gperez           ###   ########.fr       */
+/*   Updated: 2021/10/12 18:20:44 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ class Engine
 		bool					firstMouse;
 		Hud						hud;
 		bool					lockRay;
-		Block					*getBlockFromPos(Chunk **chunk, ChunkPos &prev, glm::vec3 pos, glm::vec4 &bP, std::map<ChunkPos, Chunk*> memory);
+		Block					*getBlockFromPos(Chunk **chunk, glm::vec3 pos, glm::vec4 &bP, std::map<ChunkPos, Chunk*> memory);
 
 	public:
 		Engine();

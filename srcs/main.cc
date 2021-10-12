@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/23 21:37:51 by gperez           ###   ########.fr       */
+/*   Updated: 2021/10/12 12:10:56 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,22 +115,14 @@ int		main(void)
 		(float)WIDTH / (float)HEIGHT, 0.1f, (float)RENDER_DIST);
 	if (env.initWindow() == -1)
 		return (1);
-	// ft_printf(GREEN "Avant loadShader\n" NA);
 	if (shader.loadShader((char*)VERTEX, (char*)FRAGMENT))
 		return (1);
-	// ft_printf(GREEN "Apres loadShader\n" NA);
-	// if (env.genTextures() || env.genSkybox()
-	// 	|| env.getHud().init(glm::mat4(1)))
-	// 	return (1);
 	if (env.genTextures())
 		return (1);
-	// ft_printf(GREEN "Apres Textures\n" NA);
 	if (env.genSkybox())
 		return (1);
-	// ft_printf(GREEN "Apres Skybox\n" NA);
 	if (env.getHud().init(glm::mat4(1)))
 		return (1);
-	// ft_printf(GREEN "Apres init\n" NA);
 	env.getCam().setProjMatrix(mat);
 	env.getCam().setTranslate((glm::vec3){7.5, 35, 7.5});
 
