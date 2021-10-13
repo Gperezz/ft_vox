@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/04 23:48:55 by gperez            #+#    #+#             */
-/*   Updated: 2021/10/12 17:36:52 by gperez           ###   ########.fr       */
+/*   Updated: 2021/10/13 11:18:28 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,7 @@ glm::vec3	Camera::getCameraFront(void)
 glm::vec3	Camera::createRay(glm::vec2 pos, float width, float height)
 {
 	pos.x = pos.x / (width * 0.5) - 1.0f;
-	pos.y = 2 - (pos.y / (height * 0.5)) - 1.0f;
+	pos.y = 2. - (pos.y / (height * 0.5)) - 1.0f;
 	glm::vec4	screenPos = glm::vec4(pos.x, pos.y, 1.0, 1.0);
 	this->look();
 	glm::mat4 invVP = glm::inverse(this->getProjMatrix() * this->getMatrix());

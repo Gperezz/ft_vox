@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2021/10/12 18:19:48 by gperez           ###   ########.fr       */
+/*   Updated: 2021/10/13 12:31:56 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,7 @@ static bool	switchedBlock(int startPos[3], glm::vec3 pos)
 		&& startPos[1] == (int)pos.y
 		&& startPos[2] == (int)pos.z));
 }
+
 static void	stepLoop(glm::vec3 &pos, glm::vec3 ray)
 {
 	int			startPos[3] = {(int)pos.x, (int)pos.y, (int)pos.z};
@@ -116,19 +117,25 @@ Block		*Engine::getBlockFromPos(Chunk **chunk, glm::vec3 pos, glm::vec4 &bP, std
 	ChunkPos	chunkPos = Camera::getCurrentChunkPos(pos);
 
 	(*chunk) = memory.at(chunkPos);
-	bP = glm::vec4(Camera::getCurrentOffset(pos), (int)(pos.y / 16));
+	bP = glm::vec4(Camera::getCurrentOffset(pos), (int)(pos.y / 16.));
 	if (bP.x - PREC < 0.0)
 		bP.x = 1.0 + bP.x;
 	if (bP.z - PREC < 0.0)
 		bP.z = 1.0 + bP.z;
-	
+
 	bP.x *= 16.0;
 	bP.y *= 16.0;
 	bP.z *= 16.0;
-
 	bP.x = (int)(bP.x);
 	bP.y = (int)(bP.y);
 	bP.z = (int)(bP.z);
+
+	if ((int)bP.x == 16)
+		bP.x = 0;
+	else if ((int)bP.y == 16)
+		bP.y = 0;
+	else if ((int)bP.z == 16)
+		bP.z = 0;
 
 	if (!(*chunk))
 		return (NULL);
@@ -211,46 +218,6 @@ void		Engine::rayCasting(Chunk *chunk, map<ChunkPos, Chunk*> &memory)
 	this->getHud().setCursorColor(GREEN_CURSOR);
 	printf(BOLD_MAGENTA "Chunk %d %d\n" NA, chunk->getPos().get(0), chunk->getPos().get(1));
 	printf(MAGENTA "Cam %f %f\n" NA, this->camera.getTranslate().x, this->camera.getTranslate().z);
-
-
-
-	// if (posDir.x < 0.5)
-	// {
-	// 	if (posDir.x < posDir.y)
-	// 	{
-	// 		currentBlock = chunk->getBlockNeighboor(currentBlock, WEST);
-	// 		currentBP.x = currentBP.x - 1;
-	// 		if (currentBP.x < 0)
-	// 		{
-	// 			currentBP.x = 15;
-	// 			chunk = chunk->getNeighboor(WEST);
-	// 		}
-	// 	}
-	// 	else
-	// 	{
-	// 		currentBlock = chunk->getBlockNeighboor(currentBlock, NORTH);
-	// 		currentBP.y = currentBP.y + 1;
-	// 		if (currentBP.y > 15)
-	// 		{
-	// 			currentBP.y = 0;
-	// 			currentBP.w
-	// 		}
-	// 	}
-	// }
-	// else
-	// {
-	// 	if (posDir.x > posDir.y)
-	// 	{
-	// 		currentBlock = chunk->getBlockNeighboor(currentBlock, EAST);
-	// 	}
-	// 	else
-	// 	{
-	// 		currentBlock = chunk->getBlockNeighboor(currentBlock, SOUTH);
-	// 	}
-	// }
-	// setGenBlock(currentBP, chunk, STONE);
-
-
 
 	if (this->getButton(GLFW_MOUSE_BUTTON_1) == true)
 		setGenBlock(saveBP, saveChunk, STONE);
