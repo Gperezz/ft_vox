@@ -16,10 +16,9 @@ void main()
 	float	typeF;
 
 	dir = int(meta) & 7;
-	typeF = int(meta) >> 8;
-	tCoords = aPos.xy;
+	typeF = (int(meta) >> 8);
 	pos4 = vec4(aPos.xyz, 1.0);
 	tCoords = aCoords;
-	tCoords.y = tCoords.y / nbTxt + (1.0 / nbTxt) * typeF;
+	tCoords.y = (tCoords.y / nbTxt) + (1.0 / nbTxt) * typeF;
 	gl_Position = projection * view * pos4;
 }

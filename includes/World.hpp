@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:08:20 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/23 02:25:03 by gperez           ###   ########.fr       */
+/*   Updated: 2021/10/13 14:31:35 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,8 @@
 # include "Engine.hpp"
 # include "Chunk.hpp"
 # include "WorldGenerator.hpp"
-# define CHK_RND_DIST 16
-# define CHK_DEL_DIST 32
+# define CHK_RND_DIST 8
+# define CHK_DEL_DIST 10
 
 using namespace std;
 using ChunkPos = Coords::Coords<int, 2>;
@@ -42,7 +42,7 @@ class World
 		mutex					displayedMutex;
 		set<ChunkPos, function<bool (ChunkPos, ChunkPos)>>	loadQueue;
 		map<ChunkPos, Chunk*>	memoryChunks;
-		set<ChunkPos>			graphicQueue;
+		// set<ChunkPos>			graphicQueue;
 		unordered_set<ChunkPos>	displayedChunks;
 		WorldGenerator			worldGen;
 		Engine&					enginePtr;

@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/23 02:34:11 by gperez           ###   ########.fr       */
+/*   Updated: 2021/10/13 20:00:46 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,6 @@ World::~World()
 	std::map<ChunkPos, Chunk*>::iterator it = memoryChunks.begin();
 	while (it != memoryChunks.end())
 	{
-
 		delete it->second;
 		it++;
 	}
@@ -83,20 +82,19 @@ bool	World::LoadNextQueuedChunk(){
 	return false;
 }
 
-void	World::initQueueThread()
-{
-	auto queueLoop = [this]() {
-		while (this->queueOn){
-			this->LoadNextQueuedChunk();
-		}
-	};
-	this->queueThread = thread(queueLoop);
-}
+// void	World::initQueueThread()
+// {
+// 	auto queueLoop = [this]() {
+// 		while (this->queueOn){
+// 			this->LoadNextQueuedChunk();
+// 		}
+// 	};
+// 	this->queueThread = thread(queueLoop);
+// }
 
 void	World::display(Engine &e, float currentFrameTime)
 {
 	this->rearrangeQueues();
-			// printf("text\n");
 
 	this->LoadNextQueuedChunk();
 	if (e.isSkybox() && e.getTexture(1))
@@ -114,18 +112,41 @@ void	World::display(Engine &e, float currentFrameTime)
 void	World::rearrangeQueues()
 {
 	static ChunkPos pos;
+	static bool	start = true;
 	ChunkPos newPos = this->getCameraChunkPos();
 	// printf("cur pos: %d %d\n", newPos[0], newPos[1]);
 
-	if (pos == newPos)
+	if (pos == newPos && !start)
 		return ;
+	start = false;
 	pos = newPos;
+
+// TEST
+	// unique_lock<mutex>	lockMem(this->memoryMutex);
+	// ChunkPos			compare;
+
+	// for (map<ChunkPos, Chunk*>::iterator itMem = memoryChunks.begin(); itMem != memoryChunks.end(); itMem++)
+	// {
+	// 	compare = itMem->first;
+	// 	if (pos.distance(compare) > CHK_DEL_DIST)
+	// 	{
+	// 		unique_lock<mutex>	lockDisplay(this->displayedMutex);
+	// 		if (this->displayedChunks.find(compare) != this->displayedChunks.end())
+	// 			this->displayedChunks.erase(compare);
+	// 		unique_lock<mutex>	lockQueue(this->queueMutex);
+	// 		if (this->loadQueue.find(compare) != this->loadQueue.end())
+	// 			this->loadQueue.erase(compare);
+	// 		delete itMem->second;
+	// 		this->memoryChunks.erase(itMem);
+	// 	}
+	// }
+// TEST
+
 	unique_lock<mutex> lock(this->queueMutex);
 	for (int i = -CHK_RND_DIST; i < CHK_RND_DIST + 1; i++) {
 		for (int j = -CHK_RND_DIST; j < CHK_RND_DIST + 1; j++){
 			ChunkPos cp(pos + (int[]){i, j});
 			// printf("surrounding pos: %d %d, %d, %d,   %lu\n", j, i, cp[0], cp[1], this->loadQueue.size());
-
 			this->loadQueue.insert(cp);
 		}
 	}

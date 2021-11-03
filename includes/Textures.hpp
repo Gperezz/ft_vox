@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/13 17:42:19 by gperez            #+#    #+#             */
-/*   Updated: 2021/10/08 19:59:28 by gperez           ###   ########.fr       */
+/*   Updated: 2021/10/14 14:02:36 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,9 +37,9 @@ static t_txt_path g_txt_path[] = {
 	{STONE_T, STONE, "textures/blocks/stone.png"},
 	{END_BLOCK_T, (e_BlockType)0, ""},
 	{SKY_FRONT_T, (e_BlockType)SKY_DIR_FRONT, "textures/skybox/front.png"},
+	{SKY_RIGHT_T, (e_BlockType)SKY_DIR_RIGHT, "textures/skybox/right.png"},
 	{SKY_LEFT_T, (e_BlockType)SKY_DIR_LEFT, "textures/skybox/left.png"},
 	{SKY_BACK_T, (e_BlockType)SKY_DIR_BACK, "textures/skybox/back.png"},
-	{SKY_RIGHT_T, (e_BlockType)SKY_DIR_RIGHT, "textures/skybox/right.png"},
 	{SKY_TOP_T, (e_BlockType)SKY_DIR_UP, "textures/skybox/top.png"},
 	{SKY_BOTTOM_T, (e_BlockType)SKY_DIR_DOWN, "textures/skybox/bottom.png"},
 	{SKY_T, (e_BlockType)0, ""},

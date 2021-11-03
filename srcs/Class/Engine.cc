@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2021/10/13 12:31:56 by gperez           ###   ########.fr       */
+/*   Updated: 2021/10/13 20:32:55 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -286,9 +286,7 @@ int			Engine::genSkybox(void)
 	if (sky || this->shaderSky.loadShader((char*)VERTEX_SKY, (char*)FRAGMENT_SKY))
 		return (1);
 	for (int i = 0; i < 6; i++)
-	{
 		fillTempVbo(tempVbo, g_dir_c[i], i + SKY_FRONT_T);
-	}
 	glGenVertexArrays(1, &this->vaoSky);
 	glBindVertexArray(this->vaoSky);
 	glGenBuffers(1, &this->vboSky);
@@ -463,7 +461,7 @@ int			Engine::genTextures(void)
 {
 	if (this->genBlocksTextures((glm::vec2){16, 16}, DIRT_T, END_BLOCK_T, 0))
 		return (1);
-	if (this->genBlocksTextures((glm::vec2){512, 512}, SKY_FRONT_T, SKY_T, 1))
+	if (this->genBlocksTextures((glm::vec2){2048, 2048}, SKY_FRONT_T, SKY_T, 1))
 		return (1);
 	this->fillTextureVector(SKY_T + 1, END_T, true);
 	return (0);
