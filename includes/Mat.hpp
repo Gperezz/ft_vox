@@ -6,17 +6,18 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/04 23:29:17 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/20 03:26:41 by gperez           ###   ########.fr       */
+/*   Updated: 2021/10/08 19:28:40 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MAT_HPP
 # define MAT_HPP
 
-extern "C"
-{
-	# include "ft_printf.h"
-}
+# define PREC 0.00001
+
+# include <iostream>
+# include <mutex>
+
 # include "glm.hpp"
 # include "matrix_transform.hpp"
 # include "type_ptr.hpp"
@@ -25,6 +26,7 @@ class					Mat
 {
 	public:
 		Mat();
+		Mat(Mat& copy);
 		glm::mat4			getMatrix(void);
 		glm::mat4			getMatrix(bool calc);
 		void				setMatrix(glm::mat4 mat);
@@ -39,6 +41,7 @@ class					Mat
 		void				setScale(glm::vec3 v);
 		void				scale(glm::vec3 s);
 		glm::vec3			getScale(void);
+		void				operator=(Mat& copy);
 		virtual				~Mat();
 	private:
 		glm::mat4		matrix;
@@ -48,7 +51,8 @@ class					Mat
 
 		virtual glm::mat4	calcMatrix(glm::vec3 t, glm::vec3 r, glm::vec3 s);
 		virtual glm::mat4	calcMatrix(void);
-
+	protected:
+		std::mutex		translateMutex;
 };
 
 #endif

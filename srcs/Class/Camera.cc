@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/04 23:48:55 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/20 16:10:22 by gperez           ###   ########.fr       */
+/*   Updated: 2021/10/13 11:18:28 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ void		Camera::translate(e_axes axe, float speed)
 	else if (axe == E_UP)
 		this->setTranslate(this->getTranslate() + cameraUp * speed);
 	else
-		this->setTranslate(this->getTranslate() + cameraFront * speed);
+		this->setTranslate(this->getTranslate() + glm::normalize(glm::vec3(cameraFront.x, 0, cameraFront.z)) * speed);
 }
 
 void	Camera::rotate(glm::vec3 rotEuler)
@@ -86,6 +86,50 @@ float	Camera::getEuler(e_rot euler)
 void	Camera::setCameraFront(glm::vec3 front)
 {
 	this->cameraFront = front;
+}
+
+glm::vec3	Camera::getCameraFront(void)
+{
+	return (this->cameraFront);
+}
+
+glm::vec3	Camera::createRay(glm::vec2 pos, float width, float height)
+{
+	pos.x = pos.x / (width * 0.5) - 1.0f;
+	pos.y = 2. - (pos.y / (height * 0.5)) - 1.0f;
+	glm::vec4	screenPos = glm::vec4(pos.x, pos.y, 1.0, 1.0);
+	this->look();
+	glm::mat4 invVP = glm::inverse(this->getProjMatrix() * this->getMatrix());
+	return (glm::normalize(glm::vec3(invVP * screenPos)));
+
+}
+
+ChunkPos	Camera::getCurrentChunkPos(glm::vec3 pos)
+{
+	glm::vec2	chunkPos = (glm::vec2){pos.x / 16.0, pos.z / 16.0};
+
+	if (chunkPos.x + PREC < 0.0)
+		chunkPos.x--;
+	if (chunkPos.y + PREC < 0.0)
+		chunkPos.y--;
+	return ((int[2]){(int)chunkPos.x, (int)chunkPos.y});
+}
+
+ChunkPos	Camera::getCurrentChunkPos(void)
+{
+	return (this->getCurrentChunkPos(this->getTranslate()));
+}
+
+glm::vec3	Camera::getCurrentOffset(void)
+{
+	return (this->getCurrentOffset(this->getTranslate()));
+}
+
+glm::vec3	Camera::getCurrentOffset(glm::vec3 pos)
+{
+	return ((glm::vec3){pos.x / 16.0 - (int)(pos.x / 16.),
+		pos.y / 16.0 - (int)(pos.y / 16.),
+		pos.z / 16.0 - (int)(pos.z / 16.)});
 }
 
 glm::mat4	Camera::calcMatrix(void)

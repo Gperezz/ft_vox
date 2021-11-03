@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/04 23:49:41 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/20 16:10:18 by gperez           ###   ########.fr       */
+/*   Updated: 2020/12/22 23:41:34 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,11 @@
 # define CAMERA_HPP
 
 # include "Mat.hpp"
-# define SPEED 2.5f
+# include "Coords.hpp"
+# define SPEED 12.5f
 # define SENSITIVITY 0.15f
+
+using	ChunkPos = Coords::Coords<int, 2>;
 
 enum	e_axes{E_RIGHT, E_UP, E_FRONT};
 enum	e_rot{PITCH, YAW, ROLL};
@@ -34,6 +37,12 @@ class	Camera : public Mat
 		virtual void		rotate(glm::vec3 rotEuler);
 		float				getEuler(e_rot euler);
 		void				setCameraFront(glm::vec3 front);
+		glm::vec3			getCameraFront(void);
+		glm::vec3			createRay(glm::vec2 pos, float width, float height);
+		static ChunkPos		getCurrentChunkPos(glm::vec3 pos);
+		ChunkPos			getCurrentChunkPos(void);
+		glm::vec3			getCurrentOffset(void);
+		static glm::vec3	getCurrentOffset(glm::vec3 pos);
 		virtual				~Camera();
 	private:
 		Mat					projection;

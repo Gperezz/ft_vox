@@ -6,7 +6,7 @@
 #    By: gperez <gperez@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/10/10 18:22:58 by gperez            #+#    #+#              #
-#    Updated: 2020/10/19 19:56:51 by gperez           ###   ########.fr        #
+#    Updated: 2021/10/08 19:10:49 by gperez           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,8 +32,9 @@ SRC =	srcs/main.cc \
 		srcs/Class/Chunk.cc \
 		srcs/Class/Block.cc \
 		srcs/Class/WorldGenerator.cc \
-		srcs/Class/ContextOpenCL.cc \
 		srcs/Class/TimeMs.cc \
+		srcs/Class/Hud.cc \
+		srcs/Class/Element.cc \
 
 NC = \033[0m
 BOLD =\033[1m
@@ -58,15 +59,9 @@ RED = \033[38;5;203m
 COLOR1 = \033[38;5;75m
 COLOR2 = \033[38;5;178m
 
-LIB_L = libs/libft/libft.a
-
-LIB_P = libs/ft_printf/libftprintf.a
-
 LIB_G = libs/glfw_mac/lib-macos/libglfw3.a 
 
-LIBS_H =	libs/libft/includes \
-			libs/ft_printf/includes \
-			libs/glfw_mac/include/GLFW \
+LIBS_H =	libs/glfw_mac/include/GLFW \
 			libs/glad/include/glad \
 			libs/ \
 			libs/CL \
@@ -86,13 +81,7 @@ OBJ = $(SRC:.cc=.o)
 
 all : $(NAME)
 
-$(LIB_L) :
-	@make -C libs/libft
-
-$(LIB_P) :
-	@make -C libs/ft_printf
-
-$(NAME) : $(LIB_L) $(LIB_P) $(OBJ)
+$(NAME) : $(OBJ)
 	@gcc $(FLAG) -o srcs/glad.o -c libs/glad/src/glad.c
 	@g++ $(FLAG) $(FLAGCPP) $(FLAG_OPENCL) $(FLAG_OPENGL) $(LIB_G) srcs/glad.o $^ -o $(NAME)
 	@printf "$(BOLD)$(COLOR1)%20s : $(RS_BL)$(RS_BO)$(GREEN)succesfuly made!$(NC)%20s\n" $(NAME)
@@ -103,18 +92,10 @@ $(NAME) : $(LIB_L) $(LIB_P) $(OBJ)
 	@printf "\r"
 
 clean :
-	# @make -C libs/libft clean
-	# @make -C libs/ft_printf clean
 	@/bin/rm -rf srcs/*.o
 	@/bin/rm -rf srcs/Class/*.o
 
 fclean : clean
 	@/bin/rm -rf $(NAME)
-	@/bin/rm -rf $(LIB_L)
-	@/bin/rm -rf $(LIB_P)
 
 re : fclean all
-
-push : fclean
-	@make -C libs/libft clean
-	@make -C libs/ft_printf clean

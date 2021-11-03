@@ -9,7 +9,7 @@ struct perlinSeed {
 	int x;
 	int z;
 
-	int operator<(perlinSeed& a){
+	bool operator<(const perlinSeed& a) const{
 		if (this->seed == a.seed) {
 			if (this->layer == a.layer) {
 				if (this->x == a.x) {
@@ -32,6 +32,29 @@ struct vec2 {
 		this->z = bz - az;
 	}
 
+	vec2(float x, float z){
+		this->x = x;
+		this->z = z;
+	}
+
+	vec2(){
+		this->x = 0;
+		this->z = 0;
+	}
+
+	vec2(const vec2& from){
+		this->x = from.x;
+		this->z = from.z;
+	}
+	vec2(const vec2&& from){
+		this->x = from.x;
+		this->z = from.z;
+	}
+	void operator=(const vec2& from){
+		this->x = from.x;
+		this->z = from.z;
+	}
+
 	float dotProduct(vec2 vec) {
 		return vec.x * this->x + vec.z * this->z;
 	}
@@ -42,7 +65,8 @@ private:
 	int cellSize;
 	int seed;
 	map<perlinSeed, vec2> dotCells;
-
+public:
+	PerlinNoise(){}
 	PerlinNoise(int cellSize, long seed)
 	{
 		this->cellSize = cellSize;
@@ -55,7 +79,7 @@ private:
 		uniform_real_distribution<float> distr(-1.0, 1.0);
 		seed_seq seq = {key.seed, key.layer, key.x, key.z};
 		minstd_rand0 generator = minstd_rand0(seq);
-		return {generator(), generator()};
+		return {distr(generator), distr(generator)};
 	}
 
 	vec2 gradient(int layer, int x, int z)
@@ -116,4 +140,8 @@ private:
 
 		return value;
 	}
-}
+
+	float operator()(float w, float x, float y){
+		return this->perlin(w, x, y);
+	}
+};

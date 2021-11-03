@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:08:20 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/19 19:51:03 by gperez           ###   ########.fr       */
+/*   Updated: 2021/10/13 14:31:35 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,15 @@
 # include <string>
 # include <unordered_set>
 # include <vector>
-# include <queue>
+# include <set>
+# include <thread>
+# include <mutex>
 
+# include "Engine.hpp"
 # include "Chunk.hpp"
 # include "WorldGenerator.hpp"
+# define CHK_RND_DIST 8
+# define CHK_DEL_DIST 10
 
 using namespace std;
 using ChunkPos = Coords::Coords<int, 2>;
@@ -30,28 +35,43 @@ class Engine;
 class World
 {
 	private:
-		queue<ChunkPos>				loadQueue;
-		map<ChunkPos, Chunk*>		memoryChunks;
-		queue<ChunkPos>				graphicQueue;
-		unordered_set<ChunkPos>		displayedChunks;
-		WorldGenerator				worldGen;
-		string						path;
-		float						deltaFrameTime;
-		float						lastFrameTime;
+		bool					queueOn;
+		thread					queueThread;
+		mutex					queueMutex;
+		mutex					memoryMutex;
+		mutex					displayedMutex;
+		set<ChunkPos, function<bool (ChunkPos, ChunkPos)>>	loadQueue;
+		map<ChunkPos, Chunk*>	memoryChunks;
+		// set<ChunkPos>			graphicQueue;
+		unordered_set<ChunkPos>	displayedChunks;
+		WorldGenerator			worldGen;
+		Engine&					enginePtr;
+		string					path;
+		float					deltaFrameTime;
+		float					lastFrameTime;
+		mutex					deltaFTMutex;
 	public:
-							World(unsigned long* = NULL);
-							World(string&, unsigned long* = NULL);
+							World(Engine& engine, unsigned long* = NULL);
+							World(Engine& engine, string&, unsigned long* = NULL);
 							// World(string pathStr, );
 							// World(string )
 							~World();
+
+	
+	void					initQueueThread();
+	void					initQueueSorter();
+	bool					LoadNextQueuedChunk();
+	ChunkPos				getCameraChunkPos();
+	void					rearrangeQueues();
 	void					display(Engine &e, float currentFrameTime);
 	void					pushInDisplay(Chunk* chunk);
 	void					loadChunk(ChunkPos);
 	void					loadChunk(int x, int z);
 	Chunk					*get(ChunkPos);
+	map<ChunkPos, Chunk*>	&getMapMemory(void);
 	Chunk					*getMemoryChunk(ChunkPos pos);
 	unordered_set<ChunkPos>	&getDisplayedChunks(void);
-	float					getDeltaFrameTime(void) const;
+	float					getDeltaFrameTime(void);
 	Chunk					*operator[](ChunkPos);
 }; 
 

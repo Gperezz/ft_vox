@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:14:08 by gperez            #+#    #+#             */
-/*   Updated: 2020/04/17 17:08:57 by gperez           ###   ########.fr       */
+/*   Updated: 2021/10/08 19:03:02 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 
 extern "C"
 {
-	# include "ft_printf.h"
 	# include "glad.h" // Implementation OpenGl
 }
 
@@ -38,6 +37,15 @@ enum	e_BlockType : char {
 	// COBBLESTONE
 };
 
+enum	e_SkyDir : char {
+	SKY_DIR_FRONT,
+	SKY_DIR_RIGHT,
+	SKY_DIR_LEFT,
+	SKY_DIR_BACK,
+	SKY_DIR_UP,
+	SKY_DIR_DOWN,
+};
+
 typedef struct		block_info{
 	unsigned char	id;
 	unsigned		variation : 4;
@@ -52,6 +60,7 @@ class Block {
 						Block();
 						~Block();
 		t_block_info&	getInfo(void);
+		static bool		isTransparentBlock(Block block);
 		void			operator=(t_block_info);
 };
 

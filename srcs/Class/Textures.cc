@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/13 17:54:04 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/10 19:03:42 by gperez           ###   ########.fr       */
+/*   Updated: 2021/10/11 20:43:12 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,25 +17,45 @@
 
 Textures::Textures()
 {
+	this->load = false;
 	this->width = 0;
 	this->height = 0;
 	this->nrChannels = 0;
 	this->txt = -1;
 	this->txtData = NULL;
+	this->isBuffer = false;
 }
 
 Textures::Textures(char *txtPath)
 {
-	stbi_set_flip_vertically_on_load(true);
-	this->txtData = stbi_load(txtPath, &width, &height, &nrChannels, 0);
+	this->load = false;
+	this->txt = -1;
+	this->txtData = NULL;
+	this->isBuffer = false;
+	this->loadTexture(txtPath);
 }
 
-Textures::Textures(char *buffer, unsigned long width, unsigned long height)
+// Textures::Textures(std::string buf, unsigned long w, unsigned long h)
+Textures::Textures(char *buf, unsigned long w, unsigned long h)
 {
-	this->txtData = (unsigned char*)buffer;
-	this->width = width;
-	this->height = height;
+	this->isBuffer = true;
+	this->txtData = (unsigned char*)buf;
+	// this->buffer = buf;
+	this->width = w;
+	this->height = h;
+	this->load = true;
 }
+
+void	Textures::loadTexture(char *txtPath)
+{
+	if (this->load)
+		return;
+	stbi_set_flip_vertically_on_load(true);
+	this->txtData = stbi_load(txtPath, &this->width, &this->height, &this->nrChannels, 0);
+	printf(CYAN "Height:%d Width%d\n" NA, this->height, this->width);
+	this->load = true;
+}
+
 
 int				Textures::getWidth(void) const
 {
@@ -47,12 +67,17 @@ int				Textures::getHeight(void) const
 	return (this->height);
 }
 
+int				Textures::getNrChannels(void) const
+{
+	return (this->nrChannels);
+}
+
 void			Textures::setTxt(unsigned int t)
 {
 	this->txt = t;
 }
 
-unsigned int	Textures::getTxt(void)
+int				Textures::getTxt(void)
 {
 	return (this->txt);
 }
@@ -80,6 +105,6 @@ e_txt			Textures::getIndexTxt(e_BlockType type)
 
 Textures::~Textures()
 {
-	if (this->txtData)
+	if (this->txtData && !isBuffer)
 		stbi_image_free(this->txtData);
 }

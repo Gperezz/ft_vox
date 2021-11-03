@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/20 16:13:06 by gperez           ###   ########.fr       */
+/*   Updated: 2021/10/08 19:00:19 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,12 @@ Chunk::Chunk(const Chunk& copy)
 	this->operator=(copy);
 }
 
+Chunk::~Chunk()
+{
+	for (int i = 0; i < 16; i++)
+		this->deleteVbo((char)i);
+}
+
 
 void	Chunk::fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, BlockPos posInMesh, unsigned char id)
 {
@@ -55,7 +61,27 @@ void	Chunk::fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, Blo
 		vboType.tab[1] = dir_c.pts[iPt].get(Y) + posInMesh.get(Y) + posInMesh.get(MY) * 16;
 		vboType.tab[2] = dir_c.pts[iPt].get(Z) + posInMesh.get(Z) + this->getPos().get(1) * 16;
 
+		vboType.normal[0] = dir_c.pts[iPt].get(X) - LENGTH_BLOCK / 2; // On pourra le mettre en brut dans le header
+		vboType.normal[1] = dir_c.pts[iPt].get(X) - LENGTH_BLOCK / 2;
+		vboType.normal[2] = dir_c.pts[iPt].get(X) - LENGTH_BLOCK / 2;
+	
 		vboType.meta = dir_c.axis < 0 ? dir_c.axis + 7 : dir_c.axis;
+
+		if (vboType.meta == 1 || vboType.meta == 6)
+		{
+			vboType.coords[0] = dir_c.pts[iPt].get(Z);
+			vboType.coords[1] = dir_c.pts[iPt].get(Y);
+		}
+		else if (vboType.meta == 2 || vboType.meta == 5)
+		{
+			vboType.coords[0] = dir_c.pts[iPt].get(X);
+			vboType.coords[1] = dir_c.pts[iPt].get(Z);
+		}
+		else
+		{
+			vboType.coords[0] = dir_c.pts[iPt].get(X);
+			vboType.coords[1] = dir_c.pts[iPt].get(Y);
+		}
 		idBitwise = id << 8;
 		vboType.meta = (int)vboType.meta | idBitwise;
 		tempVbo.push_back(vboType);
@@ -75,10 +101,10 @@ bool		Chunk::canPrintBlock(vector<vbo_type> &tempVbo, BlockPos posInMesh)
 	while (i < 6)
 	{
 		Block *tmp = this->getBlockNeighboor(posInMesh, (Direction)i);
-		if (!tmp || (tmp->getInfo().id == AIR))
+		if (!tmp || Block::isTransparentBlock(*tmp))
 		{
 			dir += 1 << i; //Faces visibles
-			fillTempVbo(tempVbo, (t_direction_consts)g_dir_c[i], posInMesh,
+			this->fillTempVbo(tempVbo, (t_direction_consts)g_dir_c[i], posInMesh,
 				Textures::getIndexTxt((e_BlockType)this->getBlock(posInMesh).getInfo().id));
 		}
 		i++;
@@ -104,10 +130,14 @@ void		Chunk::generateVbo(char index, vector<vbo_type> tempVbo)
 	glBindBuffer(GL_ARRAY_BUFFER, tabVbo[(int)index]);
 	glBufferData(GL_ARRAY_BUFFER, tempVbo.size() * sizeof(vbo_type), &tempVbo[0], GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3 + sizeof(float), (void*)0);
-	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 3 + sizeof(float), (void*)(sizeof(float) * 3));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8 + sizeof(float), (void*)0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8 + sizeof(float), (void*)(sizeof(float) * 3));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8 + sizeof(float), (void*)(sizeof(float) * 6));
+	glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 8 + sizeof(float), (void*)(sizeof(float) * 8));
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(3);
 }
 
 void		Chunk::validateMesh(char meshIdx)
@@ -115,11 +145,12 @@ void		Chunk::validateMesh(char meshIdx)
 	BlockPos				pos; // [meshY][x][y][z]
 	bool					validateValue;
 	vector<vbo_type>		tempVbo;
-
-	if (this->valid.find(meshIdx) != Chunk::valid.end())
-	{
-		this->valid.erase(meshIdx);
-		deleteVbo(meshIdx);
+	{	unique_lock<mutex> lock(this->validMutex);
+		if (this->valid.find(meshIdx) != Chunk::valid.end())
+		{
+			this->valid.erase(meshIdx);
+			deleteVbo(meshIdx);
+		}
 	}
 	validateValue = 0;
 	pos[MY] = meshIdx;
@@ -142,7 +173,8 @@ void		Chunk::validateMesh(char meshIdx)
 	if (validateValue && tempVbo.size())
 	{
 		generateVbo(meshIdx, tempVbo);
-		ft_printf(GREEN "generate VBO (Mesh %d) %d points (%d floats)\n" NA, meshIdx, tempVbo.size(), tempVbo.size() * 3);
+		// ft_printf(GREEN "generate VBO (Mesh %d) %d points (%d floats)\n" NA, meshIdx, tempVbo.size(), tempVbo.size() * 3);
+		unique_lock<mutex> lock(this->validMutex);
 		this->valid.insert({meshIdx, tempVbo.size()});
 	}
 }
@@ -266,32 +298,35 @@ Block		*Chunk::getBlockNeighboor(BlockPos pos, Direction dir) // Fonction peut e
 	return &this->getBlock(pos + c.block_vec);
 }
 
+void		Chunk::generateGraphics(unsigned int mesh)
+{
+	if (this->state == FENCED && mesh < 16)
+		validateMesh(mesh);
+}
+
 void		Chunk::generateGraphics(void)
 {
-	ft_printf(ORANGE "Validating Chunk %d %d\n" NA, this->pos.get(0), this->pos.get(1));
+	// ft_printf(ORANGE "Validating Chunk %d %d\n" NA, this->pos.get(0), this->pos.get(1));
 	for (unsigned i = 0; i < 16; i++)
 	{
-		ft_printf(ORANGE "Validating Mesh %d\n" NA, i);
 		validateMesh(i);
 	}
 }
 
-void		Chunk::displayChunk(Engine &e)
+void		Chunk::displayChunk(Camera cam, Shader shader, Textures *t)
 {
+	unique_lock<mutex>						lock(this->validMutex);
 	std::map<char, unsigned int>::iterator	it = this->valid.begin();
-	Shader&									shader(e.getShader());
-	Textures								*t;
 
-	t = e.getTexture(0);
 	while (it != this->valid.end())
 	{
 		// ft_printf(CYAN "%d %u\n" NA, it->first, it->second);
 		glBindVertexArray(this->tabVao[(int)it->first]);
 		glUseProgram(shader.getProgram());
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),
-			"view"), 1, GL_FALSE, glm::value_ptr(e.getCam().getMatrix(false)));
+			"view"), 1, GL_FALSE, glm::value_ptr(cam.getMatrix(false)));
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),
-			"projection"), 1, GL_FALSE, glm::value_ptr(e.getCam().getProjMatrix()));
+			"projection"), 1, GL_FALSE, glm::value_ptr(cam.getProjMatrix()));
 		glUniform1i(glGetUniformLocation(shader.getProgram(),
 			"nbTxt"), END_BLOCK_T);
 		glUniform1i(glGetUniformLocation(shader.getProgram(),
