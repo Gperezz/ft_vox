@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:17:27 by gperez            #+#    #+#             */
-/*   Updated: 2021/10/08 18:58:38 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/03 17:55:06 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,9 +44,9 @@ enum Geomorph : char{
 
 enum Direction : char{
 	NORTH,
-	EAST,
-	SOUTH,
 	WEST,
+	SOUTH,
+	EAST,
 	UP,
 	DOWN
 };

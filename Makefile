@@ -6,7 +6,7 @@
 #    By: gperez <gperez@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/10/10 18:22:58 by gperez            #+#    #+#              #
-#    Updated: 2021/10/08 19:10:49 by gperez           ###   ########.fr        #
+#    Updated: 2021/11/03 17:41:35 by gperez           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -76,6 +76,8 @@ INC =	includes/ft_vox.hpp \
 		includes/Coords.hpp \
 		includes/Chunk.hpp \
 		includes/TimeMs.hpp \
+		includes/StructBlock.hpp \
+		includes/Textures.hpp \
 
 OBJ = $(SRC:.cc=.o)
 

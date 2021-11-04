@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 20:41:33 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/15 20:43:10 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/04 15:19:07 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,11 +53,11 @@ static t_direction_consts	g_dir_c[] = {
 			t_cube_pt[0], t_cube_pt[2], t_cube_pt[3],
 		}
 	},
-	// EAST
-	{BlockPos((int[4]){0,1,0,0}), ChunkPos((int[2]){1, 0}), X,
+	// WEST
+	{BlockPos((int[4]){0,-1,0,0}), ChunkPos((int[2]){-1, 0}), -X,
 		{
-			t_cube_pt[3], t_cube_pt[2], t_cube_pt[6],
-			t_cube_pt[3], t_cube_pt[6], t_cube_pt[7],
+			t_cube_pt[4], t_cube_pt[5], t_cube_pt[1],
+			t_cube_pt[4], t_cube_pt[1], t_cube_pt[0],
 		}
 	},
 	// SOUTH
@@ -67,11 +67,11 @@ static t_direction_consts	g_dir_c[] = {
 			t_cube_pt[4], t_cube_pt[7], t_cube_pt[6],
 		}
 	},
-	// WEST
-	{BlockPos((int[4]){0,-1,0,0}), ChunkPos((int[2]){-1, 0}), -X,
+	// EAST
+	{BlockPos((int[4]){0,1,0,0}), ChunkPos((int[2]){1, 0}), X,
 		{
-			t_cube_pt[4], t_cube_pt[5], t_cube_pt[1],
-			t_cube_pt[4], t_cube_pt[1], t_cube_pt[0],
+			t_cube_pt[3], t_cube_pt[2], t_cube_pt[6],
+			t_cube_pt[3], t_cube_pt[6], t_cube_pt[7],
 		}
 	},
 	// UP

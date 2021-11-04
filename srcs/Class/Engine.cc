@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2021/10/13 20:32:55 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/04 17:25:39 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -258,20 +258,29 @@ static void	fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, uns
 		vboType.tab[1] = dir_c.pts[iPt].get(Y);
 		vboType.tab[2] = dir_c.pts[iPt].get(Z);
 		vboType.meta = dir_c.axis < 0 ? dir_c.axis + 7 : dir_c.axis;
-		if (vboType.meta == 1 || vboType.meta == 6)
+		if (vboType.meta == 1 || vboType.meta == 6) // X et -X
 		{
-			vboType.coords[0] = dir_c.pts[iPt].get(Z);
 			vboType.coords[1] = dir_c.pts[iPt].get(Y);
+			if (vboType.meta == 1)
+				vboType.coords[0] = 1. - dir_c.pts[iPt].get(Z);
+			else
+				vboType.coords[0] = dir_c.pts[iPt].get(Z);
 		}
-		else if (vboType.meta == 2 || vboType.meta == 5)
+		else if (vboType.meta == 2 || vboType.meta == 5) // Y et -Y
 		{
 			vboType.coords[0] = dir_c.pts[iPt].get(X);
+			if (vboType.meta == 2)
+				vboType.coords[1] = 1. - dir_c.pts[iPt].get(Z);
+			else
 			vboType.coords[1] = dir_c.pts[iPt].get(Z);
 		}
-		else
+		else // Z et -Z
 		{
-			vboType.coords[0] = dir_c.pts[iPt].get(X);
 			vboType.coords[1] = dir_c.pts[iPt].get(Y);
+			if (vboType.meta == 3)
+				vboType.coords[0] = dir_c.pts[iPt].get(X);
+			else
+				vboType.coords[0] = 1. - dir_c.pts[iPt].get(X);
 		}
 		idBitwise = (int)g_txt_path[idxgTxtPath].type << 8;
 		vboType.meta = (int)vboType.meta | idBitwise;
