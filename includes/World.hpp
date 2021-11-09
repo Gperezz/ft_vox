@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:08:20 by gperez            #+#    #+#             */
-/*   Updated: 2021/10/13 14:31:35 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/09 19:49:03 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,9 @@
 # include "Engine.hpp"
 # include "Chunk.hpp"
 # include "WorldGenerator.hpp"
-# define CHK_RND_DIST 8
-# define CHK_DEL_DIST 10
+# define CHK_RND_DIST 4
+# define CHK_DEL_DIST 6
+# define CHK_DEL_DIST_MEM 6
 
 using namespace std;
 using ChunkPos = Coords::Coords<int, 2>;
@@ -49,7 +50,9 @@ class World
 		string					path;
 		float					deltaFrameTime;
 		float					lastFrameTime;
-		mutex					deltaFTMutex;
+		// mutex					deltaFTMutex;
+	
+		void					pushInDisplay(Chunk* chunk);
 	public:
 							World(Engine& engine, unsigned long* = NULL);
 							World(Engine& engine, string&, unsigned long* = NULL);
@@ -63,8 +66,9 @@ class World
 	bool					LoadNextQueuedChunk();
 	ChunkPos				getCameraChunkPos();
 	void					rearrangeQueues();
+	void					deleteFarInDisplay();
+	void					deleteFar();
 	void					display(Engine &e, float currentFrameTime);
-	void					pushInDisplay(Chunk* chunk);
 	void					loadChunk(ChunkPos);
 	void					loadChunk(int x, int z);
 	Chunk					*get(ChunkPos);

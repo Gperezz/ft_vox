@@ -20,7 +20,7 @@ void main()
 {
 	vec4	pos4;
 	int		dir;
-	vec3	lightP = vec3(0, 500.0, 0.0);
+	vec3	lightP = vec3(1., 1., -0.4);
 
 	dir = int(meta) & 7;
 	typeF = int(meta) >> 8;
@@ -32,6 +32,6 @@ void main()
 	tCoords = aCoords;
 	tCoords.y = (tCoords.y / nbTxt) + (1.0 / nbTxt) * typeF;
 	normal = aNorm;
-	vecToLight = lightP - aPos;
+	vecToLight = normalize(lightP);
 	gl_Position = projection * view * pos4;
 }

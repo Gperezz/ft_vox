@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2021/10/08 19:00:19 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/09 19:40:25 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -233,6 +233,11 @@ bool	Chunk::getFenced(void)
 	return (this->state);
 }
 
+void	Chunk::setFenced(ChunkState f)
+{
+	this->state = f;
+}
+
 void		Chunk::updateFenced(int source)
 {
 	if (source)
@@ -306,11 +311,8 @@ void		Chunk::generateGraphics(unsigned int mesh)
 
 void		Chunk::generateGraphics(void)
 {
-	// ft_printf(ORANGE "Validating Chunk %d %d\n" NA, this->pos.get(0), this->pos.get(1));
 	for (unsigned i = 0; i < 16; i++)
-	{
 		validateMesh(i);
-	}
 }
 
 void		Chunk::displayChunk(Camera cam, Shader shader, Textures *t)
@@ -320,7 +322,6 @@ void		Chunk::displayChunk(Camera cam, Shader shader, Textures *t)
 
 	while (it != this->valid.end())
 	{
-		// ft_printf(CYAN "%d %u\n" NA, it->first, it->second);
 		glBindVertexArray(this->tabVao[(int)it->first]);
 		glUseProgram(shader.getProgram());
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),

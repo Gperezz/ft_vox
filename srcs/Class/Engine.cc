@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/04 17:25:39 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/09 19:09:11 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,12 +140,12 @@ Block		*Engine::getBlockFromPos(Chunk **chunk, glm::vec3 pos, glm::vec4 &bP, std
 	if (!(*chunk))
 		return (NULL);
 	block = &(*chunk)->getBlock(bP.w, bP.x, bP.y, bP.z);
-	if ((this->getButton(GLFW_MOUSE_BUTTON_1) == true || this->getButton(GLFW_MOUSE_BUTTON_2) == true)
-		&& this->lockRay == false)
-	{
-		printf(RED "ChunkPos %d %d\n" NA, (*chunk)->getPos().get(0), (*chunk)->getPos().get(1));
-		printf(ORANGE "Bp %f %f %f\n" NA, bP.x, bP.y, bP.z);
-	}
+	// if ((this->getButton(GLFW_MOUSE_BUTTON_1) == true || this->getButton(GLFW_MOUSE_BUTTON_2) == true)
+	// 	&& this->lockRay == false)
+	// {
+	// 	printf(RED "ChunkPos %d %d\n" NA, (*chunk)->getPos().get(0), (*chunk)->getPos().get(1));
+	// 	printf(ORANGE "Bp %f %f %f\n" NA, bP.x, bP.y, bP.z);
+	// }
 	return (block);
 }
 
