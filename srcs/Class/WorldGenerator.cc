@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WorldGenerator.cc                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
+/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/02 08:06:26 by gperez            #+#    #+#             */
-/*   Updated: 2020/11/27 16:22:25 by karldouveno      ###   ########.fr       */
+/*   Updated: 2021/11/10 15:50:45 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ void	WorldGenerator::genChunk(Chunk *chunk)
 			int y = 0;
 			for (; y < height; y++) {
 				chunk->setBlock(BlockPos((int[4]){y / 16, x, y % 16, z}),
-						(t_block_info){2,0,0,0});
+						(t_block_info){DIRT,0,0,0});
 			}
 		}
 	}

@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2021/10/13 20:00:46 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/10 14:11:05 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,12 +67,15 @@ void	World::initQueueSorter()
 
 bool	World::LoadNextQueuedChunk(){
 	size_t size;
-	{	unique_lock<mutex> lock(this->queueMutex);
+	{
+		unique_lock<mutex> lock(this->queueMutex);
 		size = this->loadQueue.size(); 
 	}
-	if (size){
+	if (size)
+	{
 		decltype(this->loadQueue.begin()) pos;
-		{	unique_lock<mutex> lock(this->queueMutex);
+		{
+			unique_lock<mutex> lock(this->queueMutex);
 			pos = this->loadQueue.begin();
 			this->loadQueue.erase(pos);
 		}
@@ -92,15 +95,102 @@ bool	World::LoadNextQueuedChunk(){
 // 	this->queueThread = thread(queueLoop);
 // }
 
+void	World::deleteFar()
+{
+	static ChunkPos	prevPos;
+	ChunkPos		pos = this->getCameraChunkPos();
+	ChunkPos		chunkP;
+
+	if (pos == prevPos)
+		return ;
+	unique_lock<mutex> lockMem(this->memoryMutex);
+	for (auto it = this->memoryChunks.begin(); it != this->memoryChunks.end(); it++)
+	{
+		chunkP = it->first;
+		if (chunkP.get(0) < pos.get(0) - CHK_DEL_DIST_MEM
+			|| chunkP.get(0) > pos.get(0) + CHK_DEL_DIST_MEM
+			|| chunkP.get(1) < pos.get(1) - CHK_DEL_DIST_MEM
+			|| chunkP.get(1) > pos.get(1) + CHK_DEL_DIST_MEM)
+		{
+			Chunk* delChunk = it->second;
+			std::cout << RED << "Chunk " << chunkP.get(0) << " " << chunkP.get(1) << "\n";
+
+			delete delChunk;
+			this->memoryChunks[chunkP] = NULL;
+			// this->memoryChunks[chunkP]->updateFenced(1); // mettre un delete updateFenced
+			this->memoryChunks.erase(chunkP);
+		}
+	}
+	pos = prevPos;
+}
+
+void	World::deleteFarInDisplay()
+{
+	static ChunkPos	prevPos;
+	ChunkPos		pos = this->getCameraChunkPos();
+	ChunkPos		chunkP;
+
+	if (pos == prevPos)
+		return ;
+
+	{unique_lock<mutex> lockQueue(this->queueMutex);
+	for (auto it = this->loadQueue.begin(); it != this->loadQueue.end(); it++)
+	{
+		chunkP = *it;
+		if (chunkP.get(0) < pos.get(0) - CHK_DEL_DIST
+			|| chunkP.get(0) > pos.get(0) + CHK_DEL_DIST
+			|| chunkP.get(1) < pos.get(1) - CHK_DEL_DIST
+			|| chunkP.get(1) > pos.get(1) + CHK_DEL_DIST)
+				this->loadQueue.erase(chunkP);
+	}}
+
+	{unique_lock<mutex> lock(this->displayedMutex);
+	for (auto it = this->displayedChunks.begin(); it != this->displayedChunks.end(); it++)
+	{
+		chunkP = *it;
+		if (chunkP.get(0) < pos.get(0) - CHK_DEL_DIST
+			|| chunkP.get(0) > pos.get(0) + CHK_DEL_DIST
+			|| chunkP.get(1) < pos.get(1) - CHK_DEL_DIST
+			|| chunkP.get(1) > pos.get(1) + CHK_DEL_DIST)
+				this->displayedChunks.erase(it);
+	}}
+	pos = prevPos;
+}
+
+
+void	World::rearrangeQueues()
+{
+	static ChunkPos prevPos;
+	static bool	start = true;
+	ChunkPos pos = this->getCameraChunkPos();
+
+	if (prevPos == pos && !start)
+		return ;
+	start = false;
+	unique_lock<mutex> lock(this->queueMutex);
+	for (int i = -CHK_RND_DIST; i < CHK_RND_DIST + 1; i++)
+	{
+		for (int j = -CHK_RND_DIST; j < CHK_RND_DIST + 1; j++)
+		{
+			ChunkPos cp(pos + (int[]){i, j});
+			if (this->loadQueue.count(cp) == 0)
+				this->loadQueue.insert(cp);
+		}
+	}
+	prevPos = pos;
+}
+
 void	World::display(Engine &e, float currentFrameTime)
 {
 	this->rearrangeQueues();
+	this->deleteFarInDisplay();
+	// this->deleteFar();
 
 	this->LoadNextQueuedChunk();
 	if (e.isSkybox() && e.getTexture(1))
 		e.displaySky(e.getTexture(1));
 	unique_lock<mutex> lk(this->displayedMutex);
-	unique_lock<mutex> lk2(this->deltaFTMutex);
+	// unique_lock<mutex> lk2(this->deltaFTMutex);
 	unique_lock<mutex> lk3(this->memoryMutex);
 	
 	for (auto it = this->displayedChunks.begin(); it != this->displayedChunks.end(); it++)
@@ -109,67 +199,23 @@ void	World::display(Engine &e, float currentFrameTime)
 	this->lastFrameTime = currentFrameTime;
 }
 
-void	World::rearrangeQueues()
-{
-	static ChunkPos pos;
-	static bool	start = true;
-	ChunkPos newPos = this->getCameraChunkPos();
-	// printf("cur pos: %d %d\n", newPos[0], newPos[1]);
-
-	if (pos == newPos && !start)
-		return ;
-	start = false;
-	pos = newPos;
-
-// TEST
-	// unique_lock<mutex>	lockMem(this->memoryMutex);
-	// ChunkPos			compare;
-
-	// for (map<ChunkPos, Chunk*>::iterator itMem = memoryChunks.begin(); itMem != memoryChunks.end(); itMem++)
-	// {
-	// 	compare = itMem->first;
-	// 	if (pos.distance(compare) > CHK_DEL_DIST)
-	// 	{
-	// 		unique_lock<mutex>	lockDisplay(this->displayedMutex);
-	// 		if (this->displayedChunks.find(compare) != this->displayedChunks.end())
-	// 			this->displayedChunks.erase(compare);
-	// 		unique_lock<mutex>	lockQueue(this->queueMutex);
-	// 		if (this->loadQueue.find(compare) != this->loadQueue.end())
-	// 			this->loadQueue.erase(compare);
-	// 		delete itMem->second;
-	// 		this->memoryChunks.erase(itMem);
-	// 	}
-	// }
-// TEST
-
-	unique_lock<mutex> lock(this->queueMutex);
-	for (int i = -CHK_RND_DIST; i < CHK_RND_DIST + 1; i++) {
-		for (int j = -CHK_RND_DIST; j < CHK_RND_DIST + 1; j++){
-			ChunkPos cp(pos + (int[]){i, j});
-			// printf("surrounding pos: %d %d, %d, %d,   %lu\n", j, i, cp[0], cp[1], this->loadQueue.size());
-			this->loadQueue.insert(cp);
-		}
-	}
-}
-
 ChunkPos	World::getCameraChunkPos()
 {
 	glm::vec3 mat;
 	mat = this->enginePtr.getCam().getTranslate();
-	float test[] = {mat.x / 16, mat.z / 16};
-	if (test[0] < 0)
-		test[0] -= 1.0;
-	if (test[1] < 0)
-		test[1] -= 1.0;
-	return (int[]){(int)test[0], (int)test[1]};
+	float cam[] = {mat.x / 16, mat.z / 16};
+	if (cam[0] < 0)
+		cam[0] -= 1.0;
+	if (cam[1] < 0)
+		cam[1] -= 1.0;
+	return (int[]){(int)cam[0], (int)cam[1]};
 }
 
 Chunk	*World::get(ChunkPos cp)
 {
-	unique_lock<mutex> lock(this->memoryMutex);
 	if (this->memoryChunks.count(cp) == 0)
 		return NULL;
-	return this->memoryChunks.at(cp); // Potentiellement optimisable
+	return this->memoryChunks.at(cp);
 }
 
 Chunk	*World::operator[](ChunkPos cp)
@@ -177,30 +223,31 @@ Chunk	*World::operator[](ChunkPos cp)
 	return this->get(cp);
 }
 
-void	World::pushInDisplay(Chunk* chunk)
+void	World::pushInDisplay(Chunk* chunk, bool alreadyLoad)
 {
 	Chunk*	tmp;
-	this->displayedMutex.lock();
+	ChunkPos chunkP;
+
 	pair<unordered_set<ChunkPos>::iterator, bool> ret(this->getDisplayedChunks().begin(), false);
-	this->displayedMutex.unlock();
-	int		i = 0;
+
+	unique_lock<mutex> lockMem(this->memoryMutex); // On check tout au long de la fonction si le chunk existe encore dans mem
+	if (!chunk)
+		return;
+	chunkP = chunk->getPos();
 
 	if (chunk->getFenced())
 	{
-		{	unique_lock<mutex> lock(this->displayedMutex);
-			ret = this->displayedChunks.insert(chunk->getPos()); 
-		}
-		if (ret.second)
+		ret = this->displayedChunks.insert(chunk->getPos());
+		if (ret.second && !alreadyLoad)
 			chunk->generateGraphics();
 	}
-	while (i < 4)
+	int		i = 0;
+	while (i < 4 && !alreadyLoad)
 	{
 		tmp = chunk->getNeighboor((Direction)i);
 		if (tmp && tmp->getFenced())
 		{
-			{	unique_lock<mutex> lock(this->displayedMutex);
-				ret = this->displayedChunks.insert(tmp->getPos());
-			}
+			ret = this->displayedChunks.insert(tmp->getPos());
 			if (ret.second)
 				tmp->generateGraphics();
 		}
@@ -210,22 +257,36 @@ void	World::pushInDisplay(Chunk* chunk)
 
 void	World::loadChunk(ChunkPos cp)
 {
-	// printf(YELLOW "%d %d\n" NA, cp.get(0), cp.get(1));
-	bool count;
-	{	unique_lock<mutex> lock(this->memoryMutex);
-		count = this->memoryChunks.count(cp);
-	}
-	if (count == 0)
-	{
-		Chunk	*newChunk = new Chunk(this, cp);
-		this->worldGen.genChunk(newChunk);
+	{unique_lock<mutex> lockDisp(this->displayedMutex);
+		if (this->displayedChunks.count(cp))
+			return;
+	} // Check s'il est deja afficher
+
+	Chunk	*newChunk = NULL;
+	// {
+		this->memoryMutex.lock(); // On check tout au long de la fonction si le chunk existe encore dans memory
+		std::map<ChunkPos, Chunk*>::iterator findChunk = this->memoryChunks.find(cp);
+		if (findChunk != this->memoryChunks.end())
 		{
-			unique_lock<mutex> lock(this->memoryMutex);
-			this->memoryChunks[cp] = newChunk;
+			this->memoryMutex.unlock();
+			newChunk = findChunk->second;
+			{unique_lock<mutex> lockDisp(this->displayedMutex);
+				this->pushInDisplay(newChunk, true);
+			}
+			return;
 		}
-		this->memoryChunks[cp]->updateFenced(1);
-		this->pushInDisplay(newChunk);
-	}
+		this->memoryMutex.unlock();
+	// }
+	newChunk = new Chunk(this, cp);
+	this->worldGen.genChunk(newChunk);
+	
+	{unique_lock<mutex> lockMem(this->memoryMutex);
+	this->memoryChunks.insert(std::pair<ChunkPos, Chunk*>(cp, newChunk));
+	this->memoryChunks[cp]->updateFenced(1);}
+	
+	{unique_lock<mutex> lockDisp(this->displayedMutex);
+		this->pushInDisplay(newChunk, false);}
+
 }
 
 map<ChunkPos, Chunk*>	&World::getMapMemory(void)
@@ -250,6 +311,6 @@ void	World::loadChunk(int x, int z)
 
 float	World::getDeltaFrameTime(void)
 {
-	unique_lock<mutex> lk(this->deltaFTMutex);
+	// unique_lock<mutex> lk(this->deltaFTMutex);
 	return (this->deltaFrameTime);
 }

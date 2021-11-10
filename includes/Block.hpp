@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:14:08 by gperez            #+#    #+#             */
-/*   Updated: 2021/10/08 19:03:02 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/10 15:09:37 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ enum	e_BlockType : char {
 	LOG,
 	LEAVES,
 	WATER,
+	SNOW
 	// COAL_ORE,
 	// IRON_ORE,
 	// GOLD_ORE,
@@ -39,9 +40,9 @@ enum	e_BlockType : char {
 
 enum	e_SkyDir : char {
 	SKY_DIR_FRONT,
-	SKY_DIR_RIGHT,
 	SKY_DIR_LEFT,
 	SKY_DIR_BACK,
+	SKY_DIR_RIGHT,
 	SKY_DIR_UP,
 	SKY_DIR_DOWN,
 };

@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2021/10/08 19:00:19 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/10 15:35:18 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,11 +48,12 @@ Chunk::~Chunk()
 }
 
 
-void	Chunk::fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, BlockPos posInMesh, unsigned char id)
+void	Chunk::fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, BlockPos posInMesh, t_id	id)
 {
 	int			iPt;
 	vbo_type	vboType;
-	short		idBitwise;
+	short		idTxtBitwise;
+	short		idBitwise = 0;
 
 	iPt = 0;
 	while (iPt < 6)
@@ -82,8 +83,9 @@ void	Chunk::fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, Blo
 			vboType.coords[0] = dir_c.pts[iPt].get(X);
 			vboType.coords[1] = dir_c.pts[iPt].get(Y);
 		}
-		idBitwise = id << 8;
-		vboType.meta = (int)vboType.meta | idBitwise;
+		idTxtBitwise = id.txt << 4;
+		idBitwise = id.type << 8;
+		vboType.meta = (int)vboType.meta | idTxtBitwise | idBitwise;
 		tempVbo.push_back(vboType);
 		iPt++;
 	}
@@ -104,8 +106,9 @@ bool		Chunk::canPrintBlock(vector<vbo_type> &tempVbo, BlockPos posInMesh)
 		if (!tmp || Block::isTransparentBlock(*tmp))
 		{
 			dir += 1 << i; //Faces visibles
-			this->fillTempVbo(tempVbo, (t_direction_consts)g_dir_c[i], posInMesh,
-				Textures::getIndexTxt((e_BlockType)this->getBlock(posInMesh).getInfo().id));
+			this->fillTempVbo(tempVbo, (t_direction_consts)g_dir_c[i], posInMesh, (t_id){
+				Textures::getIndexTxt((e_BlockType)this->getBlock(posInMesh).getInfo().id),
+					(e_BlockType)this->getBlock(posInMesh).getInfo().id});
 		}
 		i++;
 	}
@@ -233,6 +236,11 @@ bool	Chunk::getFenced(void)
 	return (this->state);
 }
 
+void	Chunk::setFenced(ChunkState f)
+{
+	this->state = f;
+}
+
 void		Chunk::updateFenced(int source)
 {
 	if (source)
@@ -306,11 +314,8 @@ void		Chunk::generateGraphics(unsigned int mesh)
 
 void		Chunk::generateGraphics(void)
 {
-	// ft_printf(ORANGE "Validating Chunk %d %d\n" NA, this->pos.get(0), this->pos.get(1));
 	for (unsigned i = 0; i < 16; i++)
-	{
 		validateMesh(i);
-	}
 }
 
 void		Chunk::displayChunk(Camera cam, Shader shader, Textures *t)
@@ -320,7 +325,6 @@ void		Chunk::displayChunk(Camera cam, Shader shader, Textures *t)
 
 	while (it != this->valid.end())
 	{
-		// ft_printf(CYAN "%d %u\n" NA, it->first, it->second);
 		glBindVertexArray(this->tabVao[(int)it->first]);
 		glUseProgram(shader.getProgram());
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),
