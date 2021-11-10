@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WorldGenerator.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
+/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/30 16:22:18 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/09 17:40:39 by karldouveno      ###   ########.fr       */
+/*   Updated: 2021/11/10 10:02:50 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,5 +28,6 @@ class WorldGenerator{
 		void genTest(Chunk*);
 		void genChunk(Chunk*);
 		void configure(unsigned long* seed);
+		int biomeHeight(ChunkPos pos, unsigned char biome, int x, int z);
 };
 #endif

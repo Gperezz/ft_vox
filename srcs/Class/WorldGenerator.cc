@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WorldGenerator.cc                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/02 08:06:26 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/10 15:50:45 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/10 17:12:59 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 WorldGenerator::WorldGenerator()
 {
 	this->seed = Rand<unsigned long>().generate();
-	this->tP = PerlinNoise(16, this->seed);
+	this->tP = PerlinNoise(1);
 	
 }
 
@@ -25,7 +25,7 @@ WorldGenerator::WorldGenerator(unsigned long* seed)
 		this->seed = Rand<unsigned long>().generate();
 	else
 		this->seed = *seed;
-	this->tP = PerlinNoise(16, this->seed);
+	this->tP = PerlinNoise(this->seed);
 }
 
 void	WorldGenerator::genTest(Chunk *chunk)
@@ -56,20 +56,129 @@ void	WorldGenerator::genTest(Chunk *chunk)
 		(t_block_info){0,0,0,0});
 }
 
+// int WorldGenerator::biomeHeight(ChunkPos pos, unsigned char biome, int x, int z)
+// {
+// 	PerlinNoise noise = PerlinNoise();
+// 	int height;
+
+// 	if (biome == WATER)
+// 	{
+// 		height = noise.perlin(1, 0.003, 3, pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX);
+// 		return(((height + 1) / 4) * 255);
+// 	}
+// 	if (biome == BEACH)
+// 	{
+// 		height = noise.perlin(1, 0.003, 3, pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX);
+// 		return(((height + 1) / 4) * 255);
+// 	}
+// 	if (biome == GRASS)
+// 	{
+// 		height = noise.perlin(1, 0.0003, 1, pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX);
+// 		return(((height + 1) / 2) * 255);
+		
+// 	}
+// 	if (biome == FOREST)
+// 	{
+// 		height = noise.perlin(1, 0.005, 1, pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX);
+// 		return(((height + 1) / 2) * 255);
+		
+// 	}
+// 	if (biome == STONE)
+// 	{
+// 		height = noise.perlin(1, 0.5, 3, pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX);
+// 		return(((height + 1) / 2) * 255);
+		
+// 	}
+// 	if (biome == SNOW)
+// 	{
+// 		height = noise.perlin(1, 0.5, 3, pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX);
+// 		return(((height + 1) / 2) * 255);
+		
+// 	}
+// 	if (biome == DESERT)
+// 	{
+// 		height = noise.perlin(1, 0.0005, 1, pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX);
+// 		return(((height + 1) / 2) * 255);
+		
+// 	}
+
+
+// }
+
+unsigned char blockColor(double biome, double elevation)
+{
+    if (elevation < -0.5)
+        return WATER;
+    if (elevation < -0.48)
+        return DIRT; //BEACH
+    if (elevation > 0.45) 
+    {
+        if (biome < 0.2)
+            return STONE;
+        return LEAVES;//SNOW
+    }
+    if (elevation < 0.3)
+    {
+        if (biome < -0.15)
+            return DIRT; //DESERT
+        if (biome < 0.1)
+            return GRASS;
+        if (biome < 0.4)
+            return GRASS;//FOREST
+    }
+    return GRASS;
+}
+//sand water snow stone grass dirt forest
+
+double elevation(double x, double z, double seed)
+{
+	PerlinNoise noise = PerlinNoise(seed);
+	double e = (1.00 * noise.perlin(1, 0.005, 3, x, z)
+		+ 0.50 * noise.perlin(1, 0.005, 3, 2 * x, 2 * z)
+		+ 0.25 * noise.perlin(1, 0.005, 3, 3 * x, 3 * z)
+		+ 0.13 * noise.perlin(1, 0.005, 3, 4 * x, 4 * z)
+		+ 0.06 * noise.perlin(1, 0.005, 3, 5 * x, 5 * z)
+		+ 0.03 * noise.perlin(1, 0.005, 3, 6 * x, 6 * z)
+	);
+    e = e / (1.00 + 0.50 + 0.25 + 0.13 + 0.06 + 0.03);
+    e = pow(e, 2.00);
+    return (e);
+}
+
+double moisure(double x, double z, double seed)
+{
+	PerlinNoise noise = PerlinNoise();
+	double m = (1.00 * noise.perlin(1, 1.0, 3, x, z)
+		+ 0.75 * noise.perlin(1, 1.0, 3, 2 * x, 2 * z)
+		+ 0.33 * noise.perlin(1, 1.0, 3, 3 * x, 3 * z)
+		+ 0.33 * noise.perlin(1, 1.0, 3, 4 * x, 4 * z)
+		+ 0.33 * noise.perlin(1, 1.0, 3, 5 * x, 5 * z)
+		+ 0.50 * noise.perlin(1, 1.0, 3, 6 * x, 6 * z)
+	);
+    m = m / (1.00 + 0.75 + 0.33 + 0.33 + 0.33 + 0.50);
+	return(m);
+}
 void	WorldGenerator::genChunk(Chunk *chunk)
 {
+	// printf("x:\n");
 	for (int x = 0; x < 16; x++){
+		// printf("z: ");
 		for (int z = 0; z < 16; z++){
+			
 			ChunkPos pos = chunk->getPos();
-			float perlinNoise = tP(0.0f, pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX);
-			int height = (int)((perlinNoise + 1.0f) * 10) + 20;
-			int y = 0;
-			for (; y < height; y++) {
-				chunk->setBlock(BlockPos((int[4]){y / 16, x, y % 16, z}),
-						(t_block_info){DIRT,0,0,0});
-			}
+			double e = elevation(pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX, 1567612511);
+			double m = elevation(pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX, 3);
+			double height = ((e + 1) / 2) * 255;
+			unsigned char type = blockColor(m, e);
+			// printf("%f, \n", height);
+			for (int y = 0; y < height; y++)  { // (-1,  1) -> (0,255)
+				chunk->setBlock(BlockPos((int[4]){y / 16, x, y % 16, z}), //my [0,16], 
+						(t_block_info){type,0,0,0});
+			}	
 		}
+		// printf("\n");
 	}
+	// printf("\n");
 }
 
 void	WorldGenerator::configure(unsigned long* seed)
