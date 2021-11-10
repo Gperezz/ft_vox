@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/09 19:56:13 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/10 12:36:53 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,15 +113,6 @@ void	World::deleteFar()
 			|| chunkP.get(1) > pos.get(1) + CHK_DEL_DIST_MEM)
 		{
 			Chunk* delChunk = it->second;
-			Chunk* neighboor;
-			if ((neighboor = delChunk->getNeighboor(NORTH)))
-				neighboor->setFenced((ChunkState)0);
-			if ((neighboor = delChunk->getNeighboor(SOUTH)))
-				neighboor->setFenced((ChunkState)0);
-			if ((neighboor = delChunk->getNeighboor(EAST)))
-				neighboor->setFenced((ChunkState)0);
-			if ((neighboor = delChunk->getNeighboor(WEST)))
-				neighboor->setFenced((ChunkState)0);
 			delete delChunk;
 			this->memoryChunks.erase(it->first);
 		}
@@ -138,7 +129,7 @@ void	World::deleteFarInDisplay()
 	if (pos == prevPos)
 		return ;
 
-	unique_lock<mutex> lockQueue(this->queueMutex);
+	{unique_lock<mutex> lockQueue(this->queueMutex);
 	for (auto it = this->loadQueue.begin(); it != this->loadQueue.end(); it++)
 	{
 		chunkP = *it;
@@ -146,10 +137,10 @@ void	World::deleteFarInDisplay()
 			|| chunkP.get(0) > pos.get(0) + CHK_DEL_DIST
 			|| chunkP.get(1) < pos.get(1) - CHK_DEL_DIST
 			|| chunkP.get(1) > pos.get(1) + CHK_DEL_DIST)
-			this->loadQueue.erase(chunkP);
-	}
+				this->loadQueue.erase(chunkP);
+	}}
 
-	unique_lock<mutex> lock(this->displayedMutex);
+	{unique_lock<mutex> lock(this->displayedMutex);
 	for (auto it = this->displayedChunks.begin(); it != this->displayedChunks.end(); it++)
 	{
 		chunkP = *it;
@@ -157,8 +148,8 @@ void	World::deleteFarInDisplay()
 			|| chunkP.get(0) > pos.get(0) + CHK_DEL_DIST
 			|| chunkP.get(1) < pos.get(1) - CHK_DEL_DIST
 			|| chunkP.get(1) > pos.get(1) + CHK_DEL_DIST)
-			this->displayedChunks.erase(it);
-	}
+				this->displayedChunks.erase(it);
+	}}
 	pos = prevPos;
 }
 
@@ -228,7 +219,7 @@ Chunk	*World::operator[](ChunkPos cp)
 	return this->get(cp);
 }
 
-void	World::pushInDisplay(Chunk* chunk)
+void	World::pushInDisplay(Chunk* chunk, bool alreadyLoad)
 {
 	Chunk*	tmp;
 	ChunkPos chunkP;
@@ -243,11 +234,11 @@ void	World::pushInDisplay(Chunk* chunk)
 	if (chunk->getFenced())
 	{
 		ret = this->displayedChunks.insert(chunk->getPos());
-		if (ret.second)
+		if (ret.second && !alreadyLoad)
 			chunk->generateGraphics();
 	}
 	int		i = 0;
-	while (i < 4)
+	while (i < 4 && !alreadyLoad)
 	{
 		tmp = chunk->getNeighboor((Direction)i);
 		if (tmp && tmp->getFenced())
@@ -268,18 +259,20 @@ void	World::loadChunk(ChunkPos cp)
 	} // Check s'il est deja afficher
 
 	Chunk	*newChunk = NULL;
-	{
-		unique_lock<mutex> lockMem(this->memoryMutex); // On check tout au long de la fonction si le chunk existe encore dans memory
+	// {
+		this->memoryMutex.lock(); // On check tout au long de la fonction si le chunk existe encore dans memory
 		std::map<ChunkPos, Chunk*>::iterator findChunk = this->memoryChunks.find(cp);
 		if (findChunk != this->memoryChunks.end())
 		{
-			// this->memoryChunks[cp]->updateFenced(1);
-			// {unique_lock<mutex> lockDisp(this->displayedMutex);
-			// 	this->pushInDisplay(findChunk->second);
-			// }
+			this->memoryMutex.unlock();
+			newChunk = findChunk->second;
+			{unique_lock<mutex> lockDisp(this->displayedMutex);
+				this->pushInDisplay(newChunk, true);
+			}
 			return;
 		}
-	}
+		this->memoryMutex.unlock();
+	// }
 	newChunk = new Chunk(this, cp);
 	this->worldGen.genChunk(newChunk);
 	
@@ -288,7 +281,7 @@ void	World::loadChunk(ChunkPos cp)
 	this->memoryChunks[cp]->updateFenced(1);}
 	
 	{unique_lock<mutex> lockDisp(this->displayedMutex);
-		this->pushInDisplay(newChunk);}
+		this->pushInDisplay(newChunk, false);}
 
 }
 
