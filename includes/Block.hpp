@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:14:08 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/04 15:12:23 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/10 15:09:37 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ enum	e_BlockType : char {
 	LOG,
 	LEAVES,
 	WATER,
+	SNOW
 	// COAL_ORE,
 	// IRON_ORE,
 	// GOLD_ORE,

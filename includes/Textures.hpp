@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/13 17:42:19 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/04 15:12:38 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/10 14:37:50 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,12 @@ typedef struct s_txt_path
 	e_BlockType		type;
 	char			path_txt[34];
 }				t_txt_path;
+
+typedef struct s_id
+{
+	e_txt		txt;
+	e_BlockType	type;
+}				t_id;
 
 static t_txt_path g_txt_path[] = {
 	{DIRT_T, DIRT, "textures/blocks/dirt.png"},

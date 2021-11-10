@@ -1,7 +1,5 @@
 #version 410 core
 
-#define DIRT 0
-
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNorm;
 layout (location = 2) in vec2 aCoords;
@@ -11,10 +9,20 @@ uniform mat4	view;
 uniform mat4	projection;
 uniform int		nbTxt;
 
+#define		AIR 0
+#define		STONE 1
+#define		DIRT 2
+#define		GRASS 3
+#define		LOG 4
+#define		LEAVES 5
+#define		WATER 6
+#define		SNOW 7
+
 out vec3	normal;
 out vec3	vecToLight;
 out vec2	tCoords;
-out float	typeF;
+out float	textureType;
+out float	type;
 
 void main()
 {
@@ -23,14 +31,15 @@ void main()
 	vec3	lightP = vec3(1., 1., -0.4);
 
 	dir = int(meta) & 7;
-	typeF = int(meta) >> 8;
-	if (typeF == DIRT && dir == 2)
-		typeF++;
-	else if (typeF == DIRT && dir != 2 && dir != 5)
-		typeF += 2;
+	textureType = (int(meta) >> 4) & 4;
+	type = int(meta) >> 8;
+	if (dir == 2 && (type == DIRT || type == SNOW))
+		textureType++;
+	else if (type == DIRT && dir != 2 && dir != 5)
+		textureType += 2;
 	pos4 = vec4(aPos.xyz, 1.0);
 	tCoords = aCoords;
-	tCoords.y = (tCoords.y / nbTxt) + (1.0 / nbTxt) * typeF;
+	tCoords.y = (tCoords.y / nbTxt) + (1.0 / nbTxt) * textureType;
 	normal = aNorm;
 	vecToLight = normalize(lightP);
 	gl_Position = projection * view * pos4;

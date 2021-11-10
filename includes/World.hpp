@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:08:20 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/10 12:34:15 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/10 12:46:16 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,9 @@
 # include "Engine.hpp"
 # include "Chunk.hpp"
 # include "WorldGenerator.hpp"
-# define CHK_RND_DIST 4
-# define CHK_DEL_DIST 4
-# define CHK_DEL_DIST_MEM 16
+# define CHK_RND_DIST 2
+# define CHK_DEL_DIST 3
+# define CHK_DEL_DIST_MEM 4
 
 using namespace std;
 using ChunkPos = Coords::Coords<int, 2>;

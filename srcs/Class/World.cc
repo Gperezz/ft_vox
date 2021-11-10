@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/10 12:36:53 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/10 14:11:05 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,8 +113,12 @@ void	World::deleteFar()
 			|| chunkP.get(1) > pos.get(1) + CHK_DEL_DIST_MEM)
 		{
 			Chunk* delChunk = it->second;
+			std::cout << RED << "Chunk " << chunkP.get(0) << " " << chunkP.get(1) << "\n";
+
 			delete delChunk;
-			this->memoryChunks.erase(it->first);
+			this->memoryChunks[chunkP] = NULL;
+			// this->memoryChunks[chunkP]->updateFenced(1); // mettre un delete updateFenced
+			this->memoryChunks.erase(chunkP);
 		}
 	}
 	pos = prevPos;
