@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 20:41:33 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/04 15:19:07 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/11 12:53:58 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ static t_direction_consts	g_dir_c[] = {
 };
 
 struct	vbo_type {
-	float			tab[3];
+	float			pos[3];
 	float			normal[3];
 	float			coords[2];
 	float			meta;

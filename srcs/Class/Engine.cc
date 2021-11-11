@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/09 19:09:11 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/11 12:55:10 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -254,9 +254,9 @@ static void	fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, uns
 
 	for (iPt = 0; iPt < 6; iPt++)
 	{
-		vboType.tab[0] = dir_c.pts[iPt].get(X);
-		vboType.tab[1] = dir_c.pts[iPt].get(Y);
-		vboType.tab[2] = dir_c.pts[iPt].get(Z);
+		vboType.pos[0] = dir_c.pts[iPt].get(X);
+		vboType.pos[1] = dir_c.pts[iPt].get(Y);
+		vboType.pos[2] = dir_c.pts[iPt].get(Z);
 		vboType.meta = dir_c.axis < 0 ? dir_c.axis + 7 : dir_c.axis;
 		if (vboType.meta == 1 || vboType.meta == 6) // X et -X
 		{

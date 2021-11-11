@@ -28,7 +28,7 @@ void main()
 {
 	vec4	pos4;
 	int		dir;
-	vec3	lightP = vec3(1., 1., -0.4);
+	vec3	lightP = vec3(0., 100., 0.);
 
 	dir = int(meta) & 7;
 	textureType = (int(meta) >> 3) & 31;
