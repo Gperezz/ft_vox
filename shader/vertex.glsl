@@ -31,8 +31,8 @@ void main()
 	vec3	lightP = vec3(1., 1., -0.4);
 
 	dir = int(meta) & 7;
-	textureType = (int(meta) >> 4) & 32;
-	type = int(meta) >> 12;
+	textureType = (int(meta) >> 3) & 31;
+	type = int(meta) >> 8;
 	if (dir == 2 && (type == DIRT || type == SNOW))
 		textureType++;
 	else if (type == DIRT && dir != 2 && dir != 5)
