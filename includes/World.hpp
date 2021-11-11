@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   World.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:08:20 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/10 12:46:16 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/11 11:15:41 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,8 @@
 # include "Engine.hpp"
 # include "Chunk.hpp"
 # include "WorldGenerator.hpp"
-# define CHK_RND_DIST 2
-# define CHK_DEL_DIST 3
+# define CHK_RND_DIST 10
+# define CHK_DEL_DIST 10
 # define CHK_DEL_DIST_MEM 4
 
 using namespace std;

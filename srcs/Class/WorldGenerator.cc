@@ -6,7 +6,7 @@
 /*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/02 08:06:26 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/10 17:12:59 by maiwenn          ###   ########.fr       */
+/*   Updated: 2021/11/11 11:14:58 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,17 +107,17 @@ void	WorldGenerator::genTest(Chunk *chunk)
 
 unsigned char blockColor(double biome, double elevation)
 {
-    if (elevation < -0.5)
+    if (elevation < 0.50)
         return WATER;
-    if (elevation < -0.48)
+    if (elevation < 0.51)
         return DIRT; //BEACH
-    if (elevation > 0.45) 
+    if (elevation > 0.60) 
     {
         if (biome < 0.2)
             return STONE;
-        return LEAVES;//SNOW
+        return SNOW;//SNOW
     }
-    if (elevation < 0.3)
+    if (elevation < 0.55)
     {
         if (biome < -0.15)
             return DIRT; //DESERT
@@ -133,14 +133,14 @@ unsigned char blockColor(double biome, double elevation)
 double elevation(double x, double z, double seed)
 {
 	PerlinNoise noise = PerlinNoise(seed);
-	double e = (1.00 * noise.perlin(1, 0.005, 3, x, z)
-		+ 0.50 * noise.perlin(1, 0.005, 3, 2 * x, 2 * z)
-		+ 0.25 * noise.perlin(1, 0.005, 3, 3 * x, 3 * z)
-		+ 0.13 * noise.perlin(1, 0.005, 3, 4 * x, 4 * z)
-		+ 0.06 * noise.perlin(1, 0.005, 3, 5 * x, 5 * z)
-		+ 0.03 * noise.perlin(1, 0.005, 3, 6 * x, 6 * z)
+	double e = (5.00 * noise.perlin(1, 0.05, 8, x, z) 
+		+ 4.50 * noise.perlin(1, 0.01, 1, 2 * x, 2 * z)
+		+ 3.25 * noise.perlin(1, 0.005, 2, 3 * x, 3 * z)
+		+ 2.13 * noise.perlin(1, 0.004, 6, 4 * x, 4 * z)
+		+ 1.06 * noise.perlin(1, 0.03, 1, 5 * x, 5 * z)
+		+ 0.03 * noise.perlin(1, 0.01, 6, 6 * x, 6 * z)
 	);
-    e = e / (1.00 + 0.50 + 0.25 + 0.13 + 0.06 + 0.03);
+    e = e / (5.00 + 4.50 + 3.25 + 2.13 + 1.06 + 0.03);
     e = pow(e, 2.00);
     return (e);
 }
@@ -149,11 +149,11 @@ double moisure(double x, double z, double seed)
 {
 	PerlinNoise noise = PerlinNoise();
 	double m = (1.00 * noise.perlin(1, 1.0, 3, x, z)
-		+ 0.75 * noise.perlin(1, 1.0, 3, 2 * x, 2 * z)
-		+ 0.33 * noise.perlin(1, 1.0, 3, 3 * x, 3 * z)
-		+ 0.33 * noise.perlin(1, 1.0, 3, 4 * x, 4 * z)
-		+ 0.33 * noise.perlin(1, 1.0, 3, 5 * x, 5 * z)
-		+ 0.50 * noise.perlin(1, 1.0, 3, 6 * x, 6 * z)
+		// + 0.75 * noise.perlin(1, 1.0, 3, 2 * x, 2 * z)
+		// + 0.33 * noise.perlin(1, 1.0, 3, 3 * x, 3 * z)
+		// + 0.33 * noise.perlin(1, 1.0, 3, 4 * x, 4 * z)
+		// + 0.33 * noise.perlin(1, 1.0, 3, 5 * x, 5 * z)
+		// + 0.50 * noise.perlin(1, 1.0, 3, 6 * x, 6 * z)
 	);
     m = m / (1.00 + 0.75 + 0.33 + 0.33 + 0.33 + 0.50);
 	return(m);
