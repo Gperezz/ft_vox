@@ -6,7 +6,7 @@
 /*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/02 08:06:26 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/11 11:14:58 by maiwenn          ###   ########.fr       */
+/*   Updated: 2021/11/11 15:46:32 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,28 +105,28 @@ void	WorldGenerator::genTest(Chunk *chunk)
 
 // }
 
-unsigned char blockColor(double biome, double elevation)
+unsigned char blockColor(double moisure, double elevation)
 {
-    if (elevation < 0.50)
+    if (elevation < 129)
         return WATER;
-    if (elevation < 0.51)
-        return DIRT; //BEACH
-    if (elevation > 0.60) 
+    if (elevation < 130)
+        return SAND; //BEACH
+    if (elevation > 140) 
     {
-        if (biome < 0.2)
+        if (moisure < 130)
             return STONE;
         return SNOW;//SNOW
     }
-    if (elevation < 0.55)
+    if (elevation < 197)
     {
-        if (biome < -0.15)
-            return DIRT; //DESERT
-        if (biome < 0.1)
-            return GRASS;
-        if (biome < 0.4)
-            return GRASS;//FOREST
+        if (moisure < 108)
+            return SAND; //DESERT
+        if (moisure < 114)
+            return DIRT;
+        if (moisure < 76)
+            return DIRT;//FOREST
     }
-    return GRASS;
+    return DIRT;
 }
 //sand water snow stone grass dirt forest
 
@@ -138,9 +138,9 @@ double elevation(double x, double z, double seed)
 		+ 3.25 * noise.perlin(1, 0.005, 2, 3 * x, 3 * z)
 		+ 2.13 * noise.perlin(1, 0.004, 6, 4 * x, 4 * z)
 		+ 1.06 * noise.perlin(1, 0.03, 1, 5 * x, 5 * z)
-		+ 0.03 * noise.perlin(1, 0.01, 6, 6 * x, 6 * z)
+		// + 0.03 * noise.perlin(1, 0.01, 6, 6 * x, 6 * z)
 	);
-    e = e / (5.00 + 4.50 + 3.25 + 2.13 + 1.06 + 0.03);
+    e = e / (5.00 + 4.50 + 3.25 + 2.13 + 1.06 /*+ 0.03*/);
     e = pow(e, 2.00);
     return (e);
 }
@@ -155,7 +155,7 @@ double moisure(double x, double z, double seed)
 		// + 0.33 * noise.perlin(1, 1.0, 3, 5 * x, 5 * z)
 		// + 0.50 * noise.perlin(1, 1.0, 3, 6 * x, 6 * z)
 	);
-    m = m / (1.00 + 0.75 + 0.33 + 0.33 + 0.33 + 0.50);
+    // m = m / (1.00 + 0.75 + 0.33 + 0.33 + 0.33 + 0.50);
 	return(m);
 }
 void	WorldGenerator::genChunk(Chunk *chunk)
@@ -168,12 +168,28 @@ void	WorldGenerator::genChunk(Chunk *chunk)
 			ChunkPos pos = chunk->getPos();
 			double e = elevation(pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX, 1567612511);
 			double m = elevation(pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX, 3);
-			double height = ((e + 1) / 2) * 255;
+			e = ((e + 1) / 2) * 255;
+			m = ((m + 1) / 2) * 255;
 			unsigned char type = blockColor(m, e);
 			// printf("%f, \n", height);
-			for (int y = 0; y < height; y++)  { // (-1,  1) -> (0,255)
+			
+			if (type == WATER)
+			{
+				for (int y = 0; y < e; y++)  { // (-1,  1) -> (0,255)
 				chunk->setBlock(BlockPos((int[4]){y / 16, x, y % 16, z}), //my [0,16], 
-						(t_block_info){type,0,0,0});
+						(t_block_info){SAND,0,0,0});
+				}
+				for (int y = e; y < 130; y++) {
+					chunk->setBlock(BlockPos((int[4]){y / 16, x, y % 16, z}), //my [0,16], 
+							(t_block_info){WATER,0,0,0});
+				}
+			}
+			else
+			{
+				for (int y = 0; y < e; y++)  { // (-1,  1) -> (0,255)
+					chunk->setBlock(BlockPos((int[4]){y / 16, x, y % 16, z}), //my [0,16], 
+							(t_block_info){type,0,0,0});
+				}
 			}	
 		}
 		// printf("\n");
