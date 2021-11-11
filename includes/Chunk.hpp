@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:17:27 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/10 14:40:24 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/11 16:38:09 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,6 @@ class Chunk{
 		unsigned int					tabVao[16];
 		unsigned int					tabVbo[16];
 		std::map<char, unsigned int>	valid;
-		// unsigned int	ebo[16];
 		ChunkPos						pos;
 		// Biome						biome;
 		// Geomorph						geomoprh;
@@ -90,7 +89,6 @@ class Chunk{
 		ChunkPos						getPos(void);
 		bool							getFenced(void);
 		void							updateFenced(int source);
-		void							setFenced(ChunkState f);
 
 		Chunk							*getNeighboor(Direction);
 		Block							*getBlockNeighboor(BlockPos, Direction);

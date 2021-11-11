@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2021/10/12 12:10:56 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/11 16:50:04 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ void	exec(World &world, Engine &env, TimeMs time)
 		|| checkMouse(env, GLFW_MOUSE_BUTTON_2))
 		return ;
 	env.rayCasting(world.getMapMemory().at(env.getCam().getCurrentChunkPos()),
-		world.getMapMemory());
+		world.getMapMemory()); // A deplacer
 	world.display(env, time.getTimeSeconds());
 	idx = env.getNbTextures() - 1;
 	t = env.getTexture(idx);

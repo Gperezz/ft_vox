@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/10 14:11:05 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/11 16:47:33 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,8 @@ void	World::initQueueSorter()
 	this->loadQueue = set<ChunkPos, function<bool (ChunkPos, ChunkPos)>>(cmp);
 }
 
-bool	World::LoadNextQueuedChunk(){
+bool	World::LoadNextQueuedChunk()
+{
 	size_t size;
 	{
 		unique_lock<mutex> lock(this->queueMutex);
@@ -114,6 +115,7 @@ void	World::deleteFar()
 		{
 			Chunk* delChunk = it->second;
 			std::cout << RED << "Chunk " << chunkP.get(0) << " " << chunkP.get(1) << "\n";
+			std::cout << GREEN << this->memoryChunks.count(chunkP) << "\n";
 
 			delete delChunk;
 			this->memoryChunks[chunkP] = NULL;
@@ -184,7 +186,7 @@ void	World::display(Engine &e, float currentFrameTime)
 {
 	this->rearrangeQueues();
 	this->deleteFarInDisplay();
-	// this->deleteFar();
+	this->deleteFar();
 
 	this->LoadNextQueuedChunk();
 	if (e.isSkybox() && e.getTexture(1))
@@ -193,8 +195,17 @@ void	World::display(Engine &e, float currentFrameTime)
 	// unique_lock<mutex> lk2(this->deltaFTMutex);
 	unique_lock<mutex> lk3(this->memoryMutex);
 	
+	Textures	*texture = e.getTexture(0);
+	Shader		&shader = e.getShader();
+	Camera		cam = e.getCam();
+
+	std::map<ChunkPos, Chunk*>::iterator	chunk;
 	for (auto it = this->displayedChunks.begin(); it != this->displayedChunks.end(); it++)
-		this->memoryChunks.at(*it)->displayChunk(e.getCam(), e.getShader(), e.getTexture(0));
+	{
+		chunk = this->memoryChunks.find(*it);
+		if (chunk != this->memoryChunks.end())
+			chunk->second->displayChunk(cam, shader, texture);
+	}
 	this->deltaFrameTime = currentFrameTime - this->lastFrameTime;
 	this->lastFrameTime = currentFrameTime;
 }
@@ -228,9 +239,8 @@ void	World::pushInDisplay(Chunk* chunk, bool alreadyLoad)
 	Chunk*	tmp;
 	ChunkPos chunkP;
 
-	pair<unordered_set<ChunkPos>::iterator, bool> ret(this->getDisplayedChunks().begin(), false);
+	pair<unordered_set<ChunkPos>::iterator, bool> ret(this->displayedChunks.begin(), false);
 
-	unique_lock<mutex> lockMem(this->memoryMutex); // On check tout au long de la fonction si le chunk existe encore dans mem
 	if (!chunk)
 		return;
 	chunkP = chunk->getPos();
@@ -263,20 +273,18 @@ void	World::loadChunk(ChunkPos cp)
 	} // Check s'il est deja afficher
 
 	Chunk	*newChunk = NULL;
-	// {
-		this->memoryMutex.lock(); // On check tout au long de la fonction si le chunk existe encore dans memory
+	{unique_lock<mutex> lockMem(this->memoryMutex); // On check tout au long de la fonction si le chunk existe encore dans memory
 		std::map<ChunkPos, Chunk*>::iterator findChunk = this->memoryChunks.find(cp);
 		if (findChunk != this->memoryChunks.end())
 		{
-			this->memoryMutex.unlock();
+			this->memoryChunks[cp]->updateFenced(1);
 			newChunk = findChunk->second;
 			{unique_lock<mutex> lockDisp(this->displayedMutex);
 				this->pushInDisplay(newChunk, true);
 			}
 			return;
 		}
-		this->memoryMutex.unlock();
-	// }
+	}
 	newChunk = new Chunk(this, cp);
 	this->worldGen.genChunk(newChunk);
 	

@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/11 13:10:42 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/11 16:37:32 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -234,11 +234,6 @@ ChunkPos	Chunk::getPos(void)
 bool	Chunk::getFenced(void)
 {
 	return (this->state);
-}
-
-void	Chunk::setFenced(ChunkState f)
-{
-	this->state = f;
 }
 
 void		Chunk::updateFenced(int source)
