@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/11 12:54:08 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/11 13:10:42 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,9 +62,9 @@ void	Chunk::fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, Blo
 		vboType.pos[1] = dir_c.pts[iPt].get(Y) + posInMesh.get(Y) + posInMesh.get(MY) * 16;
 		vboType.pos[2] = dir_c.pts[iPt].get(Z) + posInMesh.get(Z) + this->getPos().get(1) * 16;
 
-		vboType.normal[0] = dir_c.pts[iPt].get(X) - LENGTH_BLOCK / 2; // On pourra le mettre en brut dans le header
-		vboType.normal[1] = dir_c.pts[iPt].get(Y) - LENGTH_BLOCK / 2;
-		vboType.normal[2] = dir_c.pts[iPt].get(Z) - LENGTH_BLOCK / 2;
+		vboType.normal[0] = dir_c.pts[iPt].get(X) - (float)LENGTH_BLOCK / 2.; // On pourra le mettre en brut dans le header
+		vboType.normal[1] = dir_c.pts[iPt].get(Y) - (float)LENGTH_BLOCK / 2.;
+		vboType.normal[2] = dir_c.pts[iPt].get(Z) - (float)LENGTH_BLOCK / 2.;
 	
 		vboType.meta = dir_c.axis < 0 ? dir_c.axis + 7 : dir_c.axis;
 
