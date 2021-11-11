@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/10 15:56:52 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/11 11:08:31 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,8 +83,8 @@ void	Chunk::fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, Blo
 			vboType.coords[0] = dir_c.pts[iPt].get(X);
 			vboType.coords[1] = dir_c.pts[iPt].get(Y);
 		}
-		idTxtBitwise = id.txt << 4;
-		idBitwise = id.type << 12;
+		idTxtBitwise = id.txt << 3;
+		idBitwise = id.type << 8;
 		vboType.meta = (int)vboType.meta | idTxtBitwise | idBitwise;
 		tempVbo.push_back(vboType);
 		iPt++;
