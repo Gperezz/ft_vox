@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/04 23:19:34 by gperez            #+#    #+#             */
-/*   Updated: 2021/10/08 19:12:35 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/11 19:37:49 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,20 +100,20 @@ void		Mat::printMatrix(bool calc)
 
 void		Mat::translate(glm::vec3 v)
 {
-	std::unique_lock<std::mutex> lk(this->translateMutex);
+	// std::unique_lock<std::mutex> lk(this->translateMutex);
 	Mat::trans += v;
 }
 
 void		Mat::setTranslate(glm::vec3 v)
 {
-	std::unique_lock<std::mutex> lk(this->translateMutex);
+	// std::unique_lock<std::mutex> lk(this->translateMutex);
 	Mat::trans = v;
 }
 
 glm::vec3	Mat::getTranslate(void)
 {
 	glm::vec3 out;
-	std::unique_lock<std::mutex> lk(this->translateMutex);
+	// std::unique_lock<std::mutex> lk(this->translateMutex);
 	out = Mat::trans;
 	return (out);
 }

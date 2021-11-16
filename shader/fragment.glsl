@@ -32,7 +32,7 @@ void	main()
 	vec4	textureColor;
 	vec4	colorAddedTexture = vec4(1.0, 1.0, 1.0, 1.0);
 
-	brightness = max(dot(normalize(vecToLight), normalize(normal)), 0.2);
+	brightness = clamp(dot(normal, vecToLight) + 0.1, 0.2, 1.);
 	diffuse = brightness * lightColor;
 	textureColor = texture(basicTexture, tCoords);
 	if (textureColor.w < 0.9)

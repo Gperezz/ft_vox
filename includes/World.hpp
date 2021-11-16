@@ -6,7 +6,7 @@
 /*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:08:20 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/11 11:15:41 by maiwenn          ###   ########.fr       */
+/*   Updated: 2021/11/16 15:48:39 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,9 @@
 # include "Engine.hpp"
 # include "Chunk.hpp"
 # include "WorldGenerator.hpp"
-# define CHK_RND_DIST 10
-# define CHK_DEL_DIST 10
-# define CHK_DEL_DIST_MEM 4
+# define CHK_RND_DIST 4
+# define CHK_DEL_DIST 6
+# define CHK_DEL_DIST_MEM 8
 
 using namespace std;
 using ChunkPos = Coords::Coords<int, 2>;
@@ -37,14 +37,14 @@ class World
 {
 	private:
 		bool					queueOn;
-		thread					queueThread;
 		mutex					queueMutex;
 		mutex					memoryMutex;
 		mutex					displayedMutex;
+		mutex					graphicMutex;
 		set<ChunkPos, function<bool (ChunkPos, ChunkPos)>>	loadQueue;
 		map<ChunkPos, Chunk*>	memoryChunks;
-		// set<ChunkPos>			graphicQueue;
 		unordered_set<ChunkPos>	displayedChunks;
+		unordered_set<Chunk*>	graphicQueue;
 		WorldGenerator			worldGen;
 		Engine&					enginePtr;
 		string					path;
@@ -52,7 +52,10 @@ class World
 		float					lastFrameTime;
 		// mutex					deltaFTMutex;
 	
+		bool					isLoadable(ChunkPos &pos);
 		void					pushInDisplay(Chunk* chunk, bool alreadyLoad);
+		void					loadGraphics(void);
+
 	public:
 							World(Engine& engine, unsigned long* = NULL);
 							World(Engine& engine, string&, unsigned long* = NULL);
@@ -60,10 +63,11 @@ class World
 							// World(string )
 							~World();
 
-	
+	void					test();
+	void					test2();
 	void					initQueueThread();
 	void					initQueueSorter();
-	bool					LoadNextQueuedChunk();
+	void					LoadNextQueuedChunk();
 	ChunkPos				getCameraChunkPos();
 	void					rearrangeQueues();
 	void					deleteFarInDisplay();

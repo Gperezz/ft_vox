@@ -77,7 +77,7 @@ void	exec(World &world, Engine &env, TimeMs time)
 		|| checkMouse(env, GLFW_MOUSE_BUTTON_2))
 		return ;
 	// env.rayCasting(world.getMapMemory().at(env.getCam().getCurrentChunkPos()),
-		// world.getMapMemory());
+	// 	world.getMapMemory()); // A deplacer  FAIT SEGFAULT QUAND LE CHUNK OU L ON SE TROUVE N EST PAS GENERER
 	world.display(env, time.getTimeSeconds());
 	idx = env.getNbTextures() - 1;
 	t = env.getTexture(idx);
