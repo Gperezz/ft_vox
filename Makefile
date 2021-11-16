@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: gperez <gperez@student.42.fr>              +#+  +:+       +#+         #
+#    By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/10/10 18:22:58 by gperez            #+#    #+#              #
-#    Updated: 2021/11/09 19:08:11 by gperez           ###   ########.fr        #
+#    Updated: 2021/11/10 17:12:11 by maiwenn          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,7 @@ NAME = ft_vox
 
 FLAGCPP = -std=c++11
 
-FLAG = -Wall -Werror -Wextra
+FLAG = -Wall # -Werror -Wextra
 
 FLAG_OPENGL = -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo
 
@@ -35,6 +35,7 @@ SRC =	srcs/main.cc \
 		srcs/Class/TimeMs.cc \
 		srcs/Class/Hud.cc \
 		srcs/Class/Element.cc \
+		srcs/Class/Perlin.cc
 
 NC = \033[0m
 BOLD =\033[1m

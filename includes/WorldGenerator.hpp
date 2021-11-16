@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WorldGenerator.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: karldouvenot <karldouvenot@student.42.f    +#+  +:+       +#+        */
+/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/30 16:22:18 by gperez            #+#    #+#             */
-/*   Updated: 2020/10/09 17:40:39 by karldouveno      ###   ########.fr       */
+/*   Updated: 2021/11/12 10:38:21 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,20 @@
 # include "Chunk.hpp"
 # include "Perlin.hpp"
 
+enum Biome : char{
+	OCEAN,
+	BEACH,
+	FOREST,
+	GRASSLAND,
+	DESERT,
+	MOUNTAIN,
+};
+
 class WorldGenerator{
 	private:
 		unsigned long	seed;
 		PerlinNoise		tP;
+		Biome			biome;
 	public:
 		WorldGenerator();
 		WorldGenerator(unsigned long* seed);
@@ -28,5 +38,7 @@ class WorldGenerator{
 		void genTest(Chunk*);
 		void genChunk(Chunk*);
 		void configure(unsigned long* seed);
+		int biomeHeight(ChunkPos pos, unsigned char biome, int x, int z);
+		unsigned char blockColor(double moisure, double elevation);
 };
 #endif

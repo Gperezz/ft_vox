@@ -22,6 +22,7 @@ vec3	convertRGB(vec3 rgb)
 #define		LEAVES 5
 #define		WATER 6
 #define		SNOW 7
+#define		SAND 8
 
 void	main()
 {
@@ -29,7 +30,7 @@ void	main()
 	vec3	lightColor = vec3(1.0, 1.0, 1.0);
 	vec3	diffuse;
 	vec4	textureColor;
-	vec3	colorAddedTexture = vec3(1.0, 1.0, 1.0);
+	vec4	colorAddedTexture = vec4(1.0, 1.0, 1.0, 1.0);
 
 	brightness = clamp(dot(normal, vecToLight) + 0.1, 0.2, 1.);
 	diffuse = brightness * lightColor;
@@ -37,8 +38,12 @@ void	main()
 	if (textureColor.w < 0.9)
 		discard;
 	if ((int(textureType) == 1 && type == 2) || type == LEAVES)
-		colorAddedTexture = convertRGB(vec3(176, 252, 113));
-	else if ((int(textureType) == 1 && type == SNOW))
-		colorAddedTexture = vec3(1., 0., 1.);
-	FragColor = vec4(diffuse, 1.0) * vec4(colorAddedTexture, 1.0) * textureColor;
+		colorAddedTexture = vec4(convertRGB(vec3(176, 252, 113)), 1.0);
+	else if (type == SNOW)
+		textureColor = (textureColor + vec4(1., 1., 1., 1.)) / 2;
+	else if (type == WATER)
+		colorAddedTexture = vec4(convertRGB(vec3(0, 100, 255)), 0.7);
+	else if (type == SAND)
+		colorAddedTexture = vec4(convertRGB(vec3(200, 150, 0)), 1.0);
+	FragColor = vec4(diffuse, 1.0) * colorAddedTexture * textureColor;
 }

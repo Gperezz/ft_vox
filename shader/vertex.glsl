@@ -17,6 +17,7 @@ uniform int		nbTxt;
 #define		LEAVES 5
 #define		WATER 6
 #define		SNOW 7
+#define		SAND 8
 
 out vec3	normal;
 out vec3	vecToLight;
@@ -33,7 +34,7 @@ void main()
 	dir = int(meta) & 7;
 	textureType = (int(meta) >> 3) & 31;
 	type = int(meta) >> 8;
-	if (dir == 2 && (type == DIRT || type == SNOW))
+	if (dir == 2 && type == DIRT)
 		textureType++;
 	else if (type == DIRT && dir != 2 && dir != 5)
 		textureType += 2;
