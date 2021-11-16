@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:17:27 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/11 16:38:09 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/12 11:17:29 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,8 @@ class Chunk{
 		ChunkPos						getPos(void);
 		bool							getFenced(void);
 		void							updateFenced(int source);
+		void							setUnfenced(void);
+		void							updateDelFenced(void);
 
 		Chunk							*getNeighboor(Direction);
 		Block							*getBlockNeighboor(BlockPos, Direction);

@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/11 16:37:32 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/12 11:12:10 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,7 +148,7 @@ void		Chunk::validateMesh(char meshIdx)
 	BlockPos				pos; // [meshY][x][y][z]
 	bool					validateValue;
 	vector<vbo_type>		tempVbo;
-	{	unique_lock<mutex> lock(this->validMutex);
+	{	//unique_lock<mutex> lock(this->validMutex);
 		if (this->valid.find(meshIdx) != Chunk::valid.end())
 		{
 			this->valid.erase(meshIdx);
@@ -177,7 +177,7 @@ void		Chunk::validateMesh(char meshIdx)
 	{
 		generateVbo(meshIdx, tempVbo);
 		// ft_printf(GREEN "generate VBO (Mesh %d) %d points (%d floats)\n" NA, meshIdx, tempVbo.size(), tempVbo.size() * 3);
-		unique_lock<mutex> lock(this->validMutex);
+		// unique_lock<mutex> lock(this->validMutex);
 		this->valid.insert({meshIdx, tempVbo.size()});
 	}
 }
@@ -236,6 +236,24 @@ bool	Chunk::getFenced(void)
 	return (this->state);
 }
 
+void	Chunk::setUnfenced(void)
+{
+	this->state = UNFENCED;
+}
+
+void		Chunk::updateDelFenced(void)
+{
+	Chunk* tmp;
+	if ((tmp = this->getNeighboor(NORTH)))
+		tmp->setUnfenced();
+	if ((tmp = this->getNeighboor(SOUTH)))
+		tmp->setUnfenced();
+	if ((tmp = this->getNeighboor(EAST)))
+		tmp->setUnfenced();
+	if ((tmp = this->getNeighboor(WEST)))
+		tmp->setUnfenced();
+}
+
 void		Chunk::updateFenced(int source)
 {
 	if (source)
@@ -260,7 +278,9 @@ Chunk		*Chunk::getNeighboor(Direction dir)
 {
 	if (g_dir_c[dir].axis == Y || g_dir_c[dir].axis == -Y)
 		return NULL;
-	return this->world->get(this->pos + g_dir_c[dir].chunk_vec);
+	if (this->world)
+		return this->world->get(this->pos + g_dir_c[dir].chunk_vec);
+	return NULL;
 }
 
 Block		*Chunk::getBlockNeighboor(BlockPos pos, Direction dir) // Fonction peut etre opti
@@ -315,7 +335,7 @@ void		Chunk::generateGraphics(void)
 
 void		Chunk::displayChunk(Camera cam, Shader shader, Textures *t)
 {
-	unique_lock<mutex>						lock(this->validMutex);
+	// unique_lock<mutex>						lock(this->validMutex);
 	std::map<char, unsigned int>::iterator	it = this->valid.begin();
 
 	while (it != this->valid.end())

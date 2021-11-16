@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/11 16:50:04 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/11 21:46:28 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,8 +76,8 @@ void	exec(World &world, Engine &env, TimeMs time)
 	if (checkMouse(env, GLFW_MOUSE_BUTTON_1)
 		|| checkMouse(env, GLFW_MOUSE_BUTTON_2))
 		return ;
-	env.rayCasting(world.getMapMemory().at(env.getCam().getCurrentChunkPos()),
-		world.getMapMemory()); // A deplacer
+	// env.rayCasting(world.getMapMemory().at(env.getCam().getCurrentChunkPos()),
+	// 	world.getMapMemory()); // A deplacer  FAIT SEGFAULT QUAND LE CHUNK OU L ON SE TROUVE N EST PAS GENERER
 	world.display(env, time.getTimeSeconds());
 	idx = env.getNbTextures() - 1;
 	t = env.getTexture(idx);
