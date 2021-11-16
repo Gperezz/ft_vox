@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cc                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2021/10/12 12:10:56 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/15 11:29:37 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,8 +76,8 @@ void	exec(World &world, Engine &env, TimeMs time)
 	if (checkMouse(env, GLFW_MOUSE_BUTTON_1)
 		|| checkMouse(env, GLFW_MOUSE_BUTTON_2))
 		return ;
-	env.rayCasting(world.getMapMemory().at(env.getCam().getCurrentChunkPos()),
-		world.getMapMemory());
+	// env.rayCasting(world.getMapMemory().at(env.getCam().getCurrentChunkPos()),
+		// world.getMapMemory());
 	world.display(env, time.getTimeSeconds());
 	idx = env.getNbTextures() - 1;
 	t = env.getTexture(idx);

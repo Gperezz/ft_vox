@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Chunk.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:17:27 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/10 14:40:24 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/12 10:32:18 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,14 +24,14 @@
 
 class World;
 
-enum Biome : char{
-	PLAIN,
-	FOREST,
-	TAIGA,
-	OCEAN,
-	DESERT,
-	JUNGLE
-};
+// enum Biome : char{
+// 	PLAIN,
+// 	FOREST,
+// 	TAIGA,
+// 	OCEAN,
+// 	DESERT,
+// 	JUNGLE
+// };
 
 enum Geomorph : char{
 	FLAT,
