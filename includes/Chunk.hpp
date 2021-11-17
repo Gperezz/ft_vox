@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Chunk.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
+/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:17:27 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/12 11:17:29 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/17 15:19:24 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,13 +64,12 @@ class Chunk{
 		unsigned int					tabVbo[16];
 		std::map<char, unsigned int>	valid;
 		ChunkPos						pos;
-		// Biome						biome;
-		// Geomorph						geomoprh;
+		bool							generate;
 		ChunkState						state;
 		World							*world;
 		bool							canPrintBlock(std::vector<vbo_type> &tempVbo, BlockPos posInMesh);
 		void							fillTempVbo(std::vector<vbo_type> &tempVbo, t_direction_consts dir_c, BlockPos posInMesh, t_id id);
-		bool							conditionValidate(std::vector<vbo_type> &tempVbo, BlockPos posInMesh, bool &b);
+		void							conditionValidate(std::vector<vbo_type> &tempVbo, BlockPos posInMesh, bool &b);
 		void							validateMesh(char meshIdx);
 		void							generateVbo(char index, std::vector<vbo_type> tempVbo);
 		void							deleteVbo(char index);
@@ -80,7 +79,8 @@ class Chunk{
 		Chunk(World*, ChunkPos);
 		Chunk(const Chunk& copy);
 		~Chunk();
-
+		void							deleteAllVbos(void);
+		bool							isGenerated(void);
 		void							printSlice(int z);
 		
 		Block&							getBlock(BlockPos);
@@ -89,10 +89,12 @@ class Chunk{
 		ChunkPos						getPos(void);
 		bool							getFenced(void);
 		void							updateFenced(int source);
+		void							updateFencedUnsafe(int source);
 		void							setUnfenced(void);
 		void							updateDelFenced(void);
 
 		Chunk							*getNeighboor(Direction);
+		Chunk							*getNeighboorUnsafe(Direction dir);
 		Block							*getBlockNeighboor(BlockPos, Direction);
 
 		void							generateGraphics(void);

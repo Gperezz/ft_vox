@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cc                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
+/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/15 11:29:37 by maiwenn          ###   ########.fr       */
+/*   Updated: 2021/11/17 17:39:28 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,7 @@ void	exec(World &world, Engine &env, TimeMs time)
 	static int		imgNb;
 	Textures		*t;
 	int				idx;
+	// Chunk*			chunk = NULL;
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -76,8 +77,11 @@ void	exec(World &world, Engine &env, TimeMs time)
 	if (checkMouse(env, GLFW_MOUSE_BUTTON_1)
 		|| checkMouse(env, GLFW_MOUSE_BUTTON_2))
 		return ;
-	// env.rayCasting(world.getMapMemory().at(env.getCam().getCurrentChunkPos()),
-	// 	world.getMapMemory()); // A deplacer  FAIT SEGFAULT QUAND LE CHUNK OU L ON SE TROUVE N EST PAS GENERER
+	
+	// chunk = world.get(env.getCam().getCurrentChunkPos());
+	// if (chunk)
+	// 	env.rayCasting(chunk, world); // FAIT SEGFAULT QUAND LE CHUNK OU L ON SE TROUVE N EST PAS GENERER
+	
 	world.display(env, time.getTimeSeconds());
 	idx = env.getNbTextures() - 1;
 	t = env.getTexture(idx);
@@ -90,17 +94,6 @@ void	exec(World &world, Engine &env, TimeMs time)
 	}
 	glfwSwapBuffers(env.getWindow());
 	glfwPollEvents();
-}
-
-static void	recLoad(World &w, int x, int y, int rec)
-{
-	w.loadChunk(x, y);
-	if (rec == 1)
-		return;
-	recLoad(w, x, y + 1, 1);
-	recLoad(w, x, y - 1, 1);
-	recLoad(w, x + 1, y, 1);
-	recLoad(w, x - 1, y, 1);
 }
 
 int		main(void)
@@ -124,7 +117,7 @@ int		main(void)
 	if (env.getHud().init(glm::mat4(1)))
 		return (1);
 	env.getCam().setProjMatrix(mat);
-	env.getCam().setTranslate((glm::vec3){7.5, 35, 7.5});
+	env.getCam().setTranslate((glm::vec3){7.5, 180., 7.5});
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
@@ -134,23 +127,23 @@ int		main(void)
 	glCullFace(GL_BACK);
 	glEnable(GL_CULL_FACE);
 
-	// int lim = 1;
-
-	///////////////////////////////////// Load test ////////////////////
-
-	// for (int y = 0; y < lim; y++)
-	// {
-	// 	for (int x = 0; x < lim; x++)
-	// 	{
-	// 	}
-	// }
-	//////////////////////////////////////////////////////////////////////////
-
-	recLoad(world, 0, 0, 0);
-
 	time.setTime();
-	while(!glfwWindowShouldClose(env.getWindow()))
+
+	int	close = 0;
+	std::mutex	windowMutex;
+	std::thread t0(&World::initThread, std::ref(world));
+
+	while(!close)
+	{
+		{unique_lock<mutex>		lk(windowMutex);
+			close = glfwWindowShouldClose(env.getWindow());
+		}
 		exec(world, env, time);
+	}
+
+	world.end();
+	t0.join();
+
 	glfwDestroyWindow(env.getWindow());
 	glfwTerminate();
 	return (0);

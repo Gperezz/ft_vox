@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/12 11:12:10 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/17 17:34:14 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,9 @@ Chunk::Chunk()
 {
 	this->state = UNFENCED;
 	bzero(this->blocks, sizeof(this->blocks));
+	this->generate = false;
+	bzero(this->tabVao, sizeof(unsigned int) * 16);
+	bzero(this->tabVbo, sizeof(unsigned int) * 16);
 }
 
 Chunk::Chunk(World *w)
@@ -26,6 +29,9 @@ Chunk::Chunk(World *w)
 	this->state = UNFENCED,
 	this->world = w;
 	bzero(this->blocks, sizeof(this->blocks));
+	this->generate = false;
+	bzero(this->tabVao, sizeof(unsigned int) * 16);
+	bzero(this->tabVbo, sizeof(unsigned int) * 16);
 }
 
 Chunk::Chunk(World *w, ChunkPos pos)
@@ -34,6 +40,9 @@ Chunk::Chunk(World *w, ChunkPos pos)
 	this->pos = pos;
 	this->world = w;
 	bzero(this->blocks, sizeof(this->blocks));
+	this->generate = false;
+	bzero(this->tabVao, sizeof(unsigned int) * 16);
+	bzero(this->tabVbo, sizeof(unsigned int) * 16);
 }
 
 Chunk::Chunk(const Chunk& copy)
@@ -43,8 +52,7 @@ Chunk::Chunk(const Chunk& copy)
 
 Chunk::~Chunk()
 {
-	for (int i = 0; i < 16; i++)
-		this->deleteVbo((char)i);
+	this->deleteAllVbos();
 }
 
 
@@ -62,7 +70,7 @@ void	Chunk::fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, Blo
 		vboType.pos[1] = dir_c.pts[iPt].get(Y) + posInMesh.get(Y) + posInMesh.get(MY) * 16;
 		vboType.pos[2] = dir_c.pts[iPt].get(Z) + posInMesh.get(Z) + this->getPos().get(1) * 16;
 
-		vboType.normal[0] = dir_c.pts[iPt].get(X) - (float)LENGTH_BLOCK / 2.; // On pourra le mettre en brut dans le header
+		vboType.normal[0] = dir_c.pts[iPt].get(X) - (float)LENGTH_BLOCK / 2.;
 		vboType.normal[1] = dir_c.pts[iPt].get(Y) - (float)LENGTH_BLOCK / 2.;
 		vboType.normal[2] = dir_c.pts[iPt].get(Z) - (float)LENGTH_BLOCK / 2.;
 	
@@ -95,11 +103,9 @@ void	Chunk::fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, Blo
 
 bool		Chunk::canPrintBlock(vector<vbo_type> &tempVbo, BlockPos posInMesh)
 {
-	char	dir;
-	int		i;
+	char	dir = 0;
+	int		i = NORTH;
 
-	i = NORTH;
-	dir = 0;
 	while (i < 6)
 	{
 		Block *tmp = this->getBlockNeighboor(posInMesh, (Direction)i);
@@ -116,13 +122,12 @@ bool		Chunk::canPrintBlock(vector<vbo_type> &tempVbo, BlockPos posInMesh)
 	return (dir != 0);
 }
 
-bool		Chunk::conditionValidate(vector<vbo_type> &tempVbo, BlockPos posInMesh, bool &b)
+void		Chunk::conditionValidate(vector<vbo_type> &tempVbo, BlockPos posInMesh, bool &b)
 {
 	if (this->getBlock(posInMesh).getInfo().id == AIR
 		|| !this->canPrintBlock(tempVbo, posInMesh))
-		return (0);
+		return;
 	b = 1;
-	return (1);
 }
 
 void		Chunk::generateVbo(char index, vector<vbo_type> tempVbo)
@@ -190,7 +195,17 @@ void		Chunk::deleteVbo(char index)
 
 ////////////////////////////// Public //////////////////////////////
 
+bool		Chunk::isGenerated(void)
+{
+	return (this->generate);
+}
 
+void		Chunk::deleteAllVbos(void)
+{
+	for (unsigned int i = 0; i < 16; i++)
+		this->deleteVbo(i);
+	this->generate = false;
+}
 
 void		Chunk::printSlice(int z)
 {
@@ -244,13 +259,13 @@ void	Chunk::setUnfenced(void)
 void		Chunk::updateDelFenced(void)
 {
 	Chunk* tmp;
-	if ((tmp = this->getNeighboor(NORTH)))
+	if ((tmp = this->getNeighboorUnsafe(NORTH)))
 		tmp->setUnfenced();
-	if ((tmp = this->getNeighboor(SOUTH)))
+	if ((tmp = this->getNeighboorUnsafe(SOUTH)))
 		tmp->setUnfenced();
-	if ((tmp = this->getNeighboor(EAST)))
+	if ((tmp = this->getNeighboorUnsafe(EAST)))
 		tmp->setUnfenced();
-	if ((tmp = this->getNeighboor(WEST)))
+	if ((tmp = this->getNeighboorUnsafe(WEST)))
 		tmp->setUnfenced();
 }
 
@@ -272,6 +287,35 @@ void		Chunk::updateFenced(int source)
 		this->state = FENCED;
 	else
 		this->state = UNFENCED;
+}
+
+void		Chunk::updateFencedUnsafe(int source)
+{
+	if (source)
+	{
+		Chunk* tmp;
+		if ((tmp = this->getNeighboorUnsafe(NORTH)))
+			tmp->updateFencedUnsafe(0);
+		if ((tmp = this->getNeighboorUnsafe(SOUTH)))
+			tmp->updateFencedUnsafe(0);
+		if ((tmp = this->getNeighboorUnsafe(EAST)))
+			tmp->updateFencedUnsafe(0);
+		if ((tmp = this->getNeighboorUnsafe(WEST)))
+			tmp->updateFencedUnsafe(0);
+	}
+	if (this->getNeighboorUnsafe(NORTH) && this->getNeighboorUnsafe(SOUTH) && this->getNeighboorUnsafe(EAST) && this->getNeighboorUnsafe(WEST))
+		this->state = FENCED;
+	else
+		this->state = UNFENCED;
+}
+
+Chunk		*Chunk::getNeighboorUnsafe(Direction dir)
+{
+	if (g_dir_c[dir].axis == Y || g_dir_c[dir].axis == -Y)
+		return NULL;
+	if (this->world)
+		return this->world->getUnsafe(this->pos + g_dir_c[dir].chunk_vec);
+	return NULL;
 }
 
 Chunk		*Chunk::getNeighboor(Direction dir)
@@ -299,7 +343,7 @@ Block		*Chunk::getBlockNeighboor(BlockPos pos, Direction dir) // Fonction peut e
 			pos[MY] = pos[MY] + 1;
 		}
 		else
-			neighboor = this->getNeighboor(dir);
+			neighboor = this->getNeighboorUnsafe(dir);
 		if (neighboor)
 			return &neighboor->getBlock(pos);
 		return NULL;
@@ -313,7 +357,7 @@ Block		*Chunk::getBlockNeighboor(BlockPos pos, Direction dir) // Fonction peut e
 			pos[MY] = pos[MY] - 1;
 		}
 		else
-			neighboor = this->getNeighboor(dir);
+			neighboor = this->getNeighboorUnsafe(dir);
 		if (neighboor)
 			return &neighboor->getBlock(pos);
 		return NULL;
@@ -325,12 +369,17 @@ void		Chunk::generateGraphics(unsigned int mesh)
 {
 	if (this->state == FENCED && mesh < 16)
 		validateMesh(mesh);
+	this->generate = true;
 }
 
 void		Chunk::generateGraphics(void)
 {
-	for (unsigned i = 0; i < 16; i++)
-		validateMesh(i);
+	if (!this->generate)
+	{
+		for (int i = 15; i > -1; i--)
+			validateMesh((unsigned int)i);
+	}
+	this->generate = true;
 }
 
 void		Chunk::displayChunk(Camera cam, Shader shader, Textures *t)
