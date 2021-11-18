@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WorldGenerator.cc                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
+/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/02 08:06:26 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/16 15:45:30 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/18 15:39:37 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -200,6 +200,8 @@ void	chooseBlock(Chunk *chunk, unsigned char type, int x, int z, double e)
 
 void	WorldGenerator::genChunk(Chunk *chunk)
 {
+	if (!chunk)
+		return;
 	// printf("x:\n");
 	for (int x = 0; x < 16; x++){
 		// printf("z: ");

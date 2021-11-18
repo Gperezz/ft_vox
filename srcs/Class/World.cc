@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/17 17:42:03 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/18 15:06:19 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,7 @@ void		World::end(void)
 
 void const	World::initThread(void)
 {
+	static bool isLoaded = false;
 	while (true)
 	{
 		{unique_lock<mutex>	lk(queueOnMutex);
@@ -69,8 +70,16 @@ void const	World::initThread(void)
 				return ;
 		}
 		while (this->LoadNextQueuedChunk())
+		{
+			isLoaded = false;
 			(void)this;
-		std::cout << ORANGE << "Loaded !\n" << NA;
+		}
+		if (!isLoaded)
+		{
+			{unique_lock<mutex>		lockPrint(this->printMutex);
+			std::cout << ORANGE << "Loaded !\n" << NA;}
+		}
+		isLoaded = true;
 	}
 }
 
@@ -124,11 +133,10 @@ bool	World::isLoadable(ChunkPos &p)
 	size = this->loadQueue.size();
 	if (size)
 	{
-		std::cout << YELLOW << "Nombre de Chunks dans la queue: " << loadQueue.size() << "\n" << NA;
 		auto pos = this->loadQueue.begin();
-		if (pos == this->loadQueue.end())
-			return false;
 		this->loadQueue.erase(*pos);
+		{unique_lock<mutex>		lockPrint(this->printMutex);
+			std::cout << BOLD_YELLOW << "Nombre de Chunks dans la queue: " << loadQueue.size() << "\n" << NA;}
 		p = *pos;
 		return true;
 	}
@@ -150,11 +158,12 @@ void			World::parallelizeLoad(void)
 		}
 		if (!alreadyLoad)
 		{
+			{unique_lock<mutex>		lockPrint(this->printMutex);
+				std::cout << YELLOW << "Chunk " << pos.get(0) << " " << pos.get(1) << "\n";}
 			this->loadChunk(pos);
-			std::cout << BLUE << "Chunk " << pos.get(0) << " " << pos.get(1) << "\n";
 			{unique_lock<mutex>	lockCp(this->chunkPMutex);
-				this->chunkPQueue.erase(pos);
-				std::cout << BOLD_BLUE << chunkPQueue.size() << "\n";
+				if (this->chunkPQueue.count(pos) != 0)
+					this->chunkPQueue.erase(pos);
 			}
 		}
 	}
@@ -162,30 +171,26 @@ void			World::parallelizeLoad(void)
 
 unsigned int		World::LoadNextQueuedChunk()
 {
-	std::thread t1 ([this](){
+	// std::thread t1 ([this](){
 		parallelizeLoad();
-	});
-
-	std::thread t2 ([this](){
-		parallelizeLoad();
-	});
-
-	std::thread t3 ([this](){
-		parallelizeLoad();
-	});
-
-	std::thread t4 ([this](){
-		parallelizeLoad();
-	});
-
-	if (t1.joinable())
-		t1.join();
-	if (t2.joinable())
-		t2.join();
-	if (t3.joinable())
-		t3.join();
-	if (t4.joinable())
-		t4.join();
+	// });
+	// std::thread t2 ([this](){
+	// 	parallelizeLoad();
+	// });
+	// std::thread t3 ([this](){
+	// 	parallelizeLoad();
+	// });
+	// std::thread t4 ([this](){
+	// 	parallelizeLoad();
+	// });
+	// if (t1.joinable())
+		// t1.join();
+	// if (t2.joinable())
+	// 	t2.join();
+	// if (t3.joinable())
+	// 	t3.join();
+	// if (t4.joinable())
+	// 	t4.join();
 
 	size_t size;
 	{unique_lock<mutex> queueLock(this->queueMutex);
@@ -196,6 +201,7 @@ unsigned int		World::LoadNextQueuedChunk()
 
 void	World::loadChunk(ChunkPos cp)
 {
+	Chunk	*newChunk = NULL;
 	{
 		unique_lock<mutex> lockMem(this->memoryMutex); // On check tout au long de la fonction si le chunk existe encore dans memory
 		{unique_lock<mutex> lockDisp(this->displayedMutex);
@@ -203,22 +209,25 @@ void	World::loadChunk(ChunkPos cp)
 			return;
 		} // Check s'il est deja afficher
 
-		Chunk	*newChunk = NULL;
 		std::map<ChunkPos, Chunk*>::iterator findChunk = this->memoryChunks.find(cp);
 		if (findChunk != this->memoryChunks.end())
 		{
-			newChunk = findChunk->second;
 			{unique_lock<mutex> lockDisp(this->displayedMutex);
 				if (this->displayedChunks.count(cp))
 					return;
-				this->memoryChunks[cp]->updateFencedUnsafe(1);
-				this->pushInDisplay(newChunk);
+				findChunk->second->updateFencedUnsafe(1);
+				this->pushInDisplay(findChunk->second);
 			}
 			return;
 		}
+		newChunk = new Chunk(this, cp);
+
 	}
-	Chunk	*newChunk = NULL;
-	newChunk = new Chunk(this, cp);
+	if (!newChunk)
+	{
+		std::cout << "ERROR\n";
+		return;
+	}
 	this->worldGen.genChunk(newChunk);
 	
 	{unique_lock<mutex> lockMem(this->memoryMutex);
@@ -257,7 +266,7 @@ void	World::pushInDisplay(Chunk* chunk)
 	}
 	Chunk*	tmp;
 	int		i = 0;
-	while (i < 4)
+	while (i < 4 && !chunk->isGenerated())
 	{
 		tmp = chunk->getNeighboorUnsafe((Direction)i);
 		if (tmp && tmp->getFenced() && !tmp->isGenerated())
@@ -276,7 +285,9 @@ void	World::loadGraphics(void)
 	unique_lock<mutex> lockMem(this->memoryMutex);
 	unique_lock<mutex> lockGraph(this->graphicMutex);
 	for (auto it = this->graphicQueue.begin(); it != this->graphicQueue.end(); it++)
+	{
 		(*it)->generateGraphics();
+	}
 	this->graphicQueue.clear();
 }
 
@@ -304,7 +315,10 @@ void	World::deleteFarInDisplay()
 					{
 						chunk = this->getUnsafe(chunkP);
 						if (chunk && chunk->isGenerated())
+						{
 							chunk->deleteAllVbos();
+							// std::cout << ORANGE << "Chunk " << chunkP.get(0) << " " << chunkP.get(1) << "\n" << NA;
+						}
 					}
 					this->displayedChunks.erase(chunkP);
 				}
@@ -346,11 +360,9 @@ void	World::queueToDisplay(void)
 {
 	this->deleteFarInDisplay();
 	this->insertLoadQueue();
-
-	// this->LoadNextQueuedChunk()
-
+	while (this->LoadNextQueuedChunk())
+		(void)this;
 	this->loadGraphics();
-
 	// this->deleteFar();
 }
 

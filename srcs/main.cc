@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/17 17:39:28 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/18 15:03:03 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,7 +131,7 @@ int		main(void)
 
 	int	close = 0;
 	std::mutex	windowMutex;
-	std::thread t0(&World::initThread, std::ref(world));
+	// std::thread t0(&World::initThread, std::ref(world));
 
 	while(!close)
 	{
@@ -142,7 +142,7 @@ int		main(void)
 	}
 
 	world.end();
-	t0.join();
+	// t0.join();
 
 	glfwDestroyWindow(env.getWindow());
 	glfwTerminate();

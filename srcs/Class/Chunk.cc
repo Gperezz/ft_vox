@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/17 17:34:14 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/18 15:37:59 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,9 +132,16 @@ void		Chunk::conditionValidate(vector<vbo_type> &tempVbo, BlockPos posInMesh, bo
 
 void		Chunk::generateVbo(char index, vector<vbo_type> tempVbo)
 {
+	GLenum err;
+
+	while((err = glGetError()) != GL_NO_ERROR)
+            std::cout << BOLD_RED << "AVANT Error " << err << '\n' << NA;
+
 	glGenVertexArrays(1, &(Chunk::tabVao[(int)index]));
+
 	glBindVertexArray(tabVao[(int)index]);
 	glGenBuffers(1, &(Chunk::tabVbo[(int)index]));
+
 	glBindBuffer(GL_ARRAY_BUFFER, tabVbo[(int)index]);
 	glBufferData(GL_ARRAY_BUFFER, tempVbo.size() * sizeof(vbo_type), &tempVbo[0], GL_STATIC_DRAW);
 
@@ -146,6 +153,10 @@ void		Chunk::generateVbo(char index, vector<vbo_type> tempVbo)
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
 	glEnableVertexAttribArray(3);
+
+	while((err = glGetError()) != GL_NO_ERROR)
+            std::cout << BOLD_RED << "Error " << err << '\n' << NA;
+
 }
 
 void		Chunk::validateMesh(char meshIdx)
@@ -376,7 +387,8 @@ void		Chunk::generateGraphics(void)
 {
 	if (!this->generate)
 	{
-		for (int i = 15; i > -1; i--)
+		std::cout << GREEN << "Chunk " << this->getPos().get(0) << " " << this->getPos().get(1) << "\n" << NA;
+		for (int i = 15; i >= 0; i--)
 			validateMesh((unsigned int)i);
 	}
 	this->generate = true;
