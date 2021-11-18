@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/18 16:53:54 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/18 18:21:15 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ World::World(Engine& engine, unsigned long *seed)
 		{unique_lock<mutex>	lk(this->queueOnMutex);
 			this->queueOn = true;
 		}
-		this->initQueueSorter();
 		this->worldGen.configure(seed);
 	}
 
@@ -37,7 +36,6 @@ World::World(Engine& engine, string& path, unsigned long *seed)
 		{unique_lock<mutex>	lk(this->queueOnMutex);
 			this->queueOn = true;
 		}
-		this->initQueueSorter();
 		this->worldGen.configure(seed);
 	}
 
@@ -62,40 +60,16 @@ void		World::end(void)
 
 void const	World::initThread(void)
 {
-	static bool isLoaded = false;
 	while (true)
 	{
 		{unique_lock<mutex>	lk(queueOnMutex);
 			if (!this->queueOn)
 				return ;
 		}
+		this->insertLoadQueue();
 		while (this->LoadNextQueuedChunk())
-		{
-			isLoaded = false;
 			(void)this;
-		}
-		if (!isLoaded)
-		{
-			{unique_lock<mutex>		lockPrint(this->printMutex);
-			std::cout << ORANGE << "Loaded !\n" << NA;}
-		}
-		isLoaded = true;
 	}
-}
-
-
-void	World::initQueueSorter(void)
-{
-	auto cmp = [this](ChunkPos a, ChunkPos b)->bool{
-		ChunkPos center = this->getCameraChunkPos();
-		// printf("center : %d, %d\n", center[0], center[1]);
-		float da = a.distance(center);
-		float db = b.distance(center);
-		if (da - PREC < db && da + PREC > db)
-			return a < b;
-		return da < db;
-	};
-	this->loadQueue = set<ChunkPos, function<bool (ChunkPos, ChunkPos)>>(cmp);
 }
 
 void	World::insertLoadQueue(void)
@@ -107,7 +81,6 @@ void	World::insertLoadQueue(void)
 	if (prevPos == pos && !start)
 		return ;
 	start = false;
-	// std::cout << BLUE << "Chunk " << pos.get(0) << " " << pos.get(1) << "\n";
 
 	unique_lock<mutex> lk(this->queueMutex);
 	for (int i = -CHK_RND_DIST; i < CHK_RND_DIST + 1; i++)
@@ -116,10 +89,7 @@ void	World::insertLoadQueue(void)
 		{
 			ChunkPos cp(pos + (int[]){i, j});
 			if (this->loadQueue.count(cp) == 0)
-			{
-				// std::cout << BLUE << "Chunk " << cp.get(0) << " " << cp.get(1) << "\n";
 				this->loadQueue.insert(cp);
-			}
 		}
 	}
 	prevPos = pos;
@@ -134,10 +104,8 @@ bool	World::isLoadable(ChunkPos &p)
 	if (size)
 	{
 		auto pos = this->loadQueue.begin();
-		this->loadQueue.erase(*pos);
-		{unique_lock<mutex>		lockPrint(this->printMutex);
-			std::cout << BOLD_YELLOW << "Nombre de Chunks dans la queue: " << loadQueue.size() << "\n" << NA;}
 		p = *pos;
+		this->loadQueue.erase(p);
 		return true;
 	}
 	return false;
@@ -158,8 +126,6 @@ void			World::parallelizeLoad(void)
 		}
 		if (!alreadyLoad)
 		{
-			{unique_lock<mutex>		lockPrint(this->printMutex);
-				std::cout << YELLOW << "Chunk " << pos.get(0) << " " << pos.get(1) << "\n";}
 			this->loadChunk(pos);
 			{unique_lock<mutex>	lockCp(this->chunkPMutex);
 				if (this->chunkPQueue.count(pos) != 0)
@@ -184,7 +150,7 @@ unsigned int		World::LoadNextQueuedChunk()
 	// 	parallelizeLoad();
 	// });
 	// if (t1.joinable())
-		// t1.join();
+	// 	t1.join();
 	// if (t2.joinable())
 	// 	t2.join();
 	// if (t3.joinable())
@@ -216,40 +182,34 @@ void	World::loadChunk(ChunkPos cp)
 				if (this->displayedChunks.count(cp))
 					return;
 				findChunk->second->updateFencedUnsafe(1);
-				this->pushInDisplay(findChunk->second);
+				this->pushInDisplay(findChunk->second, true);
 			}
 			return;
 		}
 		newChunk = new Chunk(this, cp);
 
 	}
-	if (!newChunk)
-	{
-		std::cout << "ERROR\n";
-		return;
-	}
 	this->worldGen.genChunk(newChunk);
 	
 	{unique_lock<mutex> lockMem(this->memoryMutex);
-		// if (this->memoryChunks.find(cp) != this->memoryChunks.end()) // Si le chunk a ete ajouter entre temps
+// A CHECKER//		// if (this->memoryChunks.find(cp) != this->memoryChunks.end()) // Si le chunk a ete ajouter entre temps
 		// {
 		// 	std::cout << "Here\n";
 		// 	delete newChunk;
 		// 	return;
 		// }
 		this->memoryChunks.insert(std::pair<ChunkPos, Chunk*>(cp, newChunk));
-		// std::cout << ORANGE << "Chunk " << cp.get(0) << " " << cp.get(1) << "\n" << NA;
 		this->memoryChunks[cp]->updateFencedUnsafe(1);
 	
 		{unique_lock<mutex> lockDisp(this->displayedMutex);
 			if (this->displayedChunks.count(cp))
 					return;
-			this->pushInDisplay(newChunk);
+			this->pushInDisplay(newChunk, false);
 		}
 	}
 }
 
-void	World::pushInDisplay(Chunk* chunk)
+void	World::pushInDisplay(Chunk* chunk, bool alreadyGen)
 {
 	ChunkPos	chunkP;
 
@@ -257,19 +217,21 @@ void	World::pushInDisplay(Chunk* chunk)
 		return;
 	chunkP = chunk->getPos();
 
-	if (chunk->getFenced() && !chunk->isGenerated())
+	if (chunk->getFenced())
 	{
 		this->displayedChunks.insert(chunk->getPos());
-		{unique_lock<mutex> lk(this->graphicMutex); //chunk->generateGraphics();
+		if (!alreadyGen)
+		{
+			unique_lock<mutex> lk(this->graphicMutex); //chunk->generateGraphics();
 			this->graphicQueue.insert(chunk);
 		}
 	}
 	Chunk*	tmp;
 	int		i = 0;
-	while (i < 4 && !chunk->isGenerated())
+	while (i < 4 && !alreadyGen)
 	{
 		tmp = chunk->getNeighboorUnsafe((Direction)i);
-		if (tmp && tmp->getFenced() && !tmp->isGenerated())
+		if (tmp && tmp->getFenced())
 		{
 			this->displayedChunks.insert(tmp->getPos());
 			{unique_lock<mutex> lk(this->graphicMutex); //tmp->generateGraphics();
@@ -334,10 +296,7 @@ void	World::deleteFar(void)
 			|| chunkP.get(1) - pos.get(1) > CHK_DEL_DIST_MEM 
 			|| chunkP.get(1) - pos.get(1) < -CHK_DEL_DIST_MEM)
 		{
-		Chunk* delChunk = this->memoryChunks.at(chunkP);
-		// 	std::cout << RED << "Chunk " << chunkP.get(0) << " " << chunkP.get(1) << "\n";
-		// 	std::cout << GREEN << this->memoryChunks.count(chunkP) << "\n";
-
+			Chunk* delChunk = this->memoryChunks.at(chunkP);
 			delete delChunk;
 			this->memoryChunks[chunkP]->updateDelFenced();
 			this->memoryChunks.erase(chunkP);
@@ -349,9 +308,6 @@ void	World::deleteFar(void)
 void	World::queueToDisplay(void)
 {
 	this->deleteFarInDisplay();
-	this->insertLoadQueue();
-	while (this->LoadNextQueuedChunk())
-		(void)this;
 	this->loadGraphics();
 	this->deleteFar();
 }

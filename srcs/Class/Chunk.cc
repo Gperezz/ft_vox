@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/18 16:44:48 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/18 18:13:34 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -381,7 +381,7 @@ void		Chunk::generateGraphics(void)
 		glGenBuffers(16,  &(this->tabVbo[0]));
 		this->generate = true;
 	}
-	std::cout << GREEN << "Chunk " << this->getPos().get(0) << " " << this->getPos().get(1) << "\n" << NA;
+	// std::cout << GREEN << "Chunk " << this->getPos().get(0) << " " << this->getPos().get(1) << "\n" << NA;
 	for (int i = 15; i >= 0; i--)
 		validateMesh((unsigned int)i);
 }
@@ -393,12 +393,7 @@ void		Chunk::displayChunk(Camera cam, Shader shader, Textures *t)
 
 	while (it != this->valid.end())
 	{
-		GLenum err;
-		while((err = glGetError()) != GL_NO_ERROR)
-			std::cout << BOLD_RED << "AVANT " << err << '\n' << NA;
 		glBindVertexArray(this->tabVao[(int)it->first]);
-		while((err = glGetError()) != GL_NO_ERROR)
-			std::cout << BOLD_RED << "APRES " << err << '\n' << NA;
 		glUseProgram(shader.getProgram());
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),
 			"view"), 1, GL_FALSE, glm::value_ptr(cam.getMatrix(false)));

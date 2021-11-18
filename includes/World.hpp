@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:08:20 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/18 15:16:24 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/18 18:19:39 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,9 @@
 # include "Engine.hpp"
 # include "Chunk.hpp"
 # include "WorldGenerator.hpp"
-# define CHK_RND_DIST 5
-# define CHK_DEL_DIST 7
-# define CHK_DEL_DIST_MEM 9
+# define CHK_RND_DIST 10
+# define CHK_DEL_DIST 15
+# define CHK_DEL_DIST_MEM 25
 
 using namespace std;
 using ChunkPos = Coords::Coords<int, 2>;
@@ -39,12 +39,11 @@ class World
 		bool					queueOn;
 		mutex					queueOnMutex;
 		mutex					queueMutex;
-		mutex					printMutex;
 		mutex					memoryMutex;
 		mutex					displayedMutex;
 		mutex					graphicMutex;
 		mutex					chunkPMutex;
-		set<ChunkPos, function<bool (ChunkPos, ChunkPos)>>	loadQueue;
+		set<ChunkPos>			loadQueue;
 		map<ChunkPos, Chunk*>	memoryChunks;
 		unordered_set<ChunkPos>	displayedChunks;
 		unordered_set<Chunk*>	graphicQueue;
@@ -65,7 +64,7 @@ class World
 		void					parallelizeLoad(void);
 		unsigned int			LoadNextQueuedChunk(void);
 		void					loadChunk(ChunkPos);
-		void					pushInDisplay(Chunk* chunk);
+		void					pushInDisplay(Chunk* chunk, bool alreadyGen);
 		void					loadGraphics(void);
 
 		void					deleteFarInDisplay(void);
