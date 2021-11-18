@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/18 15:06:19 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/18 16:53:54 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -311,17 +311,7 @@ void	World::deleteFarInDisplay()
 				|| chunkP.get(0) - pos.get(0) < -CHK_DEL_DIST
 				|| chunkP.get(1) - pos.get(1) > CHK_DEL_DIST 
 				|| chunkP.get(1) - pos.get(1) < -CHK_DEL_DIST)
-				{
-					{
-						chunk = this->getUnsafe(chunkP);
-						if (chunk && chunk->isGenerated())
-						{
-							chunk->deleteAllVbos();
-							// std::cout << ORANGE << "Chunk " << chunkP.get(0) << " " << chunkP.get(1) << "\n" << NA;
-						}
-					}
 					this->displayedChunks.erase(chunkP);
-				}
 		}
 	}
 	pos = prevPos;
@@ -363,7 +353,7 @@ void	World::queueToDisplay(void)
 	while (this->LoadNextQueuedChunk())
 		(void)this;
 	this->loadGraphics();
-	// this->deleteFar();
+	this->deleteFar();
 }
 
 void	World::display(Engine &e, float currentFrameTime)
@@ -384,7 +374,9 @@ void	World::display(Engine &e, float currentFrameTime)
 			{
 				chunk = this->memoryChunks.find(*it);
 				if (chunk != this->memoryChunks.end() && chunk->second->isGenerated())
+				{
 					chunk->second->displayChunk(cam, shader, texture);
+				}
 			}
 		}
 	// });

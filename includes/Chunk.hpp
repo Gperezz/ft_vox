@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:17:27 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/17 15:19:24 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/18 16:31:31 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,14 +72,13 @@ class Chunk{
 		void							conditionValidate(std::vector<vbo_type> &tempVbo, BlockPos posInMesh, bool &b);
 		void							validateMesh(char meshIdx);
 		void							generateVbo(char index, std::vector<vbo_type> tempVbo);
-		void							deleteVbo(char index);
+		void							deleteVbos(void);
 	public:
 		Chunk();
 		Chunk(World*);
 		Chunk(World*, ChunkPos);
 		Chunk(const Chunk& copy);
 		~Chunk();
-		void							deleteAllVbos(void);
 		bool							isGenerated(void);
 		void							printSlice(int z);
 		

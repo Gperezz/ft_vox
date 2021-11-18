@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/18 15:37:59 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/18 16:44:48 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ Chunk::Chunk(const Chunk& copy)
 
 Chunk::~Chunk()
 {
-	this->deleteAllVbos();
+	this->deleteVbos();
 }
 
 
@@ -135,15 +135,11 @@ void		Chunk::generateVbo(char index, vector<vbo_type> tempVbo)
 	GLenum err;
 
 	while((err = glGetError()) != GL_NO_ERROR)
-            std::cout << BOLD_RED << "AVANT Error " << err << '\n' << NA;
-
-	glGenVertexArrays(1, &(Chunk::tabVao[(int)index]));
+		std::cout << BOLD_RED << "AVANT Error " << err << '\n' << NA;
 
 	glBindVertexArray(tabVao[(int)index]);
-	glGenBuffers(1, &(Chunk::tabVbo[(int)index]));
-
 	glBindBuffer(GL_ARRAY_BUFFER, tabVbo[(int)index]);
-	glBufferData(GL_ARRAY_BUFFER, tempVbo.size() * sizeof(vbo_type), &tempVbo[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, tempVbo.size() * sizeof(vbo_type), &tempVbo[0], GL_DYNAMIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8 + sizeof(float), (void*)0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8 + sizeof(float), (void*)(sizeof(float) * 3));
@@ -166,10 +162,7 @@ void		Chunk::validateMesh(char meshIdx)
 	vector<vbo_type>		tempVbo;
 	{	//unique_lock<mutex> lock(this->validMutex);
 		if (this->valid.find(meshIdx) != Chunk::valid.end())
-		{
 			this->valid.erase(meshIdx);
-			deleteVbo(meshIdx);
-		}
 	}
 	validateValue = 0;
 	pos[MY] = meshIdx;
@@ -198,10 +191,14 @@ void		Chunk::validateMesh(char meshIdx)
 	}
 }
 
-void		Chunk::deleteVbo(char index)
+void		Chunk::deleteVbos(void)
 {
-	glDeleteBuffers(1, &(Chunk::tabVbo[(int)index]));
-	glDeleteVertexArrays(1, &(Chunk::tabVao[(int)index]));
+	if (this->generate)
+	{
+		glDeleteBuffers(16, &(this->tabVbo[0]));
+		glDeleteVertexArrays(16, &(this->tabVao[0]));
+		this->generate = false;
+	}
 }
 
 ////////////////////////////// Public //////////////////////////////
@@ -209,13 +206,6 @@ void		Chunk::deleteVbo(char index)
 bool		Chunk::isGenerated(void)
 {
 	return (this->generate);
-}
-
-void		Chunk::deleteAllVbos(void)
-{
-	for (unsigned int i = 0; i < 16; i++)
-		this->deleteVbo(i);
-	this->generate = false;
 }
 
 void		Chunk::printSlice(int z)
@@ -387,11 +377,13 @@ void		Chunk::generateGraphics(void)
 {
 	if (!this->generate)
 	{
-		std::cout << GREEN << "Chunk " << this->getPos().get(0) << " " << this->getPos().get(1) << "\n" << NA;
-		for (int i = 15; i >= 0; i--)
-			validateMesh((unsigned int)i);
+		glGenVertexArrays(16,  &(this->tabVao[0]));
+		glGenBuffers(16,  &(this->tabVbo[0]));
+		this->generate = true;
 	}
-	this->generate = true;
+	std::cout << GREEN << "Chunk " << this->getPos().get(0) << " " << this->getPos().get(1) << "\n" << NA;
+	for (int i = 15; i >= 0; i--)
+		validateMesh((unsigned int)i);
 }
 
 void		Chunk::displayChunk(Camera cam, Shader shader, Textures *t)
@@ -401,7 +393,12 @@ void		Chunk::displayChunk(Camera cam, Shader shader, Textures *t)
 
 	while (it != this->valid.end())
 	{
+		GLenum err;
+		while((err = glGetError()) != GL_NO_ERROR)
+			std::cout << BOLD_RED << "AVANT " << err << '\n' << NA;
 		glBindVertexArray(this->tabVao[(int)it->first]);
+		while((err = glGetError()) != GL_NO_ERROR)
+			std::cout << BOLD_RED << "APRES " << err << '\n' << NA;
 		glUseProgram(shader.getProgram());
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),
 			"view"), 1, GL_FALSE, glm::value_ptr(cam.getMatrix(false)));
