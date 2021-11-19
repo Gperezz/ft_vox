@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/02 08:06:26 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/18 15:39:37 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/19 11:35:47 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -198,28 +198,34 @@ void	chooseBlock(Chunk *chunk, unsigned char type, int x, int z, double e)
 	}	
 }
 
+void	WorldGenerator::genThreadChunk(Chunk *chunk, ChunkPos pos, int x)
+{
+	for (int z = 0; z < 16; z++)
+	{
+		double e = elevation(pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX, 1567612511);
+		double m = elevation(pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX, 3);
+		e = ((e + 1) / 2) * 255;
+		m = ((m + 1) / 2) * 255;
+		unsigned char type = blockColor(m, e);
+		chooseBlock(chunk, type, x, z, e);
+	}
+}
+
 void	WorldGenerator::genChunk(Chunk *chunk)
 {
+	// std::thread		*t[16];
+
 	if (!chunk)
 		return;
-	// printf("x:\n");
-	for (int x = 0; x < 16; x++){
-		// printf("z: ");
-		for (int z = 0; z < 16; z++){
-			
-			ChunkPos pos = chunk->getPos();
-			double e = elevation(pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX, 1567612511);
-			double m = elevation(pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX, 3);
-			e = ((e + 1) / 2) * 255;
-			m = ((m + 1) / 2) * 255;
-			unsigned char type = blockColor(m, e);
-			// printf("%f, \n", height);
-			
-			chooseBlock(chunk, type, x, z, e);
-		}
-		// printf("\n");
-	}
-	// printf("\n");
+	ChunkPos pos = chunk->getPos();
+	for (int x = 0; x < 16; x++)
+		this->genThreadChunk(chunk, pos, x);
+	// for (int x = 0; x < 16; x++)
+	// 	t[x] = new std::thread(&WorldGenerator::genThreadChunk, this, chunk, pos, x);
+	// for (int i = 0; i < 16; i++)
+	// 	t[i]->join();
+	// for (int i = 0; i < 16; i++)
+	// 	delete t[i];
 }
 
 void	WorldGenerator::configure(unsigned long* seed)

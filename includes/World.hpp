@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:08:20 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/18 18:19:39 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/19 12:22:18 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,14 +17,13 @@
 # include <unordered_set>
 # include <vector>
 # include <set>
-# include <thread>
-# include <mutex>
 
 # include "Engine.hpp"
 # include "Chunk.hpp"
 # include "WorldGenerator.hpp"
 # define CHK_RND_DIST 10
-# define CHK_DEL_DIST 15
+# define CHK_DEL_DIST 12
+# define CHK_DIST_MEM 20
 # define CHK_DEL_DIST_MEM 25
 
 using namespace std;
@@ -36,6 +35,7 @@ class Engine;
 class World
 {
 	private:
+		// bool					onlyLoadMem;
 		bool					queueOn;
 		mutex					queueOnMutex;
 		mutex					queueMutex;
@@ -63,7 +63,7 @@ class World
 		bool					isLoadable(ChunkPos &pos);
 		void					parallelizeLoad(void);
 		unsigned int			LoadNextQueuedChunk(void);
-		void					loadChunk(ChunkPos);
+		void					loadChunk(ChunkPos cp);
 		void					pushInDisplay(Chunk* chunk, bool alreadyGen);
 		void					loadGraphics(void);
 
@@ -77,7 +77,7 @@ class World
 							// World(string )
 							~World();
 
-	void const				initThread(void);
+	void const				initThread(bool value);
 	void					queueToDisplay(void);
 	void					display(Engine &e, float currentFrameTime);
 	ChunkPos				getCameraChunkPos();

@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/18 18:21:15 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/19 13:28:04 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ using namespace std;
 
 World::World(Engine& engine, unsigned long *seed)
 :
+	// onlyLoadMem(true),
 	enginePtr(engine),
 	deltaFrameTime(0.0),
 	lastFrameTime(0.0)
@@ -28,6 +29,7 @@ World::World(Engine& engine, unsigned long *seed)
 
 World::World(Engine& engine, string& path, unsigned long *seed)
 :
+	// onlyLoadMem(true),
 	enginePtr(engine),
 	path(path),
 	deltaFrameTime(0.0),
@@ -58,9 +60,10 @@ void		World::end(void)
 	}
 }
 
-void const	World::initThread(void)
+void const	World::initThread(bool value)
 {
-	while (true)
+	bool test = true;
+	while (test)
 	{
 		{unique_lock<mutex>	lk(queueOnMutex);
 			if (!this->queueOn)
@@ -69,23 +72,26 @@ void const	World::initThread(void)
 		this->insertLoadQueue();
 		while (this->LoadNextQueuedChunk())
 			(void)this;
+		// this->onlyLoadMem = false;
+		test = value;
 	}
 }
 
 void	World::insertLoadQueue(void)
 {
-	static ChunkPos prevPos;
-	static bool	start = true;
-	ChunkPos pos = this->getCameraChunkPos();
+	static ChunkPos	prevPos;
+	int				renderDist = CHK_RND_DIST;
+	static bool		start = true;
+	ChunkPos		pos = this->getCameraChunkPos();
 
 	if (prevPos == pos && !start)
 		return ;
 	start = false;
 
 	unique_lock<mutex> lk(this->queueMutex);
-	for (int i = -CHK_RND_DIST; i < CHK_RND_DIST + 1; i++)
+	for (int i = -renderDist; i < renderDist + 1; i++)
 	{
-		for (int j = -CHK_RND_DIST; j < CHK_RND_DIST + 1; j++)
+		for (int j = -renderDist; j < renderDist + 1; j++)
 		{
 			ChunkPos cp(pos + (int[]){i, j});
 			if (this->loadQueue.count(cp) == 0)
@@ -114,24 +120,24 @@ bool	World::isLoadable(ChunkPos &p)
 void			World::parallelizeLoad(void)
 {
 	ChunkPos		pos;
-	bool			alreadyLoad = true;
+	// bool			alreadyLoad = true;
 	if (isLoadable(pos))
 	{
-		{unique_lock<mutex>		lockCp(this->chunkPMutex);
-			if (this->chunkPQueue.count(pos) == 0)
-			{
-				alreadyLoad = false;
-				this->chunkPQueue.insert(pos);
-			}
-		}
-		if (!alreadyLoad)
-		{
+		// {unique_lock<mutex>		lockCp(this->chunkPMutex);
+		// 	if (this->chunkPQueue.count(pos) == 0)
+		// 	{
+		// 		alreadyLoad = false;
+		// 		this->chunkPQueue.insert(pos);
+		// 	}
+		// }
+		// if (!alreadyLoad)
+		// {
 			this->loadChunk(pos);
-			{unique_lock<mutex>	lockCp(this->chunkPMutex);
-				if (this->chunkPQueue.count(pos) != 0)
-					this->chunkPQueue.erase(pos);
-			}
-		}
+			// {unique_lock<mutex>	lockCp(this->chunkPMutex);
+			// 	if (this->chunkPQueue.count(pos) != 0)
+			// 		this->chunkPQueue.erase(pos);
+			// }
+		// }
 	}
 }
 
@@ -199,10 +205,11 @@ void	World::loadChunk(ChunkPos cp)
 		// 	return;
 		// }
 		this->memoryChunks.insert(std::pair<ChunkPos, Chunk*>(cp, newChunk));
+		// std::cout << GREEN << cp.get(0) << " " << cp.get(1) << "\n" << NA;
 		this->memoryChunks[cp]->updateFencedUnsafe(1);
 	
 		{unique_lock<mutex> lockDisp(this->displayedMutex);
-			if (this->displayedChunks.count(cp))
+			if (this->displayedChunks.count(cp))// || this->onlyLoadMem)
 					return;
 			this->pushInDisplay(newChunk, false);
 		}
@@ -233,6 +240,7 @@ void	World::pushInDisplay(Chunk* chunk, bool alreadyGen)
 		tmp = chunk->getNeighboorUnsafe((Direction)i);
 		if (tmp && tmp->getFenced())
 		{
+			// tmp->updateFencedUnsafe(1);
 			this->displayedChunks.insert(tmp->getPos());
 			{unique_lock<mutex> lk(this->graphicMutex); //tmp->generateGraphics();
 				this->graphicQueue.insert(tmp);
@@ -329,7 +337,7 @@ void	World::display(Engine &e, float currentFrameTime)
 			for (auto it = this->displayedChunks.begin(); it != this->displayedChunks.end(); it++)
 			{
 				chunk = this->memoryChunks.find(*it);
-				if (chunk != this->memoryChunks.end() && chunk->second->isGenerated())
+				if (chunk != this->memoryChunks.end())
 				{
 					chunk->second->displayChunk(cam, shader, texture);
 				}

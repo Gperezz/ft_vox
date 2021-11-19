@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/18 18:13:41 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/19 13:18:14 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,36 +14,39 @@
 
 void	key(Engine &env, float deltaFrameTime)
 {
+	float speed = SPEED;
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(env.getWindow(), true);
+	if (glfwGetKey(env.getWindow(), GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+			speed = SPEED_ACCEL;
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_S) == GLFW_PRESS)
 	{
-		env.getCam().translate(E_FRONT, SPEED * deltaFrameTime);
+		env.getCam().translate(E_FRONT, speed * deltaFrameTime);
 		// env.getCam().printMatrix(true);
 	}
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_W) == GLFW_PRESS)
 	{
-		env.getCam().translate(E_FRONT, -SPEED * deltaFrameTime);
+		env.getCam().translate(E_FRONT, -speed * deltaFrameTime);
 		// env.getCam().printMatrix(true);
 	}
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_A) == GLFW_PRESS)
 	{
-		env.getCam().translate(E_RIGHT, SPEED * deltaFrameTime);
+		env.getCam().translate(E_RIGHT, speed * deltaFrameTime);
 		// env.getCam().printMatrix(true);
 	}
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_D) == GLFW_PRESS)
 	{
-		env.getCam().translate(E_RIGHT, -SPEED * deltaFrameTime);
+		env.getCam().translate(E_RIGHT, -speed * deltaFrameTime);
 		// env.getCam().printMatrix(true);
 	}
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_SPACE) == GLFW_PRESS)
 	{
-		env.getCam().translate(E_UP, SPEED * deltaFrameTime);
+		env.getCam().translate(E_UP, speed * deltaFrameTime);
 		// env.getCam().printMatrix(true);
 	}
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 	{
-		env.getCam().translate(E_UP, -SPEED * deltaFrameTime);
+		env.getCam().translate(E_UP, -speed * deltaFrameTime);
 		// env.getCam().printMatrix(true);
 	}
 }
@@ -104,7 +107,7 @@ int		main(void)
 	TimeMs			time;
 	glm::mat4		mat;
 
-	mat = glm::perspective(glm::radians(45.0f),
+	mat = glm::perspective(glm::radians(80.0f),
 		(float)WIDTH / (float)HEIGHT, 0.1f, (float)RENDER_DIST);
 	if (env.initWindow() == -1)
 		return (1);
@@ -131,7 +134,9 @@ int		main(void)
 
 	int	close = 0;
 	std::mutex	windowMutex;
-	std::thread t0(&World::initThread, std::ref(world));
+	
+	// world.initThread(false);
+	std::thread t0(&World::initThread, std::ref(world), true);
 
 	while(!close)
 	{
