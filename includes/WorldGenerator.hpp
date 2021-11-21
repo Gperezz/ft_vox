@@ -6,7 +6,7 @@
 /*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/30 16:22:18 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/12 10:38:21 by maiwenn          ###   ########.fr       */
+/*   Updated: 2021/11/18 17:23:40 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include "Block.hpp"
 # include "Chunk.hpp"
 # include "Perlin.hpp"
+# include "Cave.hpp"
 
 enum Biome : char{
 	OCEAN,

@@ -6,7 +6,7 @@
 #    By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/10/10 18:22:58 by gperez            #+#    #+#              #
-#    Updated: 2021/11/10 17:12:11 by maiwenn          ###   ########.fr        #
+#    Updated: 2021/11/18 17:32:48 by maiwenn          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -35,7 +35,8 @@ SRC =	srcs/main.cc \
 		srcs/Class/TimeMs.cc \
 		srcs/Class/Hud.cc \
 		srcs/Class/Element.cc \
-		srcs/Class/Perlin.cc
+		srcs/Class/Perlin.cc \
+		srcs/Class/Cave.cc
 
 NC = \033[0m
 BOLD =\033[1m
@@ -81,6 +82,8 @@ INC =	includes/ft_vox.hpp \
 		includes/Textures.hpp \
 		includes/World.hpp \
 		includes/Engine.hpp \
+		includes/Perlin.hpp \
+		includes/Cave.hpp \
 
 OBJ = $(SRC:.cc=.o)
 

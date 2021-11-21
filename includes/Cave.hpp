@@ -2,18 +2,16 @@
 # define CAVE_HPP
 
 # include "Mat.hpp"
+# include "Chunk.hpp"
 
-class PerlinWorms {
+class Cave {
 	private:
-		glm::vec2 currentDirection;
-		glm::vec2 currentPos;
-		glm::vec2 convergancePoint;
-		bool moveToCPoint;
+		
 	public:
-		PerlinWorms(float seed, glm::vec2 pos);
-		glm::vec2 PerlinWorms::getPerlinDirection();
-		glm::vec2 PerlinWorms::move();
-		~PerlinWorms();
+		Cave();
+		void startCave(Chunk *chunk, glm::vec2 chunkPos, glm::vec3 startPoint, int size);
+		void createCave(Chunk *chunk);
+		~Cave();
 };
 
 #endif
