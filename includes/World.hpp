@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:08:20 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/19 12:22:18 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/23 14:05:39 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,9 @@
 # include "Chunk.hpp"
 # include "WorldGenerator.hpp"
 # define CHK_RND_DIST 10
-# define CHK_DEL_DIST 12
+# define CHK_DEL_DIST 15
 # define CHK_DIST_MEM 20
-# define CHK_DEL_DIST_MEM 25
+# define CHK_DEL_DIST_MEM 30
 
 using namespace std;
 using ChunkPos = Coords::Coords<int, 2>;
@@ -35,14 +35,15 @@ class Engine;
 class World
 {
 	private:
-		// bool					onlyLoadMem;
 		bool					queueOn;
 		mutex					queueOnMutex;
+		mutex					genQueueMutex;
 		mutex					queueMutex;
 		mutex					memoryMutex;
 		mutex					displayedMutex;
 		mutex					graphicMutex;
 		mutex					chunkPMutex;
+		set<ChunkPos>			genQueue;
 		set<ChunkPos>			loadQueue;
 		map<ChunkPos, Chunk*>	memoryChunks;
 		unordered_set<ChunkPos>	displayedChunks;
@@ -56,14 +57,16 @@ class World
 		// mutex					deltaFTMutex;
 	
 
-
 		void					initQueueSorter(void);
 
+		void					insertGenQueue(void);
 		void					insertLoadQueue(void);
 		bool					isLoadable(ChunkPos &pos);
-		void					parallelizeLoad(void);
+		bool					isGen(ChunkPos &pos);
 		unsigned int			LoadNextQueuedChunk(void);
+		unsigned int			genNextQueuedChunk(void);
 		void					loadChunk(ChunkPos cp);
+		void					genChunk(ChunkPos cp);
 		void					pushInDisplay(Chunk* chunk, bool alreadyGen);
 		void					loadGraphics(void);
 
@@ -77,7 +80,8 @@ class World
 							// World(string )
 							~World();
 
-	void const				initThread(bool value);
+	void					loopGen(bool value);
+	void					loopLoad(bool value);
 	void					queueToDisplay(void);
 	void					display(Engine &e, float currentFrameTime);
 	ChunkPos				getCameraChunkPos();

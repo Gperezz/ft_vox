@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/18 18:13:34 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/23 12:53:20 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,8 +134,8 @@ void		Chunk::generateVbo(char index, vector<vbo_type> tempVbo)
 {
 	GLenum err;
 
-	while((err = glGetError()) != GL_NO_ERROR)
-		std::cout << BOLD_RED << "AVANT Error " << err << '\n' << NA;
+	// while((err = glGetError()) != GL_NO_ERROR)
+	// 	std::cout << BOLD_RED << "AVANT Error " << err << '\n' << NA;
 
 	glBindVertexArray(tabVao[(int)index]);
 	glBindBuffer(GL_ARRAY_BUFFER, tabVbo[(int)index]);
@@ -150,8 +150,8 @@ void		Chunk::generateVbo(char index, vector<vbo_type> tempVbo)
 	glEnableVertexAttribArray(2);
 	glEnableVertexAttribArray(3);
 
-	while((err = glGetError()) != GL_NO_ERROR)
-            std::cout << BOLD_RED << "Error " << err << '\n' << NA;
+	// while((err = glGetError()) != GL_NO_ERROR)
+    //         std::cout << BOLD_RED << "Error " << err << '\n' << NA;
 
 }
 
