@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/04 23:49:41 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/19 13:15:44 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/23 17:11:46 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include "Mat.hpp"
 # include "Coords.hpp"
 # define SPEED 1.f
+# define SPEED_SPRINT 3.f
 # define SPEED_ACCEL 20.f
 # define SENSITIVITY 0.15f
 

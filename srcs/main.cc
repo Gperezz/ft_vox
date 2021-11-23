@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/23 14:07:21 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/23 17:04:55 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,9 @@ void	key(Engine &env, float deltaFrameTime)
 	float speed = SPEED;
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(env.getWindow(), true);
-	if (glfwGetKey(env.getWindow(), GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+	if (glfwGetKey(env.getWindow(), GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+			speed = SPEED_SPRINT;
+	else if (glfwGetKey(env.getWindow(), GLFW_KEY_LEFT_ALT) == GLFW_PRESS)
 			speed = SPEED_ACCEL;
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_S) == GLFW_PRESS)
 	{
@@ -44,7 +46,7 @@ void	key(Engine &env, float deltaFrameTime)
 		env.getCam().translate(E_UP, speed * deltaFrameTime);
 		// env.getCam().printMatrix(true);
 	}
-	if (glfwGetKey(env.getWindow(), GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+	if (glfwGetKey(env.getWindow(), GLFW_KEY_X) == GLFW_PRESS)
 	{
 		env.getCam().translate(E_UP, -speed * deltaFrameTime);
 		// env.getCam().printMatrix(true);
@@ -134,10 +136,14 @@ int		main(void)
 
 	int	close = 0;
 	std::mutex	windowMutex;
-	
+
+	std::cout << GREEN << "Generation du terrain en cours...\n" << NA;
 	world.loopGen(false);
 	world.loopLoad(false);
+	while (world.isStarted())
+		world.loadGraphics();
 
+	std::cout << GREEN << "Done !\n" << NA;
 	std::thread t0(&World::loopGen, std::ref(world), true);
 	std::thread t1(&World::loopLoad, std::ref(world), true);
 

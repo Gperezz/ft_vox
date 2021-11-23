@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:08:20 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/23 14:05:39 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/23 17:09:33 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,12 @@
 # include "Engine.hpp"
 # include "Chunk.hpp"
 # include "WorldGenerator.hpp"
-# define CHK_RND_DIST 10
-# define CHK_DEL_DIST 15
-# define CHK_DIST_MEM 20
-# define CHK_DEL_DIST_MEM 30
+# define CHK_RND_DIST 7//14
+# define CHK_DEL_DIST 9//18
+# define CHK_DIST_MEM 10//20
+# define CHK_DEL_DIST_MEM 15//30
+
+# define CHK_SAFE_DIST CHK_RND_DIST * CHK_RND_DIST
 
 using namespace std;
 using ChunkPos = Coords::Coords<int, 2>;
@@ -35,6 +37,7 @@ class Engine;
 class World
 {
 	private:
+		bool					start;
 		bool					queueOn;
 		mutex					queueOnMutex;
 		mutex					genQueueMutex;
@@ -46,18 +49,17 @@ class World
 		set<ChunkPos>			genQueue;
 		set<ChunkPos>			loadQueue;
 		map<ChunkPos, Chunk*>	memoryChunks;
-		unordered_set<ChunkPos>	displayedChunks;
-		unordered_set<Chunk*>	graphicQueue;
-		unordered_set<ChunkPos>	chunkPQueue;
+		set<ChunkPos>			displayedChunks;
+		set<ChunkPos>			graphicQueue;
+		set<ChunkPos>			chunkPQueue;
 		WorldGenerator			worldGen;
 		Engine&					enginePtr;
 		string					path;
 		float					deltaFrameTime;
 		float					lastFrameTime;
-		// mutex					deltaFTMutex;
 	
 
-		void					initQueueSorter(void);
+		void					initSet(void);
 
 		void					insertGenQueue(void);
 		void					insertLoadQueue(void);
@@ -68,7 +70,6 @@ class World
 		void					loadChunk(ChunkPos cp);
 		void					genChunk(ChunkPos cp);
 		void					pushInDisplay(Chunk* chunk, bool alreadyGen);
-		void					loadGraphics(void);
 
 		void					deleteFarInDisplay(void);
 		void					deleteFar(void);
@@ -82,6 +83,7 @@ class World
 
 	void					loopGen(bool value);
 	void					loopLoad(bool value);
+	void					loadGraphics(void);
 	void					queueToDisplay(void);
 	void					display(Engine &e, float currentFrameTime);
 	ChunkPos				getCameraChunkPos();
@@ -89,10 +91,11 @@ class World
 	Chunk					*get(ChunkPos);
 	Chunk					*getUnsafe(ChunkPos);
 	// Chunk					*getMemoryChunk(ChunkPos pos);
-	unordered_set<ChunkPos>	&getDisplayedChunks(void);
+	set<ChunkPos>			&getDisplayedChunks(void);
 	float					getDeltaFrameTime(void);
 	Chunk					*operator[](ChunkPos);
 	void					end(void);
+	bool					isStarted(void);
 };
 
 #endif
