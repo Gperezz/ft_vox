@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/23 17:00:57 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/24 15:41:03 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@ using namespace std;
 
 World::World(Engine& engine, unsigned long *seed)
 :
+	startGen(true),
+	startLoad(true),
 	start(true),
 	enginePtr(engine),
 	deltaFrameTime(0.0),
@@ -28,20 +30,22 @@ World::World(Engine& engine, unsigned long *seed)
 		this->worldGen.configure(seed);
 	}
 
-World::World(Engine& engine, string& path, unsigned long *seed)
-:
-	start(true),
-	enginePtr(engine),
-	path(path),
-	deltaFrameTime(0.0),
-	lastFrameTime(0.0)
-	{
-		// initSet();
-		{unique_lock<mutex>	lk(this->queueOnMutex);
-			this->queueOn = true;
-		}
-		this->worldGen.configure(seed);
-	}
+// World::World(Engine& engine, string& path, unsigned long *seed)
+// :
+// 	startGen(true),
+// 	startLoad(true),
+// 	start(true),
+// 	enginePtr(engine),
+// 	path(path),
+// 	deltaFrameTime(0.0),
+// 	lastFrameTime(0.0)
+// 	{
+// 		// initSet();
+// 		{unique_lock<mutex>	lk(this->queueOnMutex);
+// 			this->queueOn = true;
+// 		}
+// 		this->worldGen.configure(seed);
+// 	}
 
 World::~World()
 {
@@ -117,16 +121,22 @@ void	World::insertGenQueue(void)
 {
 	static ChunkPos	prevPos;
 	int				renderDist = CHK_DIST_MEM;
-	static bool		start = true;
 	ChunkPos		pos = this->getCameraChunkPos();
 
-	if (prevPos == pos && !start)
+	if (prevPos == pos && !this->startGen)
 		return ;
-	start = false;
 
+	{unique_lock<mutex> lockStart(this->startGenMutex);
+	this->startGen = false;}
 	unique_lock<mutex> lk(this->genQueueMutex);
 	for (int i = -renderDist; i < renderDist + 1; i++)
 	{
+		{unique_lock<mutex> lockStart(this->startGenMutex);
+		if (this->startGen)
+		{
+			i = -renderDist;
+			this->genQueue.clear();
+		}}
 		for (int j = -renderDist; j < renderDist + 1; j++)
 		{
 			ChunkPos cp(pos + (int[]){i, j});
@@ -141,16 +151,22 @@ void	World::insertLoadQueue(void)
 {
 	static ChunkPos	prevPos;
 	int				renderDist = CHK_RND_DIST;
-	static bool		start = true;
 	ChunkPos		pos = this->getCameraChunkPos();
 
-	if (prevPos == pos && !start)
+	if (prevPos == pos && !this->startLoad)
 		return ;
-	start = false;
 
+	{unique_lock<mutex> lockStart(this->startLoadMutex);
+	this->startLoad = false;}
 	unique_lock<mutex> lk(this->queueMutex);
 	for (int i = -renderDist; i < renderDist + 1; i++)
 	{
+		{unique_lock<mutex> lockStart(this->startLoadMutex);
+		if (this->startLoad)
+		{
+			i = -renderDist;
+			this->loadQueue.clear();
+		}}
 		for (int j = -renderDist; j < renderDist + 1; j++)
 		{
 			ChunkPos cp(pos + (int[]){i, j});
@@ -295,6 +311,7 @@ void	World::pushInDisplay(Chunk* chunk, bool alreadyGen)
 
 void	World::loadGraphics(void)
 {
+	static int previousSize;
 	std::map<ChunkPos, Chunk*>::iterator	chunk;
 	unique_lock<mutex> lockMem(this->memoryMutex);
 	unique_lock<mutex> lockGraph(this->graphicMutex);
@@ -304,11 +321,25 @@ void	World::loadGraphics(void)
 		return ;
 	}
 
+	// std::cout << GREEN << "previous size: " << previousSize << " Size:" << this->graphicQueue.size() <<"\n";
+	if (previousSize == this->graphicQueue.size())
+	{
+		set<ChunkPos>			tmp = this->graphicQueue;
+		unique_lock<mutex> lockStartG(this->startGenMutex);
+		unique_lock<mutex> lockStart(this->startLoadMutex);
+		this->startGen = true;
+		this->startLoad = true;
+		std::cout << RED << "size: " << this->graphicQueue.size() << "\n" << NA;
+		this->graphicQueue.clear();
+		this->graphicQueue = tmp;
+	}
+
 	unsigned int size = 0;
 	for (set<ChunkPos>::iterator it; it != this->graphicQueue.end(); (void)it)
 	{
 		size = this->graphicQueue.size();
 		std::cout << size << "\n";
+		previousSize = size;
 		it = this->graphicQueue.begin();
 		if ((chunk = this->memoryChunks.find(*it)) == this->memoryChunks.end())
 			return ;
@@ -321,13 +352,13 @@ void	World::loadGraphics(void)
 
 void	World::deleteFarInDisplay()
 {
-	static ChunkPos	prevPos;
-	ChunkPos		chunkP;
-	ChunkPos		pos = this->getCameraChunkPos();
+	static ChunkPos			prevPos;
+	ChunkPos				chunkP;
+	ChunkPos				pos = this->getCameraChunkPos();
+	std::vector<ChunkPos>	erase;
 
 	if (pos == prevPos)
 		return ;
-	unique_lock<mutex> lockMem(this->memoryMutex);
 	unique_lock<mutex> lock(this->displayedMutex);
 	for (auto it = this->displayedChunks.begin(); it != this->displayedChunks.end(); it++)
 	{
@@ -336,9 +367,13 @@ void	World::deleteFarInDisplay()
 			|| chunkP.get(0) - pos.get(0) < -CHK_DEL_DIST
 			|| chunkP.get(1) - pos.get(1) > CHK_DEL_DIST 
 			|| chunkP.get(1) - pos.get(1) < -CHK_DEL_DIST)
-				this->displayedChunks.erase(chunkP);
+				erase.push_back(chunkP);
 	}
+	int i = 0;
+	while (i < erase.size())
+		this->displayedChunks.erase(erase[i++]);
 	pos = prevPos;
+	erase.clear();
 }
 
 void	World::deleteFar(void)
@@ -352,6 +387,8 @@ void	World::deleteFar(void)
 	unique_lock<mutex> lockMem(this->memoryMutex);
 	for (auto it = this->memoryChunks.begin(); it != this->memoryChunks.end(); it++)
 	{
+		if (it == this->memoryChunks.end() || !this->memoryChunks.count(it->first))
+			return;
 		chunkP = it->first;
 		if (chunkP.get(0) - pos.get(0) > CHK_DEL_DIST_MEM 
 			|| chunkP.get(0) - pos.get(0) < -CHK_DEL_DIST_MEM
@@ -359,6 +396,8 @@ void	World::deleteFar(void)
 			|| chunkP.get(1) - pos.get(1) < -CHK_DEL_DIST_MEM)
 		{
 			Chunk* delChunk = this->memoryChunks.at(chunkP);
+			if (!delChunk)
+				return;
 			delete delChunk;
 			this->memoryChunks[chunkP]->updateDelFenced();
 			this->memoryChunks.erase(chunkP);
@@ -435,10 +474,10 @@ Chunk	*World::operator[](ChunkPos cp)
 // 	return (this->memoryChunks.at(pos));
 // }
 
-set<ChunkPos>	&World::getDisplayedChunks(void)
-{
-	return (this->displayedChunks);
-}
+// set<ChunkPos>	&World::getDisplayedChunks(void)
+// {
+// 	return (this->displayedChunks);
+// }
 
 // void	World::loadChunk(int x, int z)
 // {

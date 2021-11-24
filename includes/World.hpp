@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:08:20 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/23 17:09:33 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/24 15:44:06 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,10 @@
 # include "Engine.hpp"
 # include "Chunk.hpp"
 # include "WorldGenerator.hpp"
-# define CHK_RND_DIST 7//14
-# define CHK_DEL_DIST 9//18
-# define CHK_DIST_MEM 10//20
-# define CHK_DEL_DIST_MEM 15//30
+# define CHK_RND_DIST 10//7//14
+# define CHK_DEL_DIST 14//9//18
+# define CHK_DIST_MEM 18//10//20
+# define CHK_DEL_DIST_MEM 25//15//30
 
 # define CHK_SAFE_DIST CHK_RND_DIST * CHK_RND_DIST
 
@@ -37,6 +37,10 @@ class Engine;
 class World
 {
 	private:
+		mutex					startGenMutex;
+		bool					startGen;
+		mutex					startLoadMutex;
+		bool					startLoad;
 		bool					start;
 		bool					queueOn;
 		mutex					queueOnMutex;
@@ -45,13 +49,11 @@ class World
 		mutex					memoryMutex;
 		mutex					displayedMutex;
 		mutex					graphicMutex;
-		mutex					chunkPMutex;
 		set<ChunkPos>			genQueue;
 		set<ChunkPos>			loadQueue;
 		map<ChunkPos, Chunk*>	memoryChunks;
 		set<ChunkPos>			displayedChunks;
 		set<ChunkPos>			graphicQueue;
-		set<ChunkPos>			chunkPQueue;
 		WorldGenerator			worldGen;
 		Engine&					enginePtr;
 		string					path;
@@ -91,7 +93,7 @@ class World
 	Chunk					*get(ChunkPos);
 	Chunk					*getUnsafe(ChunkPos);
 	// Chunk					*getMemoryChunk(ChunkPos pos);
-	set<ChunkPos>			&getDisplayedChunks(void);
+	// set<ChunkPos>			&getDisplayedChunks(void);
 	float					getDeltaFrameTime(void);
 	Chunk					*operator[](ChunkPos);
 	void					end(void);
