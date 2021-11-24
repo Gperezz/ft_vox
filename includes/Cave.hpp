@@ -9,7 +9,6 @@ class Cave {
 		
 	public:
 		Cave();
-		void startCave(Chunk *chunk, glm::vec2 chunkPos, glm::vec3 startPoint, int size);
 		void createCave(Chunk *chunk);
 		~Cave();
 };

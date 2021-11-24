@@ -6,7 +6,7 @@
 /*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/02 08:06:26 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/21 22:05:21 by maiwenn          ###   ########.fr       */
+/*   Updated: 2021/11/24 16:49:38 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,19 +80,19 @@ double elevation(double x, double z, double seed)
     return (e);
 }
 
-double moisure(double x, double z, double seed)
-{
-	PerlinNoise noise = PerlinNoise();
-	double m = (1.00 * noise.perlin(1, 1.0, 3, x, z)
-		+ 0.75 * noise.perlin(1, 1.0, 3, 2 * x, 2 * z)
-		+ 0.33 * noise.perlin(1, 1.0, 3, 3 * x, 3 * z)
-		+ 0.33 * noise.perlin(1, 1.0, 3, 4 * x, 4 * z)
-		+ 0.33 * noise.perlin(1, 1.0, 3, 5 * x, 5 * z)
-		+ 0.50 * noise.perlin(1, 1.0, 3, 6 * x, 6 * z)
-	);
-    m = m / (1.00 + 0.75 + 0.33 /*+ 0.33 + 0.33 + 0.50*/);
-	return(m);
-}
+// double moisure(double x, double z, double seed)
+// {
+// 	PerlinNoise noise = PerlinNoise();
+// 	double m = (1.00 * noise.perlin(1, 1.0, 3, x, z)
+// 		+ 0.75 * noise.perlin(1, 1.0, 3, 2 * x, 2 * z)
+// 		+ 0.33 * noise.perlin(1, 1.0, 3, 3 * x, 3 * z)
+// 		+ 0.33 * noise.perlin(1, 1.0, 3, 4 * x, 4 * z)
+// 		+ 0.33 * noise.perlin(1, 1.0, 3, 5 * x, 5 * z)
+// 		+ 0.50 * noise.perlin(1, 1.0, 3, 6 * x, 6 * z)
+// 	);
+//     m = m / (1.00 + 0.75 + 0.33 /*+ 0.33 + 0.33 + 0.50*/);
+// 	return(m);
+// }
 
 void	putBlock(Chunk *chunk, unsigned char type, int x, int y, int z, double e)
 {
@@ -125,26 +125,20 @@ void	WorldGenerator::genChunk(Chunk *chunk)
 {
 	Cave cave = Cave();
 	ChunkPos pos = chunk->getPos();
-	//boucle sur mes chunk allenture et creuse  si mes alentour on une grotte
+
+	for (int x = 0; x < 16; x++){
+		for (int z = 0; z < 16; z++){
+			
+			ChunkPos pos = chunk->getPos();
+			double e = elevation(pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX, 1567612511);
+			double m = elevation(pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX, 3);
+			e = ((e + 1) / 2) * 255;
+			m = ((m + 1) / 2) * 255;
+			unsigned char type = blockColor(m, e);
+			chooseBlock(chunk, type, x, z, e);
+		}
+	}
 	cave.createCave(chunk);
-	// // printf("x:\n");
-	// for (int x = 0; x < 16; x++){
-	// 	// printf("z: ");
-	// 	for (int z = 0; z < 16; z++){
-			
-	// 		ChunkPos pos = chunk->getPos();
-	// 		double e = elevation(pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX, 1567612511);
-	// 		double m = elevation(pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX, 3);
-	// 		e = ((e + 1) / 2) * 255;
-	// 		m = ((m + 1) / 2) * 255;
-	// 		unsigned char type = blockColor(m, e);
-	// 		// printf("%f, \n", height);
-			
-	// 		chooseBlock(chunk, type, x, z, e);
-	// 	}
-	// 	// printf("\n");
-	// }
-	// // printf("\n");
 }
 
 void	WorldGenerator::configure(unsigned long* seed)
