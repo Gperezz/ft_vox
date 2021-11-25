@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Chunk.cc                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/11 11:08:31 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/25 10:54:11 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -213,12 +213,12 @@ void		Chunk::printSlice(int z)
 
 Block&		Chunk::getBlock(BlockPos pos)
 {
-	return this->getBlock(pos[MY], pos[X], pos[Y], pos[Z]);
+	return (this->getBlock(pos[MY], pos[X], pos[Y], pos[Z]));
 }
 
 Block&		Chunk::getBlock(int my, int x, int y, int z)
 {
-	return this->blocks[my][x][y][z];
+	return (this->blocks[my][x][y][z]);
 }
 
 void		Chunk::setBlock(BlockPos blockPos, t_block_info info)
@@ -226,9 +226,21 @@ void		Chunk::setBlock(BlockPos blockPos, t_block_info info)
 	this->blocks[blockPos.get(0)][blockPos.get(1)][blockPos.get(2)][blockPos.get(3)] = info;
 }
 
+void		Chunk::setBlock(BlockPos blockPos, t_block_info info, unsigned char biome)
+{
+	this->blocks[blockPos.get(0)][blockPos.get(1)][blockPos.get(2)][blockPos.get(3)] = info;
+	// printBiome(biome);
+	this->blocks[blockPos.get(0)][blockPos.get(1)][blockPos.get(2)][blockPos.get(3)].setBiome(biome);
+}
+
+unsigned char Chunk::getBiome(BlockPos blockPos)
+{
+	return (this->blocks[blockPos.get(0)][blockPos.get(1)][blockPos.get(2)][blockPos.get(3)].getBiome());
+}
+
 ChunkPos	Chunk::getPos(void)
 {
-	return this->pos;
+	return (this->pos);
 }
 
 bool	Chunk::getFenced(void)

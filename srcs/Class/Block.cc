@@ -6,7 +6,7 @@
 /*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:14:03 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/15 11:33:27 by maiwenn          ###   ########.fr       */
+/*   Updated: 2021/11/25 10:53:28 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,16 @@ bool			Block::isTransparentBlock(Block block)
 void			Block::operator=(t_block_info info)
 {
 	this->info = info;
+}
+
+void			Block::setBiome(unsigned char b)
+{
+	this->biome = (e_Biome)b;
+}
+
+unsigned char	Block::getBiome()
+{
+	return(this->biome);
 }
 
 Block::~Block()

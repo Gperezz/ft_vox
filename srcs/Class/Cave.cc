@@ -37,22 +37,25 @@ static void drawCave(glm::vec3 pos, Chunk *chunk, int x, int y, int z, unsigned 
 	int positionZ = (int)pos.z + z;
 	if (positionX < 16 && positionX >= 0 && positionY < 256 && positionY >= 0 && positionZ < 16 && positionZ >= 0)
 	{
-		chunk->setBlock(BlockPos((int[4]){((int)pos.y + y) / 16, positionX, positionY, positionZ}),
-			(t_block_info){type,0,0,0});
+		BlockPos blockPos = BlockPos((int[4]){((int)pos.y + y) / 16, positionX, positionY, positionZ});
+		unsigned char biome = chunk->getBiome(blockPos);
+		// printBiome(biome);
+		if (biome != OCEAN && biome != BEACH)
+			chunk->setBlock(BlockPos(blockPos), (t_block_info){type,0,0,0});
+
 	}
 }
 
 static void dighing(glm::vec3 startInChunk, Chunk *chunk, glm::vec3 segment)
 {
-		for (int x = -2; x <= 2; x++){
-			for(int y = -2; y <= 2; y++){
-				for(int z = -2; z <= 2; z++){
-					if (x * x + y * y + z * z <= 2 * 2 * 2){
-						drawCave(startInChunk, chunk, x, y, z, AIR);
-					}
+	for (int x = -2; x <= 2; x++){
+		for(int y = -2; y <= 2; y++){
+			for(int z = -2; z <= 2; z++){
+				if (x * x + y * y + z * z <= 2 * 2 * 2){
+					drawCave(startInChunk, chunk, x, y, z, AIR);
 				}
 			}
-		// }
+		}
 	}
 }
 
@@ -63,10 +66,10 @@ static glm::vec3 move(double angle)
 	return(segment);
 }
 
-void startCave(Chunk *chunk, t_startPoint start, int size)
+void startCave(Chunk *chunk, t_startPoint start, int size, int seed)
 {
 	double noises[size];
-	PerlinNoise perlin = PerlinNoise(6);
+	PerlinNoise perlin = PerlinNoise(seed / 500);
 
 	for (int i = 0; i < size; i++) {
 		noises[i] = toDegree(perlin.noise(start.noise.x + i, start.noise.z + i));
@@ -94,7 +97,7 @@ static double elevation(double x, double z, double seed)
 }
 
 
-bool findCave(Chunk *chunk, int x, int z, t_startPoint *start)
+bool findCave(Chunk *chunk, int x, int z, t_startPoint *start, int seed)
 {
 	ChunkPos pos = chunk->getPos(); 
 
@@ -103,7 +106,7 @@ bool findCave(Chunk *chunk, int x, int z, t_startPoint *start)
 		glm::vec3 blockPos = glm::vec3((pos[0] + x) % 16, 0, (pos[1] + z) % 16);
 		start->noise = glm::vec3((pos[0] + x) * 16  + blockPos.x + (float)SHRT_MAX, 0, (pos[1] + z) * 16  + blockPos.z + (float)SHRT_MAX);
 		
-		double e = elevation(start->noise.x, start->noise.z, 1567612511);
+		double e = elevation(start->noise.x, start->noise.z, seed);
 		e = ((e + 1) / 2) * 255;
 		start->chunk = glm::vec3(blockPos.x + (16 * x), e, blockPos.z + (16 * z));
 
@@ -112,7 +115,7 @@ bool findCave(Chunk *chunk, int x, int z, t_startPoint *start)
 	return(false);
 }
 
-void Cave::createCave(Chunk *chunk)
+void Cave::createCave(Chunk *chunk, int seed)
 {
 	int size = 50;
 	t_startPoint start;
@@ -120,8 +123,8 @@ void Cave::createCave(Chunk *chunk)
 	{
 		for(int j = -7; j < 7; j++)
 		{
-			if (findCave(chunk, i, j, &start) == true)
-				startCave(chunk, start, size);
+			if (findCave(chunk, i, j, &start, seed) == true)
+				startCave(chunk, start, size, seed);
 		}
 	}
 }

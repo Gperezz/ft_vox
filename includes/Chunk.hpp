@@ -6,7 +6,7 @@
 /*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:17:27 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/12 10:32:18 by maiwenn          ###   ########.fr       */
+/*   Updated: 2021/11/25 10:28:02 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,8 @@ class Chunk{
 		Block&							getBlock(BlockPos);
 		Block&							getBlock(int my, int x, int y, int z);
 		void							setBlock(BlockPos, t_block_info);
+		void							setBlock(BlockPos blockPos, t_block_info info, unsigned char biome);
+		unsigned char					getBiome(BlockPos blockPos);
 		ChunkPos						getPos(void);
 		bool							getFenced(void);
 		void							updateFenced(int source);

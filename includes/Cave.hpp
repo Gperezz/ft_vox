@@ -9,7 +9,7 @@ class Cave {
 		
 	public:
 		Cave();
-		void createCave(Chunk *chunk);
+		void createCave(Chunk *chunk, int seed);
 		~Cave();
 };
 

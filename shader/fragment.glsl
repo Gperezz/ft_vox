@@ -37,7 +37,7 @@ void	main()
 	textureColor = texture(basicTexture, tCoords);
 	if (textureColor.w < 0.9)
 		discard;
-	if ((int(textureType) == 1 && type == 2) || type == LEAVES)
+	if ((int(textureType) == 1 && type == GRASS) || type == LEAVES)
 		colorAddedTexture = vec4(convertRGB(vec3(176, 252, 113)), 1.0);
 	else if (type == SNOW)
 		textureColor = (textureColor + vec4(1., 1., 1., 1.)) / 2;
