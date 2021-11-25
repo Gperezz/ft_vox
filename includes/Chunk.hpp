@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:17:27 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/18 16:31:31 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/25 17:15:46 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,7 @@ class Chunk{
 		bool							generate;
 		ChunkState						state;
 		World							*world;
+		void							canPrintBlockLoop(std::vector<vbo_type> &tempVbo, BlockPos posInMesh, int &i, char &dir);
 		bool							canPrintBlock(std::vector<vbo_type> &tempVbo, BlockPos posInMesh);
 		void							fillTempVbo(std::vector<vbo_type> &tempVbo, t_direction_consts dir_c, BlockPos posInMesh, t_id id);
 		void							conditionValidate(std::vector<vbo_type> &tempVbo, BlockPos posInMesh, bool &b);

@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/23 17:04:55 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/25 18:25:36 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,6 +153,8 @@ int		main(void)
 			close = glfwWindowShouldClose(env.getWindow());
 		}
 		exec(world, env, time);
+		if (world.isEnd())
+			close = 1;
 	}
 
 	world.end();

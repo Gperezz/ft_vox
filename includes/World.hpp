@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:08:20 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/24 15:44:06 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/25 19:06:33 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,10 @@
 # include "Engine.hpp"
 # include "Chunk.hpp"
 # include "WorldGenerator.hpp"
-# define CHK_RND_DIST 10//7//14
-# define CHK_DEL_DIST 14//9//18
-# define CHK_DIST_MEM 18//10//20
-# define CHK_DEL_DIST_MEM 25//15//30
+# define CHK_RND_DIST 14//10//7//14
+# define CHK_DEL_DIST 18//14//9//18
+# define CHK_DIST_MEM 20//18//10//20
+# define CHK_DEL_DIST_MEM 30//25//15//30
 
 # define CHK_SAFE_DIST CHK_RND_DIST * CHK_RND_DIST
 
@@ -97,6 +97,7 @@ class World
 	float					getDeltaFrameTime(void);
 	Chunk					*operator[](ChunkPos);
 	void					end(void);
+	bool					isEnd(void);
 	bool					isStarted(void);
 };
 

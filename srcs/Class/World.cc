@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/24 15:41:03 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/25 19:06:17 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,11 @@ World::~World()
 			it++;
 		}
 	}
+}
+
+bool		World::isEnd(void)
+{
+	return (!this->queueOn);
 }
 
 void		World::end(void)
@@ -140,8 +145,16 @@ void	World::insertGenQueue(void)
 		for (int j = -renderDist; j < renderDist + 1; j++)
 		{
 			ChunkPos cp(pos + (int[]){i, j});
+			if (this->genQueue.size() > this->genQueue.max_size() - 2)
+			{
+				std::cout << "MAX SIZE genQueue\n";
+				return ;
+			}
 			if (this->genQueue.count(cp) == 0)
+			{
+				// std::cout << GREEN << this->genQueue.size() << " " << this->genQueue.max_size() << "\n" << NA;
 				this->genQueue.insert(cp);
+			}
 		}
 	}
 	prevPos = pos;
@@ -169,9 +182,17 @@ void	World::insertLoadQueue(void)
 		}}
 		for (int j = -renderDist; j < renderDist + 1; j++)
 		{
+			if (this->loadQueue.size() > this->loadQueue.max_size() - 2)
+			{
+				std::cout << "MAX SIZE loadQueue\n";
+				return ;
+			}
 			ChunkPos cp(pos + (int[]){i, j});
 			if (this->loadQueue.count(cp) == 0)
+			{
+				// std::cout << BOLD_GREEN << this->loadQueue.size() << " " << this->loadQueue.max_size() << "\n" << NA;
 				this->loadQueue.insert(cp);
+			}
 		}
 	}
 	prevPos = pos;
@@ -263,10 +284,19 @@ void	World::genChunk(ChunkPos cp)
 		return ;
 	}
 	
+	if (this->memoryChunks.size() > this->memoryChunks.max_size() - 2)
+	{
+		std::cout << "MAX SIZE MEMORY\n";
+		return ;
+	}
+
 	Chunk	*newChunk = NULL;
 	newChunk = new Chunk(this, cp);
 	if (!newChunk)
+	{
+		this->end();
 		return;
+	}
 	this->worldGen.genChunk(newChunk);
 	
 	{unique_lock<mutex> lockMem(this->memoryMutex);
@@ -286,10 +316,20 @@ void	World::pushInDisplay(Chunk* chunk, bool alreadyGen)
 
 	if (chunk->getFenced())
 	{
+		if (this->displayedChunks.size() > this->displayedChunks.max_size() - 2)
+		{
+			std::cout << "MAX SIZE DISPLAY\n";
+			return ;
+		}
 		this->displayedChunks.insert(chunkP);
 		if (!alreadyGen)
 		{
 			unique_lock<mutex> lk(this->graphicMutex); //chunk->generateGraphics();
+			if (this->graphicQueue.size() > this->graphicQueue.max_size() - 2)
+			{
+				std::cout << "MAX SIZE GRAPHICS\n";
+				return ;
+			}
 			this->graphicQueue.insert(chunkP);
 		}
 	}
@@ -360,6 +400,7 @@ void	World::deleteFarInDisplay()
 	if (pos == prevPos)
 		return ;
 	unique_lock<mutex> lock(this->displayedMutex);
+	// std::cout << BOLD_YELLOW << this->displayedChunks.size() << " " << this->displayedChunks.max_size() << "\n";
 	for (auto it = this->displayedChunks.begin(); it != this->displayedChunks.end(); it++)
 	{
 		chunkP = *it;
@@ -378,13 +419,15 @@ void	World::deleteFarInDisplay()
 
 void	World::deleteFar(void)
 {
-	static ChunkPos	prevPos;
-	ChunkPos		pos = this->getCameraChunkPos();
-	ChunkPos		chunkP;
+	static ChunkPos			prevPos;
+	ChunkPos				pos = this->getCameraChunkPos();
+	ChunkPos				chunkP;
+	std::vector<ChunkPos>	erase;
 
 	if (pos == prevPos)
 		return ;
 	unique_lock<mutex> lockMem(this->memoryMutex);
+	// std::cout << YELLOW << this->memoryChunks.size() << " " << this->memoryChunks.max_size() << "\n";
 	for (auto it = this->memoryChunks.begin(); it != this->memoryChunks.end(); it++)
 	{
 		if (it == this->memoryChunks.end() || !this->memoryChunks.count(it->first))
@@ -394,14 +437,17 @@ void	World::deleteFar(void)
 			|| chunkP.get(0) - pos.get(0) < -CHK_DEL_DIST_MEM
 			|| chunkP.get(1) - pos.get(1) > CHK_DEL_DIST_MEM 
 			|| chunkP.get(1) - pos.get(1) < -CHK_DEL_DIST_MEM)
-		{
-			Chunk* delChunk = this->memoryChunks.at(chunkP);
-			if (!delChunk)
-				return;
-			delete delChunk;
-			this->memoryChunks[chunkP]->updateDelFenced();
-			this->memoryChunks.erase(chunkP);
-		}
+			erase.push_back(chunkP);
+	}
+	int i = 0;
+	while (i < erase.size())
+	{
+		auto delChunk = this->memoryChunks.find(erase[i]);
+		if (delChunk == this->memoryChunks.end() || !delChunk->second)
+			return;
+		delete delChunk->second;
+		this->memoryChunks[chunkP]->updateDelFenced();
+		this->memoryChunks.erase(erase[i]);
 	}
 	pos = prevPos;
 }
