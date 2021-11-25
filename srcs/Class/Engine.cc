@@ -111,12 +111,14 @@ static bool isInAirBlock(Block currentBlock)
 	return (currentBlock.getInfo().id == AIR);
 }
 
-Block		*Engine::getBlockFromPos(Chunk **chunk, glm::vec3 pos, glm::vec4 &bP, std::map<ChunkPos, Chunk*> memory)
+Block		*Engine::getBlockFromPos(Chunk **chunk, glm::vec3 pos, glm::vec4 &bP, World &world)
 {
 	Block		*block;
 	ChunkPos	chunkPos = Camera::getCurrentChunkPos(pos);
 
-	(*chunk) = memory.at(chunkPos);
+	// (*chunk) = world.getSafe(chunkPos); A REMMETTRE
+	if (!chunk)
+		return (NULL);
 	bP = glm::vec4(Camera::getCurrentOffset(pos), (int)(pos.y / 16.));
 	if (bP.x - PREC < 0.0)
 		bP.x = 1.0 + bP.x;
@@ -177,7 +179,7 @@ static void	setGenBlock(glm::vec4 posB, Chunk *chunk, e_BlockType type)
 		chunk->generateGraphics((int)posB.w + 1);
 }
 
-void		Engine::rayCasting(Chunk *chunk, map<ChunkPos, Chunk*> &memory)
+void		Engine::rayCasting(Chunk *chunk, World &world)
 {
 	glm::vec3		ray;
 	glm::vec3		pos = this->camera.getTranslate();
@@ -195,7 +197,7 @@ void		Engine::rayCasting(Chunk *chunk, map<ChunkPos, Chunk*> &memory)
 		this->getHud().setCursorColor(WHITE_CURSOR);
 		return ;
 	}
-	currentBlock = getBlockFromPos(&chunk, pos, currentBP, memory); // Check si la position de base est dans un cube d'air
+	currentBlock = getBlockFromPos(&chunk, pos, currentBP, world); // Check si la position de base est dans un cube d'air
 	if (!currentBlock || !chunk || !isInAirBlock(*currentBlock) || chunk->getFenced() == UNFENCED) //
 	{
 		this->getHud().setCursorColor(RED_CURSOR);
@@ -207,7 +209,7 @@ void		Engine::rayCasting(Chunk *chunk, map<ChunkPos, Chunk*> &memory)
 		saveChunk = chunk;
 		saveBP = currentBP;
 		stepLoop(pos, ray);
-		currentBlock = getBlockFromPos(&chunk, pos, currentBP, memory);
+		currentBlock = getBlockFromPos(&chunk, pos, currentBP, world);
 	}
 	if (i == distBlock || i == 0 || !currentBlock || isInAirBlock(*currentBlock) || !chunk) //  Si le block est inaccessible
 	{

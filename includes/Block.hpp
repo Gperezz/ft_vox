@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Block.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:14:08 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/10 15:09:37 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/25 10:12:34 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,12 +30,22 @@ enum	e_BlockType : char {
 	LOG,
 	LEAVES,
 	WATER,
-	SNOW
+	SNOW,
+	SAND
 	// COAL_ORE,
 	// IRON_ORE,
 	// GOLD_ORE,
 	// DIAMOND_ORE,
 	// COBBLESTONE
+};
+
+enum	e_Biome : char{
+	OCEAN,
+	BEACH,
+	FOREST,
+	GRASSLAND,
+	DESERT,
+	MOUNTAIN,
 };
 
 enum	e_SkyDir : char {
@@ -57,12 +67,15 @@ typedef struct		block_info{
 class Block {
 	private:
 		t_block_info	info;
+		e_Biome			biome;
 	public:
 						Block();
 						~Block();
 		t_block_info&	getInfo(void);
 		static bool		isTransparentBlock(Block block);
 		void			operator=(t_block_info);
+		void			setBiome(unsigned char biome);
+		unsigned char	getBiome();
 };
 
 #endif

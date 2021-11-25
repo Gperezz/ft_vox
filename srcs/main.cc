@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2021/10/12 12:10:56 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/23 17:04:55 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,36 +14,41 @@
 
 void	key(Engine &env, float deltaFrameTime)
 {
+	float speed = SPEED;
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(env.getWindow(), true);
+	if (glfwGetKey(env.getWindow(), GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+			speed = SPEED_SPRINT;
+	else if (glfwGetKey(env.getWindow(), GLFW_KEY_LEFT_ALT) == GLFW_PRESS)
+			speed = SPEED_ACCEL;
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_S) == GLFW_PRESS)
 	{
-		env.getCam().translate(E_FRONT, SPEED * deltaFrameTime);
+		env.getCam().translate(E_FRONT, speed * deltaFrameTime);
 		// env.getCam().printMatrix(true);
 	}
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_W) == GLFW_PRESS)
 	{
-		env.getCam().translate(E_FRONT, -SPEED * deltaFrameTime);
+		env.getCam().translate(E_FRONT, -speed * deltaFrameTime);
 		// env.getCam().printMatrix(true);
 	}
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_A) == GLFW_PRESS)
 	{
-		env.getCam().translate(E_RIGHT, SPEED * deltaFrameTime);
+		env.getCam().translate(E_RIGHT, speed * deltaFrameTime);
 		// env.getCam().printMatrix(true);
 	}
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_D) == GLFW_PRESS)
 	{
-		env.getCam().translate(E_RIGHT, -SPEED * deltaFrameTime);
+		env.getCam().translate(E_RIGHT, -speed * deltaFrameTime);
 		// env.getCam().printMatrix(true);
 	}
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_SPACE) == GLFW_PRESS)
 	{
-		env.getCam().translate(E_UP, SPEED * deltaFrameTime);
+		env.getCam().translate(E_UP, speed * deltaFrameTime);
 		// env.getCam().printMatrix(true);
 	}
-	if (glfwGetKey(env.getWindow(), GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+	if (glfwGetKey(env.getWindow(), GLFW_KEY_X) == GLFW_PRESS)
 	{
-		env.getCam().translate(E_UP, -SPEED * deltaFrameTime);
+		env.getCam().translate(E_UP, -speed * deltaFrameTime);
 		// env.getCam().printMatrix(true);
 	}
 }
@@ -66,6 +71,7 @@ void	exec(World &world, Engine &env, TimeMs time)
 	static int		imgNb;
 	Textures		*t;
 	int				idx;
+	// Chunk*			chunk = NULL;
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -76,8 +82,11 @@ void	exec(World &world, Engine &env, TimeMs time)
 	if (checkMouse(env, GLFW_MOUSE_BUTTON_1)
 		|| checkMouse(env, GLFW_MOUSE_BUTTON_2))
 		return ;
-	env.rayCasting(world.getMapMemory().at(env.getCam().getCurrentChunkPos()),
-		world.getMapMemory());
+	
+	// chunk = world.get(env.getCam().getCurrentChunkPos());
+	// if (chunk)
+	// 	env.rayCasting(chunk, world); // FAIT SEGFAULT QUAND LE CHUNK OU L ON SE TROUVE N EST PAS GENERER
+	
 	world.display(env, time.getTimeSeconds());
 	idx = env.getNbTextures() - 1;
 	t = env.getTexture(idx);
@@ -92,17 +101,6 @@ void	exec(World &world, Engine &env, TimeMs time)
 	glfwPollEvents();
 }
 
-static void	recLoad(World &w, int x, int y, int rec)
-{
-	w.loadChunk(x, y);
-	if (rec == 1)
-		return;
-	recLoad(w, x, y + 1, 1);
-	recLoad(w, x, y - 1, 1);
-	recLoad(w, x + 1, y, 1);
-	recLoad(w, x - 1, y, 1);
-}
-
 int		main(void)
 {
 	Engine			env;
@@ -111,7 +109,7 @@ int		main(void)
 	TimeMs			time;
 	glm::mat4		mat;
 
-	mat = glm::perspective(glm::radians(45.0f),
+	mat = glm::perspective(glm::radians(80.0f),
 		(float)WIDTH / (float)HEIGHT, 0.1f, (float)RENDER_DIST);
 	if (env.initWindow() == -1)
 		return (1);
@@ -124,7 +122,7 @@ int		main(void)
 	if (env.getHud().init(glm::mat4(1)))
 		return (1);
 	env.getCam().setProjMatrix(mat);
-	env.getCam().setTranslate((glm::vec3){7.5, 35, 7.5});
+	env.getCam().setTranslate((glm::vec3){7.5, 180., 7.5});
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
@@ -134,23 +132,33 @@ int		main(void)
 	glCullFace(GL_BACK);
 	glEnable(GL_CULL_FACE);
 
-	// int lim = 1;
-
-	///////////////////////////////////// Load test ////////////////////
-
-	// for (int y = 0; y < lim; y++)
-	// {
-	// 	for (int x = 0; x < lim; x++)
-	// 	{
-	// 	}
-	// }
-	//////////////////////////////////////////////////////////////////////////
-
-	recLoad(world, 0, 0, 0);
-
 	time.setTime();
-	while(!glfwWindowShouldClose(env.getWindow()))
+
+	int	close = 0;
+	std::mutex	windowMutex;
+
+	std::cout << GREEN << "Generation du terrain en cours...\n" << NA;
+	world.loopGen(false);
+	world.loopLoad(false);
+	while (world.isStarted())
+		world.loadGraphics();
+
+	std::cout << GREEN << "Done !\n" << NA;
+	std::thread t0(&World::loopGen, std::ref(world), true);
+	std::thread t1(&World::loopLoad, std::ref(world), true);
+
+	while(!close)
+	{
+		{unique_lock<mutex>		lk(windowMutex);
+			close = glfwWindowShouldClose(env.getWindow());
+		}
 		exec(world, env, time);
+	}
+
+	world.end();
+	t0.join();
+	t1.join();
+
 	glfwDestroyWindow(env.getWindow());
 	glfwTerminate();
 	return (0);
