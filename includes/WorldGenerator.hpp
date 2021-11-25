@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/30 16:22:18 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/19 11:27:14 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/25 16:45:48 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,20 +20,10 @@
 # include <thread>
 # include <mutex>
 
-enum Biome : char{
-	OCEAN,
-	BEACH,
-	FOREST,
-	GRASSLAND,
-	DESERT,
-	MOUNTAIN,
-};
-
 class WorldGenerator{
 	private:
 		unsigned long	seed;
 		PerlinNoise		tP;
-		Biome			biome;
 		void			genThreadChunk(Chunk *chunk, ChunkPos pos, int x);
 	public:
 		WorldGenerator();
