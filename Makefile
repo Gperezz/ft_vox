@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+         #
+#    By: gperez <gperez@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/10/10 18:22:58 by gperez            #+#    #+#              #
-#    Updated: 2021/11/18 17:32:48 by maiwenn          ###   ########.fr        #
+#    Updated: 2021/11/19 13:13:59 by gperez           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -84,6 +84,7 @@ INC =	includes/ft_vox.hpp \
 		includes/Engine.hpp \
 		includes/Perlin.hpp \
 		includes/Cave.hpp \
+		includes/Camera.hpp \
 
 OBJ = $(SRC:.cc=.o)
 

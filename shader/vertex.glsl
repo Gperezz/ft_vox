@@ -29,7 +29,7 @@ void main()
 {
 	vec4	pos4;
 	int		dir;
-	vec3	lightP = vec3(1., 1., -0.4);
+	vec3	lightP = vec3(0., 1., 0.);
 
 	dir = int(meta) & 7;
 	textureType = (int(meta) >> 3) & 31;
@@ -41,7 +41,7 @@ void main()
 	pos4 = vec4(aPos.xyz, 1.0);
 	tCoords = aCoords;
 	tCoords.y = (tCoords.y / nbTxt) + (1.0 / nbTxt) * textureType;
-	normal = aNorm;
+	normal = normalize(aNorm);
 	vecToLight = normalize(lightP);
 	gl_Position = projection * view * pos4;
 }

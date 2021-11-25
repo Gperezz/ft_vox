@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   World.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
+/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:08:20 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/11 11:15:41 by maiwenn          ###   ########.fr       */
+/*   Updated: 2021/11/24 15:44:06 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,15 +17,16 @@
 # include <unordered_set>
 # include <vector>
 # include <set>
-# include <thread>
-# include <mutex>
 
 # include "Engine.hpp"
 # include "Chunk.hpp"
 # include "WorldGenerator.hpp"
-# define CHK_RND_DIST 10
-# define CHK_DEL_DIST 10
-# define CHK_DEL_DIST_MEM 4
+# define CHK_RND_DIST 10//7//14
+# define CHK_DEL_DIST 14//9//18
+# define CHK_DIST_MEM 18//10//20
+# define CHK_DEL_DIST_MEM 25//15//30
+
+# define CHK_SAFE_DIST CHK_RND_DIST * CHK_RND_DIST
 
 using namespace std;
 using ChunkPos = Coords::Coords<int, 2>;
@@ -36,23 +37,45 @@ class Engine;
 class World
 {
 	private:
+		mutex					startGenMutex;
+		bool					startGen;
+		mutex					startLoadMutex;
+		bool					startLoad;
+		bool					start;
 		bool					queueOn;
-		thread					queueThread;
+		mutex					queueOnMutex;
+		mutex					genQueueMutex;
 		mutex					queueMutex;
 		mutex					memoryMutex;
 		mutex					displayedMutex;
-		set<ChunkPos, function<bool (ChunkPos, ChunkPos)>>	loadQueue;
+		mutex					graphicMutex;
+		set<ChunkPos>			genQueue;
+		set<ChunkPos>			loadQueue;
 		map<ChunkPos, Chunk*>	memoryChunks;
-		// set<ChunkPos>			graphicQueue;
-		unordered_set<ChunkPos>	displayedChunks;
+		set<ChunkPos>			displayedChunks;
+		set<ChunkPos>			graphicQueue;
 		WorldGenerator			worldGen;
 		Engine&					enginePtr;
 		string					path;
 		float					deltaFrameTime;
 		float					lastFrameTime;
-		// mutex					deltaFTMutex;
 	
-		void					pushInDisplay(Chunk* chunk, bool alreadyLoad);
+
+		void					initSet(void);
+
+		void					insertGenQueue(void);
+		void					insertLoadQueue(void);
+		bool					isLoadable(ChunkPos &pos);
+		bool					isGen(ChunkPos &pos);
+		unsigned int			LoadNextQueuedChunk(void);
+		unsigned int			genNextQueuedChunk(void);
+		void					loadChunk(ChunkPos cp);
+		void					genChunk(ChunkPos cp);
+		void					pushInDisplay(Chunk* chunk, bool alreadyGen);
+
+		void					deleteFarInDisplay(void);
+		void					deleteFar(void);
+
 	public:
 							World(Engine& engine, unsigned long* = NULL);
 							World(Engine& engine, string&, unsigned long* = NULL);
@@ -60,23 +83,21 @@ class World
 							// World(string )
 							~World();
 
-	
-	void					initQueueThread();
-	void					initQueueSorter();
-	bool					LoadNextQueuedChunk();
-	ChunkPos				getCameraChunkPos();
-	void					rearrangeQueues();
-	void					deleteFarInDisplay();
-	void					deleteFar();
+	void					loopGen(bool value);
+	void					loopLoad(bool value);
+	void					loadGraphics(void);
+	void					queueToDisplay(void);
 	void					display(Engine &e, float currentFrameTime);
-	void					loadChunk(ChunkPos);
-	void					loadChunk(int x, int z);
+	ChunkPos				getCameraChunkPos();
+	// void					loadChunk(int x, int z);
 	Chunk					*get(ChunkPos);
-	map<ChunkPos, Chunk*>	&getMapMemory(void);
-	Chunk					*getMemoryChunk(ChunkPos pos);
-	unordered_set<ChunkPos>	&getDisplayedChunks(void);
+	Chunk					*getUnsafe(ChunkPos);
+	// Chunk					*getMemoryChunk(ChunkPos pos);
+	// set<ChunkPos>			&getDisplayedChunks(void);
 	float					getDeltaFrameTime(void);
 	Chunk					*operator[](ChunkPos);
-}; 
+	void					end(void);
+	bool					isStarted(void);
+};
 
 #endif

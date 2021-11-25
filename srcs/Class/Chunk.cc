@@ -19,6 +19,9 @@ Chunk::Chunk()
 {
 	this->state = UNFENCED;
 	bzero(this->blocks, sizeof(this->blocks));
+	this->generate = false;
+	bzero(this->tabVao, sizeof(unsigned int) * 16);
+	bzero(this->tabVbo, sizeof(unsigned int) * 16);
 }
 
 Chunk::Chunk(World *w)
@@ -26,6 +29,9 @@ Chunk::Chunk(World *w)
 	this->state = UNFENCED,
 	this->world = w;
 	bzero(this->blocks, sizeof(this->blocks));
+	this->generate = false;
+	bzero(this->tabVao, sizeof(unsigned int) * 16);
+	bzero(this->tabVbo, sizeof(unsigned int) * 16);
 }
 
 Chunk::Chunk(World *w, ChunkPos pos)
@@ -34,6 +40,9 @@ Chunk::Chunk(World *w, ChunkPos pos)
 	this->pos = pos;
 	this->world = w;
 	bzero(this->blocks, sizeof(this->blocks));
+	this->generate = false;
+	bzero(this->tabVao, sizeof(unsigned int) * 16);
+	bzero(this->tabVbo, sizeof(unsigned int) * 16);
 }
 
 Chunk::Chunk(const Chunk& copy)
@@ -43,8 +52,7 @@ Chunk::Chunk(const Chunk& copy)
 
 Chunk::~Chunk()
 {
-	for (int i = 0; i < 16; i++)
-		this->deleteVbo((char)i);
+	this->deleteVbos();
 }
 
 
@@ -58,13 +66,13 @@ void	Chunk::fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, Blo
 	iPt = 0;
 	while (iPt < 6)
 	{
-		vboType.tab[0] = dir_c.pts[iPt].get(X) + posInMesh.get(X) + this->getPos().get(0) * 16;
-		vboType.tab[1] = dir_c.pts[iPt].get(Y) + posInMesh.get(Y) + posInMesh.get(MY) * 16;
-		vboType.tab[2] = dir_c.pts[iPt].get(Z) + posInMesh.get(Z) + this->getPos().get(1) * 16;
+		vboType.pos[0] = dir_c.pts[iPt].get(X) + posInMesh.get(X) + this->getPos().get(0) * 16;
+		vboType.pos[1] = dir_c.pts[iPt].get(Y) + posInMesh.get(Y) + posInMesh.get(MY) * 16;
+		vboType.pos[2] = dir_c.pts[iPt].get(Z) + posInMesh.get(Z) + this->getPos().get(1) * 16;
 
-		vboType.normal[0] = dir_c.pts[iPt].get(X) - LENGTH_BLOCK / 2; // On pourra le mettre en brut dans le header
-		vboType.normal[1] = dir_c.pts[iPt].get(X) - LENGTH_BLOCK / 2;
-		vboType.normal[2] = dir_c.pts[iPt].get(X) - LENGTH_BLOCK / 2;
+		vboType.normal[0] = dir_c.pts[iPt].get(X) - (float)LENGTH_BLOCK / 2.;
+		vboType.normal[1] = dir_c.pts[iPt].get(Y) - (float)LENGTH_BLOCK / 2.;
+		vboType.normal[2] = dir_c.pts[iPt].get(Z) - (float)LENGTH_BLOCK / 2.;
 	
 		vboType.meta = dir_c.axis < 0 ? dir_c.axis + 7 : dir_c.axis;
 
@@ -95,11 +103,9 @@ void	Chunk::fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, Blo
 
 bool		Chunk::canPrintBlock(vector<vbo_type> &tempVbo, BlockPos posInMesh)
 {
-	char	dir;
-	int		i;
+	char	dir = 0;
+	int		i = NORTH;
 
-	i = NORTH;
-	dir = 0;
 	while (i < 6)
 	{
 		Block *tmp = this->getBlockNeighboor(posInMesh, (Direction)i);
@@ -116,22 +122,24 @@ bool		Chunk::canPrintBlock(vector<vbo_type> &tempVbo, BlockPos posInMesh)
 	return (dir != 0);
 }
 
-bool		Chunk::conditionValidate(vector<vbo_type> &tempVbo, BlockPos posInMesh, bool &b)
+void		Chunk::conditionValidate(vector<vbo_type> &tempVbo, BlockPos posInMesh, bool &b)
 {
 	if (this->getBlock(posInMesh).getInfo().id == AIR
 		|| !this->canPrintBlock(tempVbo, posInMesh))
-		return (0);
+		return;
 	b = 1;
-	return (1);
 }
 
 void		Chunk::generateVbo(char index, vector<vbo_type> tempVbo)
 {
-	glGenVertexArrays(1, &(Chunk::tabVao[(int)index]));
+	GLenum err;
+
+	// while((err = glGetError()) != GL_NO_ERROR)
+	// 	std::cout << BOLD_RED << "AVANT Error " << err << '\n' << NA;
+
 	glBindVertexArray(tabVao[(int)index]);
-	glGenBuffers(1, &(Chunk::tabVbo[(int)index]));
 	glBindBuffer(GL_ARRAY_BUFFER, tabVbo[(int)index]);
-	glBufferData(GL_ARRAY_BUFFER, tempVbo.size() * sizeof(vbo_type), &tempVbo[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, tempVbo.size() * sizeof(vbo_type), &tempVbo[0], GL_DYNAMIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8 + sizeof(float), (void*)0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8 + sizeof(float), (void*)(sizeof(float) * 3));
@@ -141,6 +149,10 @@ void		Chunk::generateVbo(char index, vector<vbo_type> tempVbo)
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
 	glEnableVertexAttribArray(3);
+
+	// while((err = glGetError()) != GL_NO_ERROR)
+    //         std::cout << BOLD_RED << "Error " << err << '\n' << NA;
+
 }
 
 void		Chunk::validateMesh(char meshIdx)
@@ -148,12 +160,9 @@ void		Chunk::validateMesh(char meshIdx)
 	BlockPos				pos; // [meshY][x][y][z]
 	bool					validateValue;
 	vector<vbo_type>		tempVbo;
-	{	unique_lock<mutex> lock(this->validMutex);
+	{	//unique_lock<mutex> lock(this->validMutex);
 		if (this->valid.find(meshIdx) != Chunk::valid.end())
-		{
 			this->valid.erase(meshIdx);
-			deleteVbo(meshIdx);
-		}
 	}
 	validateValue = 0;
 	pos[MY] = meshIdx;
@@ -177,20 +186,27 @@ void		Chunk::validateMesh(char meshIdx)
 	{
 		generateVbo(meshIdx, tempVbo);
 		// ft_printf(GREEN "generate VBO (Mesh %d) %d points (%d floats)\n" NA, meshIdx, tempVbo.size(), tempVbo.size() * 3);
-		unique_lock<mutex> lock(this->validMutex);
+		// unique_lock<mutex> lock(this->validMutex);
 		this->valid.insert({meshIdx, tempVbo.size()});
 	}
 }
 
-void		Chunk::deleteVbo(char index)
+void		Chunk::deleteVbos(void)
 {
-	glDeleteBuffers(1, &(Chunk::tabVbo[(int)index]));
-	glDeleteVertexArrays(1, &(Chunk::tabVao[(int)index]));
+	if (this->generate)
+	{
+		glDeleteBuffers(16, &(this->tabVbo[0]));
+		glDeleteVertexArrays(16, &(this->tabVao[0]));
+		this->generate = false;
+	}
 }
 
 ////////////////////////////// Public //////////////////////////////
 
-
+bool		Chunk::isGenerated(void)
+{
+	return (this->generate);
+}
 
 void		Chunk::printSlice(int z)
 {
@@ -248,9 +264,22 @@ bool	Chunk::getFenced(void)
 	return (this->state);
 }
 
-void	Chunk::setFenced(ChunkState f)
+void	Chunk::setUnfenced(void)
 {
-	this->state = f;
+	this->state = UNFENCED;
+}
+
+void		Chunk::updateDelFenced(void)
+{
+	Chunk* tmp;
+	if ((tmp = this->getNeighboorUnsafe(NORTH)))
+		tmp->setUnfenced();
+	if ((tmp = this->getNeighboorUnsafe(SOUTH)))
+		tmp->setUnfenced();
+	if ((tmp = this->getNeighboorUnsafe(EAST)))
+		tmp->setUnfenced();
+	if ((tmp = this->getNeighboorUnsafe(WEST)))
+		tmp->setUnfenced();
 }
 
 void		Chunk::updateFenced(int source)
@@ -273,11 +302,42 @@ void		Chunk::updateFenced(int source)
 		this->state = UNFENCED;
 }
 
+void		Chunk::updateFencedUnsafe(int source)
+{
+	if (source)
+	{
+		Chunk* tmp;
+		if ((tmp = this->getNeighboorUnsafe(NORTH)))
+			tmp->updateFencedUnsafe(0);
+		if ((tmp = this->getNeighboorUnsafe(SOUTH)))
+			tmp->updateFencedUnsafe(0);
+		if ((tmp = this->getNeighboorUnsafe(EAST)))
+			tmp->updateFencedUnsafe(0);
+		if ((tmp = this->getNeighboorUnsafe(WEST)))
+			tmp->updateFencedUnsafe(0);
+	}
+	if (this->getNeighboorUnsafe(NORTH) && this->getNeighboorUnsafe(SOUTH) && this->getNeighboorUnsafe(EAST) && this->getNeighboorUnsafe(WEST))
+		this->state = FENCED;
+	else
+		this->state = UNFENCED;
+}
+
+Chunk		*Chunk::getNeighboorUnsafe(Direction dir)
+{
+	if (g_dir_c[dir].axis == Y || g_dir_c[dir].axis == -Y)
+		return NULL;
+	if (this->world)
+		return this->world->getUnsafe(this->pos + g_dir_c[dir].chunk_vec);
+	return NULL;
+}
+
 Chunk		*Chunk::getNeighboor(Direction dir)
 {
 	if (g_dir_c[dir].axis == Y || g_dir_c[dir].axis == -Y)
 		return NULL;
-	return this->world->get(this->pos + g_dir_c[dir].chunk_vec);
+	if (this->world)
+		return this->world->get(this->pos + g_dir_c[dir].chunk_vec);
+	return NULL;
 }
 
 Block		*Chunk::getBlockNeighboor(BlockPos pos, Direction dir) // Fonction peut etre opti
@@ -296,7 +356,7 @@ Block		*Chunk::getBlockNeighboor(BlockPos pos, Direction dir) // Fonction peut e
 			pos[MY] = pos[MY] + 1;
 		}
 		else
-			neighboor = this->getNeighboor(dir);
+			neighboor = this->getNeighboorUnsafe(dir);
 		if (neighboor)
 			return &neighboor->getBlock(pos);
 		return NULL;
@@ -310,7 +370,7 @@ Block		*Chunk::getBlockNeighboor(BlockPos pos, Direction dir) // Fonction peut e
 			pos[MY] = pos[MY] - 1;
 		}
 		else
-			neighboor = this->getNeighboor(dir);
+			neighboor = this->getNeighboorUnsafe(dir);
 		if (neighboor)
 			return &neighboor->getBlock(pos);
 		return NULL;
@@ -322,17 +382,25 @@ void		Chunk::generateGraphics(unsigned int mesh)
 {
 	if (this->state == FENCED && mesh < 16)
 		validateMesh(mesh);
+	this->generate = true;
 }
 
 void		Chunk::generateGraphics(void)
 {
-	for (unsigned i = 0; i < 16; i++)
-		validateMesh(i);
+	if (!this->generate)
+	{
+		glGenVertexArrays(16,  &(this->tabVao[0]));
+		glGenBuffers(16,  &(this->tabVbo[0]));
+		this->generate = true;
+	}
+	// std::cout << GREEN << "Chunk " << this->getPos().get(0) << " " << this->getPos().get(1) << "\n" << NA;
+	for (int i = 15; i >= 0; i--)
+		validateMesh((unsigned int)i);
 }
 
 void		Chunk::displayChunk(Camera cam, Shader shader, Textures *t)
 {
-	unique_lock<mutex>						lock(this->validMutex);
+	// unique_lock<mutex>						lock(this->validMutex);
 	std::map<char, unsigned int>::iterator	it = this->valid.begin();
 
 	while (it != this->valid.end())

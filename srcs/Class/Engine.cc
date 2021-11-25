@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/09 19:09:11 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/17 16:52:18 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,12 +111,14 @@ static bool isInAirBlock(Block currentBlock)
 	return (currentBlock.getInfo().id == AIR);
 }
 
-Block		*Engine::getBlockFromPos(Chunk **chunk, glm::vec3 pos, glm::vec4 &bP, std::map<ChunkPos, Chunk*> memory)
+Block		*Engine::getBlockFromPos(Chunk **chunk, glm::vec3 pos, glm::vec4 &bP, World &world)
 {
 	Block		*block;
 	ChunkPos	chunkPos = Camera::getCurrentChunkPos(pos);
 
-	(*chunk) = memory.at(chunkPos);
+	// (*chunk) = world.getSafe(chunkPos); A REMMETTRE
+	if (!chunk)
+		return (NULL);
 	bP = glm::vec4(Camera::getCurrentOffset(pos), (int)(pos.y / 16.));
 	if (bP.x - PREC < 0.0)
 		bP.x = 1.0 + bP.x;
@@ -177,7 +179,7 @@ static void	setGenBlock(glm::vec4 posB, Chunk *chunk, e_BlockType type)
 		chunk->generateGraphics((int)posB.w + 1);
 }
 
-void		Engine::rayCasting(Chunk *chunk, map<ChunkPos, Chunk*> &memory)
+void		Engine::rayCasting(Chunk *chunk, World &world)
 {
 	glm::vec3		ray;
 	glm::vec3		pos = this->camera.getTranslate();
@@ -195,7 +197,7 @@ void		Engine::rayCasting(Chunk *chunk, map<ChunkPos, Chunk*> &memory)
 		this->getHud().setCursorColor(WHITE_CURSOR);
 		return ;
 	}
-	currentBlock = getBlockFromPos(&chunk, pos, currentBP, memory); // Check si la position de base est dans un cube d'air
+	currentBlock = getBlockFromPos(&chunk, pos, currentBP, world); // Check si la position de base est dans un cube d'air
 	if (!currentBlock || !chunk || !isInAirBlock(*currentBlock) || chunk->getFenced() == UNFENCED) //
 	{
 		this->getHud().setCursorColor(RED_CURSOR);
@@ -207,7 +209,7 @@ void		Engine::rayCasting(Chunk *chunk, map<ChunkPos, Chunk*> &memory)
 		saveChunk = chunk;
 		saveBP = currentBP;
 		stepLoop(pos, ray);
-		currentBlock = getBlockFromPos(&chunk, pos, currentBP, memory);
+		currentBlock = getBlockFromPos(&chunk, pos, currentBP, world);
 	}
 	if (i == distBlock || i == 0 || !currentBlock || isInAirBlock(*currentBlock) || !chunk) //  Si le block est inaccessible
 	{
@@ -254,9 +256,9 @@ static void	fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, uns
 
 	for (iPt = 0; iPt < 6; iPt++)
 	{
-		vboType.tab[0] = dir_c.pts[iPt].get(X);
-		vboType.tab[1] = dir_c.pts[iPt].get(Y);
-		vboType.tab[2] = dir_c.pts[iPt].get(Z);
+		vboType.pos[0] = dir_c.pts[iPt].get(X);
+		vboType.pos[1] = dir_c.pts[iPt].get(Y);
+		vboType.pos[2] = dir_c.pts[iPt].get(Z);
 		vboType.meta = dir_c.axis < 0 ? dir_c.axis + 7 : dir_c.axis;
 		if (vboType.meta == 1 || vboType.meta == 6) // X et -X
 		{
