@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Block.cc                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:14:03 by gperez            #+#    #+#             */
-/*   Updated: 2020/11/05 11:44:55 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/25 10:53:28 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ t_block_info&		Block::getInfo(void)
 
 bool			Block::isTransparentBlock(Block block)
 {
-	if (block.getInfo().id == AIR || block.getInfo().id == LEAVES)
+	if (block.getInfo().id == AIR || block.getInfo().id == LEAVES || block.getInfo().id == WATER)
 		return (true);
 	return (false);
 }
@@ -32,6 +32,16 @@ bool			Block::isTransparentBlock(Block block)
 void			Block::operator=(t_block_info info)
 {
 	this->info = info;
+}
+
+void			Block::setBiome(unsigned char b)
+{
+	this->biome = (e_Biome)b;
+}
+
+unsigned char	Block::getBiome()
+{
+	return(this->biome);
 }
 
 Block::~Block()

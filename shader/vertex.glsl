@@ -34,10 +34,10 @@ void main()
 	dir = int(meta) & 7;
 	textureType = (int(meta) >> 3) & 31;
 	type = int(meta) >> 8;
-	if (dir == 2 && type == DIRT)
+	if (dir == 5 && type == GRASS)
+		textureType--;
+	else if (type == GRASS && dir != 2 && dir != 5)
 		textureType++;
-	else if (type == DIRT && dir != 2 && dir != 5)
-		textureType += 2;
 	pos4 = vec4(aPos.xyz, 1.0);
 	tCoords = aCoords;
 	tCoords.y = (tCoords.y / nbTxt) + (1.0 / nbTxt) * textureType;

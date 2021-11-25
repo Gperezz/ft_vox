@@ -85,6 +85,8 @@ class Chunk{
 		Block&							getBlock(BlockPos);
 		Block&							getBlock(int my, int x, int y, int z);
 		void							setBlock(BlockPos, t_block_info);
+		void							setBlock(BlockPos blockPos, t_block_info info, unsigned char biome);
+		unsigned char					getBiome(BlockPos blockPos);
 		ChunkPos						getPos(void);
 		bool							getFenced(void);
 		void							updateFenced(int source);

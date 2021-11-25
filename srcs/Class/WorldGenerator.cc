@@ -12,6 +12,22 @@
 
 #include "WorldGenerator.hpp"
 
+static void		printBiome(unsigned char biome)
+{
+	if (biome == OCEAN)
+		printf("ocean\n");
+	if (biome == BEACH)
+		printf("beach\n");
+	if (biome == FOREST)
+		printf("forest\n");
+	if (biome == GRASSLAND)
+		printf("grassland\n");
+	if (biome == DESERT)
+		printf("desert\n");
+	if (biome == MOUNTAIN)
+		printf("mountain\n");
+}
+
 WorldGenerator::WorldGenerator()
 {
 	this->seed = Rand<unsigned long>().generate();
@@ -28,119 +44,41 @@ WorldGenerator::WorldGenerator(unsigned long* seed)
 	this->tP = PerlinNoise(this->seed);
 }
 
-void	WorldGenerator::genTest(Chunk *chunk)
-{
-	for (int my = 0; my < 16; my++)
-	{
-		for (int y = 0; y < 16; y++)
-		{
-			for (int z = 0; z < 16; z++)
-			{
-				for (int x = 0; x < 16; x++)
-				{
-					chunk->setBlock(BlockPos((int[4]){my, x, y, z}),
-						(t_block_info){STONE,0,0,0});
-				}
-			}
-		}
-	}
-	chunk->setBlock(BlockPos((int[4]){7, 7, 7, 7}),
-		(t_block_info){0,0,0,0});
-	chunk->setBlock(BlockPos((int[4]){0, 8, 0, 7}),
-		(t_block_info){LEAVES,0,0,0});
-	chunk->setBlock(BlockPos((int[4]){0, 6, 0, 7}),
-		(t_block_info){DIRT,0,0,0});
-	chunk->setBlock(BlockPos((int[4]){0, 7, 0, 7}),
-		(t_block_info){0,0,0,0});
-	chunk->setBlock(BlockPos((int[4]){15, 7, 15, 7}),
-		(t_block_info){0,0,0,0});
-}
-
-// int WorldGenerator::biomeHeight(ChunkPos pos, unsigned char biome, int x, int z)
-// {
-// 	PerlinNoise noise = PerlinNoise();
-// 	int height;
-
-// 	if (biome == WATER)
-// 	{
-// 		height = noise.perlin(1, 0.003, 3, pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX);
-// 		return(((height + 1) / 4) * 255);
-// 	}
-// 	if (biome == BEACH)
-// 	{
-// 		height = noise.perlin(1, 0.003, 3, pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX);
-// 		return(((height + 1) / 4) * 255);
-// 	}
-// 	if (biome == GRASS)
-// 	{
-// 		height = noise.perlin(1, 0.0003, 1, pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX);
-// 		return(((height + 1) / 2) * 255);
-		
-// 	}
-// 	if (biome == FOREST)
-// 	{
-// 		height = noise.perlin(1, 0.005, 1, pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX);
-// 		return(((height + 1) / 2) * 255);
-		
-// 	}
-// 	if (biome == STONE)
-// 	{
-// 		height = noise.perlin(1, 0.5, 3, pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX);
-// 		return(((height + 1) / 2) * 255);
-		
-// 	}
-// 	if (biome == SNOW)
-// 	{
-// 		height = noise.perlin(1, 0.5, 3, pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX);
-// 		return(((height + 1) / 2) * 255);
-		
-// 	}
-// 	if (biome == DESERT)
-// 	{
-// 		height = noise.perlin(1, 0.0005, 1, pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX);
-// 		return(((height + 1) / 2) * 255);
-		
-// 	}
-
-
-// }
-
-unsigned char WorldGenerator::blockColor(double moisure, double elevation)
+unsigned char WorldGenerator::blockColor(double moisure, double elevation, unsigned char *type)
 {
     if (elevation < 110)
 	{
-		this->biome = OCEAN;
-        return WATER;
+		*type = WATER;
+        return OCEAN;
 	}
 	if (elevation < 111)
     {
-		this->biome = BEACH;
-	    return SAND;
+		*type = SAND;
+	    return BEACH;
 	}
     if (elevation > 150) 
     {
-		this->biome = MOUNTAIN;
         if (moisure < 130)
-            return STONE;
-        return SNOW;
+            *type = STONE;
+        *type = SNOW;
+		return MOUNTAIN;
     }
     if (elevation < 197)
     {
         if (moisure < 108)
 		{
-			this->biome = DESERT;
-            return SAND;
+			*type = SAND;
+            return DESERT;
 		}
+		*type = GRASS;
         if (moisure < 114)
-			this->biome = GRASSLAND;
+			return GRASSLAND;
         else if (moisure < 76)
-			this->biome = FOREST;
-		return DIRT;
+			return FOREST;
     }
-	this->biome = GRASSLAND;
-    return DIRT;
+	*type = GRASS;
+    return GRASSLAND;
 }
-//sand water snow stone grass dirt forest
 
 double elevation(double x, double z, double seed)
 {
@@ -157,75 +95,81 @@ double elevation(double x, double z, double seed)
     return (e);
 }
 
-double moisure(double x, double z, double seed)
-{
-	PerlinNoise noise = PerlinNoise();
-	double m = (1.00 * noise.perlin(1, 1.0, 3, x, z)
-		+ 0.75 * noise.perlin(1, 1.0, 3, 2 * x, 2 * z)
-		+ 0.33 * noise.perlin(1, 1.0, 3, 3 * x, 3 * z)
-		+ 0.33 * noise.perlin(1, 1.0, 3, 4 * x, 4 * z)
-		+ 0.33 * noise.perlin(1, 1.0, 3, 5 * x, 5 * z)
-		+ 0.50 * noise.perlin(1, 1.0, 3, 6 * x, 6 * z)
-	);
-    m = m / (1.00 + 0.75 + 0.33 /*+ 0.33 + 0.33 + 0.50*/);
-	return(m);
-}
+// double moisure(double x, double z, double seed)
+// {
+// 	PerlinNoise noise = PerlinNoise();
+// 	double m = (1.00 * noise.perlin(1, 1.0, 3, x, z)
+// 		+ 0.75 * noise.perlin(1, 1.0, 3, 2 * x, 2 * z)
+// 		+ 0.33 * noise.perlin(1, 1.0, 3, 3 * x, 3 * z)
+// 		+ 0.33 * noise.perlin(1, 1.0, 3, 4 * x, 4 * z)
+// 		+ 0.33 * noise.perlin(1, 1.0, 3, 5 * x, 5 * z)
+// 		+ 0.50 * noise.perlin(1, 1.0, 3, 6 * x, 6 * z)
+// 	);
+//     m = m / (1.00 + 0.75 + 0.33 /*+ 0.33 + 0.33 + 0.50*/);
+// 	return(m);
+// }
 
-void	putBlock(Chunk *chunk, unsigned char type, int x, int y, int z, double e)
+void	putBlock(Chunk *chunk, unsigned char biome, unsigned char type, int x, int y, int z, double e)
 {
+	
 	for (y; y < e; y++)
 	{
+		// printf("----NewBlock\n");
+		// printBiome(biome);
 		chunk->setBlock(BlockPos((int[4]){y / 16, x, y % 16, z}),
-				(t_block_info){type,0,0,0});
-		}
+				(t_block_info){type,0,0,0}, biome);
+		// printBiome(chunk->getBiome(BlockPos((int[4]){y / 16, x, y % 16, z})));
+	}
+	
 }
 
-void	chooseBlock(Chunk *chunk, unsigned char type, int x, int z, double e)
+void	chooseBlock(Chunk *chunk, unsigned char biome, unsigned char type, int x, int z, double e)
 {
+	// printBiome(biome);
 	if (type == WATER)
 	{
-		putBlock(chunk, SAND, x, 0, z, e);
-		putBlock(chunk, WATER, x, e, z, 110);
+		putBlock(chunk, biome, SAND, x, 0, z, e);
+		putBlock(chunk, biome, WATER, x, e, z, 111);
 	}
 	else if (type == SNOW)
 	{
-		putBlock(chunk, STONE, x, 0, z, e - 1);
-		putBlock(chunk, SNOW, x, e, z, e);
+		putBlock(chunk, biome, STONE, x, 0, z, e - 1);
+		putBlock(chunk, biome, SNOW, x, e, z, e);
+	}
+	else if (type == GRASS)
+	{
+		putBlock(chunk, biome, STONE, x, 0, z, e / 2);
+		putBlock(chunk, biome, DIRT, x, e / 2, z, e - 1);
+		putBlock(chunk, biome, GRASS, x, e, z, e);
 	}
 	else
 	{
-		putBlock(chunk, type, x, 0, z, e);
+		putBlock(chunk, biome, type, x, 0, z, e);
 	}	
 }
 
-void	WorldGenerator::genThreadChunk(Chunk *chunk, ChunkPos pos, int x)
-{
-	for (int z = 0; z < 16; z++)
-	{
-		double e = elevation(pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX, 1567612511);
-		double m = elevation(pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX, 3);
-		e = ((e + 1) / 2) * 255;
-		m = ((m + 1) / 2) * 255;
-		unsigned char type = blockColor(m, e);
-		chooseBlock(chunk, type, x, z, e);
-	}
-}
+#define SEED 1567612511
 
 void	WorldGenerator::genChunk(Chunk *chunk)
 {
-	// std::thread		*t[16];
-
-	if (!chunk)
-		return;
+	Cave cave = Cave();
 	ChunkPos pos = chunk->getPos();
-	for (int x = 0; x < 16; x++)
-		this->genThreadChunk(chunk, pos, x);
-	// for (int x = 0; x < 16; x++)
-	// 	t[x] = new std::thread(&WorldGenerator::genThreadChunk, this, chunk, pos, x);
-	// for (int i = 0; i < 16; i++)
-	// 	t[i]->join();
-	// for (int i = 0; i < 16; i++)
-	// 	delete t[i];
+
+	for (int x = 0; x < 16; x++){
+		for (int z = 0; z < 16; z++){
+			
+			ChunkPos pos = chunk->getPos();
+			double e = elevation(pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX, SEED);
+			double m = elevation(pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX, SEED / 300);
+			e = ((e + 1) / 2) * 255;
+			m = ((m + 1) / 2) * 255;
+			unsigned char type;
+			unsigned char biome = blockColor(m, e, &type);
+			// printBiome(biome);
+			chooseBlock(chunk, biome, type, x, z, e);
+		}
+	}
+	cave.createCave(chunk, SEED);
 }
 
 void	WorldGenerator::configure(unsigned long* seed)

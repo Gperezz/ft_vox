@@ -6,7 +6,7 @@
 /*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:14:08 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/11 14:30:36 by maiwenn          ###   ########.fr       */
+/*   Updated: 2021/11/25 10:12:34 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,15 @@ enum	e_BlockType : char {
 	// COBBLESTONE
 };
 
+enum	e_Biome : char{
+	OCEAN,
+	BEACH,
+	FOREST,
+	GRASSLAND,
+	DESERT,
+	MOUNTAIN,
+};
+
 enum	e_SkyDir : char {
 	SKY_DIR_FRONT,
 	SKY_DIR_LEFT,
@@ -58,12 +67,15 @@ typedef struct		block_info{
 class Block {
 	private:
 		t_block_info	info;
+		e_Biome			biome;
 	public:
 						Block();
 						~Block();
 		t_block_info&	getInfo(void);
 		static bool		isTransparentBlock(Block block);
 		void			operator=(t_block_info);
+		void			setBiome(unsigned char biome);
+		unsigned char	getBiome();
 };
 
 #endif

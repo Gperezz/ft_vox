@@ -35,7 +35,8 @@ SRC =	srcs/main.cc \
 		srcs/Class/TimeMs.cc \
 		srcs/Class/Hud.cc \
 		srcs/Class/Element.cc \
-		srcs/Class/Perlin.cc
+		srcs/Class/Perlin.cc \
+		srcs/Class/Cave.cc
 
 NC = \033[0m
 BOLD =\033[1m
@@ -81,6 +82,8 @@ INC =	includes/ft_vox.hpp \
 		includes/Textures.hpp \
 		includes/World.hpp \
 		includes/Engine.hpp \
+		includes/Perlin.hpp \
+		includes/Cave.hpp \
 		includes/Camera.hpp \
 
 OBJ = $(SRC:.cc=.o)

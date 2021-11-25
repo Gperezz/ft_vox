@@ -16,6 +16,7 @@
 # include "Block.hpp"
 # include "Chunk.hpp"
 # include "Perlin.hpp"
+# include "Cave.hpp"
 # include <thread>
 # include <mutex>
 
@@ -42,6 +43,6 @@ class WorldGenerator{
 		void genChunk(Chunk*);
 		void configure(unsigned long* seed);
 		int biomeHeight(ChunkPos pos, unsigned char biome, int x, int z);
-		unsigned char blockColor(double moisure, double elevation);
+		unsigned char blockColor(double moisure, double elevation, unsigned char *type);
 };
 #endif

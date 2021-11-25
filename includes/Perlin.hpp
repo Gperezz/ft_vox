@@ -1,3 +1,6 @@
+#ifndef PERLIN_HPP
+# define PERLIN_HPP
+
 #include <map>
 #include <random>
 #include <cmath>
@@ -18,3 +21,5 @@ class PerlinNoise {
 		double noise(int x, int y);
 		~PerlinNoise();
 };
+
+#endif
