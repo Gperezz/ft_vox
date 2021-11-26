@@ -6,7 +6,7 @@
 #    By: gperez <gperez@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/10/10 18:22:58 by gperez            #+#    #+#              #
-#    Updated: 2021/11/19 13:13:59 by gperez           ###   ########.fr        #
+#    Updated: 2021/11/26 11:39:02 by gperez           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,11 +14,9 @@ NAME = ft_vox
 
 FLAGCPP = -std=c++11
 
-FLAG = -Wall # -Werror -Wextra
+FLAG = -Wall -g -O2 -flto # -Werror -Wextra
 
 FLAG_OPENGL = -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo
-
-FLAG_OPENCL = -cl-std=CL1.2 -framework OpenCL
 
 APP = -framework AppKit
 

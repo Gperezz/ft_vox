@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/25 19:35:00 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/26 10:47:00 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -397,9 +397,9 @@ void		Chunk::generateGraphics(void)
 	{
 		glGenVertexArrays(16,  &(this->tabVao[0]));
 		glGenBuffers(16,  &(this->tabVbo[0]));
-		// int err;
-		// while((err = glGetError()) != GL_NO_ERROR)
-		// 	std::cout << BOLD_RED << "Error " << err << '\n' << NA;
+		int err;
+		while((err = glGetError()) != GL_NO_ERROR)
+			std::cout << BOLD_RED << "Error " << err << '\n' << NA;
 		this->generate = true;
 	}
 	// std::cout << GREEN << "Chunk " << this->getPos().get(0) << " " << this->getPos().get(1) << "\n" << NA;
