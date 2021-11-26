@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/11 12:55:10 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/26 12:05:11 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,9 +60,8 @@ int			Engine::initWindow(void)
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-	// glfwWindowHint(GLFW_AUTO_ICONIFY, GL_TRUE);
-	// this->window = glfwCreateWindow(WIDTH, HEIGHT, "ft_vox", glfwGetPrimaryMonitor(), NULL);
-	this->window = glfwCreateWindow(WIDTH, HEIGHT, "ft_vox", NULL, NULL);
+	glfwWindowHint(GLFW_AUTO_ICONIFY, GL_TRUE);
+	this->window = glfwCreateWindow(WIDTH, HEIGHT, "ft_vox", glfwGetPrimaryMonitor(), NULL);
 	if (this->window == NULL)
 	{
 		cout << "Failed to create GLFW window" << endl;
