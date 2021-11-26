@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:35:15 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/16 17:33:05 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/26 11:59:49 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,8 @@ extern "C"
 # include <iostream>
 # include <vector>
 
-# define WIDTH  500//1920
-# define HEIGHT 500//1080
+# define WIDTH  1920
+# define HEIGHT 1080
 # define RENDER_DIST 1000.0f
 # define VERTEX_SKY "shader/vertexSky.glsl"
 # define FRAGMENT_SKY "shader/fragmentSky.glsl"
