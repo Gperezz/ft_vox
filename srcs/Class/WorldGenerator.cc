@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WorldGenerator.cc                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/02 08:06:26 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/19 11:35:47 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/26 12:18:12 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,8 +116,8 @@ void	putBlock(Chunk *chunk, unsigned char biome, unsigned char type, int x, int 
 	{
 		// printf("----NewBlock\n");
 		// printBiome(biome);
-		chunk->setBlock(BlockPos((int[4]){y / 16, x, y % 16, z}),
-				(t_block_info){type,0,0,0}, biome);
+		int pos[4] = {y / 16, x, y % 16, z};
+		chunk->setBlock(BlockPos(pos), (t_block_info){type,0,0,0}, biome);
 		// printBiome(chunk->getBiome(BlockPos((int[4]){y / 16, x, y % 16, z})));
 	}
 	
@@ -148,7 +148,7 @@ void	chooseBlock(Chunk *chunk, unsigned char biome, unsigned char type, int x, i
 	}	
 }
 
-#define SEED 1567612511
+#define SEED 6
 
 void	WorldGenerator::genChunk(Chunk *chunk)
 {
