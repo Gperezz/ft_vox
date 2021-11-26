@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Chunk.cc                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
+/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/11 13:10:42 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/26 10:47:00 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,6 +100,19 @@ void	Chunk::fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, Blo
 	// ft_printf(RED"Direction : %d\n" NA, dir_c.axis);
 
 }
+void		Chunk::canPrintBlockLoop(vector<vbo_type> &tempVbo, BlockPos posInMesh, int &i, char &dir)
+{
+	Block *tmp = this->getBlockNeighboor(posInMesh, (Direction)i);
+	if ((!tmp || Block::isTransparentBlock(*tmp)))
+	{
+		e_BlockType type = (e_BlockType)this->getBlock(posInMesh).getInfo().id;
+		if (type == WATER && tmp->getInfo().id != AIR)
+			return;
+		dir += 1 << i; //Faces visibles
+		this->fillTempVbo(tempVbo, (t_direction_consts)g_dir_c[i], posInMesh, (t_id){
+			Textures::getIndexTxt(type), type});
+	}
+}
 
 bool		Chunk::canPrintBlock(vector<vbo_type> &tempVbo, BlockPos posInMesh)
 {
@@ -108,14 +121,7 @@ bool		Chunk::canPrintBlock(vector<vbo_type> &tempVbo, BlockPos posInMesh)
 
 	while (i < 6)
 	{
-		Block *tmp = this->getBlockNeighboor(posInMesh, (Direction)i);
-		if (!tmp || Block::isTransparentBlock(*tmp))
-		{
-			dir += 1 << i; //Faces visibles
-			this->fillTempVbo(tempVbo, (t_direction_consts)g_dir_c[i], posInMesh, (t_id){
-				Textures::getIndexTxt((e_BlockType)this->getBlock(posInMesh).getInfo().id),
-					(e_BlockType)this->getBlock(posInMesh).getInfo().id});
-		}
+		canPrintBlockLoop(tempVbo, posInMesh, i, dir);
 		i++;
 	}
 	// ft_printf(YELLOW"dir %b\n" NA, dir);
@@ -391,6 +397,9 @@ void		Chunk::generateGraphics(void)
 	{
 		glGenVertexArrays(16,  &(this->tabVao[0]));
 		glGenBuffers(16,  &(this->tabVbo[0]));
+		int err;
+		while((err = glGetError()) != GL_NO_ERROR)
+			std::cout << BOLD_RED << "Error " << err << '\n' << NA;
 		this->generate = true;
 	}
 	// std::cout << GREEN << "Chunk " << this->getPos().get(0) << " " << this->getPos().get(1) << "\n" << NA;

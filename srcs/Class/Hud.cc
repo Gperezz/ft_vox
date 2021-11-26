@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/03 20:12:28 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/24 00:00:03 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/26 10:40:56 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,9 +146,7 @@ Shader&		Hud::getShader(void)
 Hud::~Hud()
 {
 	for (int i = this->hudElements.size() - 1; i >= 0; i--)
-	{
-		this->deleteElement(i);
-	}
+		delete this->hudElements[i];
 	if (this->shader.getProgram())
 		this->shader.freeProgram();
 }
