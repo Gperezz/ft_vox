@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/26 11:24:21 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/26 12:44:42 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -471,6 +471,12 @@ void	World::display(Engine &e, float currentFrameTime)
 		chunk = this->memoryChunks.find(*it);
 		if (chunk != this->memoryChunks.end() && chunk->second->isGenerated())
 			chunk->second->displayChunk(cam, shader, texture);
+	}
+	for (auto it = this->displayedChunks.begin(); it != this->displayedChunks.end(); it++)
+	{
+		chunk = this->memoryChunks.find(*it);
+		if (chunk != this->memoryChunks.end() && chunk->second->isGenerated())
+			chunk->second->displayChunkTransparency(cam, shader, texture);
 	}
 	this->deltaFrameTime = currentFrameTime - this->lastFrameTime;
 	this->lastFrameTime = currentFrameTime;
