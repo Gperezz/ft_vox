@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: gperez <gperez@student.42.fr>              +#+  +:+       +#+         #
+#    By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/10/10 18:22:58 by gperez            #+#    #+#              #
-#    Updated: 2021/11/26 11:39:02 by gperez           ###   ########.fr        #
+#    Updated: 2021/11/27 23:43:17 by maiwenn          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,7 @@ NAME = ft_vox
 
 FLAGCPP = -std=c++11
 
-FLAG = -Wall -g -O2 -flto # -Werror -Wextra
+FLAG = -Wall -g -O2 #-flto # -Werror -Wextra
 
 FLAG_OPENGL = -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo
 
@@ -65,12 +65,13 @@ LIBS_H =	libs/glfw_mac/include/GLFW \
 			libs/glad/include/glad \
 			libs/ \
 			libs/CL \
-			libs/glm \
-			libs/glm/gtc \
 			includes \
 			libs/stb \
 
-LIBS = $(addprefix -I,$(LIBS_H))
+LIB_GLM =	libs/glm/glm \
+			libs/glm/glm/gtc
+
+LIBS = $(addprefix -I,$(LIBS_H) $(LIB_GLM))
 
 INC =	includes/ft_vox.hpp \
 		includes/Coords.hpp \
@@ -86,23 +87,38 @@ INC =	includes/ft_vox.hpp \
 
 OBJ = $(SRC:.cc=.o)
 
-all : $(NAME)
+.PHONY : all
+all : $(NAME) 
 
-$(NAME) : $(OBJ)
-	@gcc $(FLAG) -o srcs/glad.o -c libs/glad/src/glad.c
-	@g++ $(FLAG) $(FLAGCPP) $(FLAG_OPENCL) $(FLAG_OPENGL) $(LIB_G) srcs/glad.o $^ -o $(NAME)
+$(OBJ): $(LIB_GLM)
+
+$(NAME) : $(OBJ) 
+	@gcc-10 $(FLAG) -o srcs/glad.o -c libs/glad/src/glad.c
+	@g++-10 $(FLAG) $(FLAGCPP) $(FLAG_OPENCL) $(FLAG_OPENGL) $(LIB_G) srcs/glad.o $^ -o $(NAME)
 	@printf "$(BOLD)$(COLOR1)%20s : $(RS_BL)$(RS_BO)$(GREEN)succesfuly made!$(NC)%20s\n" $(NAME)
 
-%.o : %.cc $(INC)
-	@printf "$(BOLD)$(COLOR1)%20s : $(RS_BO)$(COLOR2)%20s$(WHITE) ...$(NC)" $(NAME) $(<F)
-	@g++ $(FLAG) $(FLAGCPP) $(LIBS) -o $@ -c $<
-	@printf "\r"
 
+libs/glm/CMakeLists.txt :
+	git clone https://github.com/g-truc/glm.git libs/glm
+
+$(LIB_GLM) : libs/glm/CMakeLists.txt
+	cmake libs/glm/CMakeLists.txt -D BUILD_SHARED_LIBS=ON
+	cmake --build libs/glm/.  #build faster
+
+
+%.o : %.cc $(INC)
+	# @printf "$(BOLD)$(COLOR1)%20s : $(RS_BO)$(COLOR2)%20s$(WHITE) ...$(NC)" $(NAME) $(<F)
+	g++-10 $(FLAG) $(FLAGCPP) $(LIBS) -o $@ -c $<
+	# @printf "\r"
+
+.PHONY : clean
 clean :
 	@/bin/rm -rf srcs/*.o
 	@/bin/rm -rf srcs/Class/*.o
 
+.PHONY : fclean
 fclean : clean
 	@/bin/rm -rf $(NAME)
 
+.PHONY : re
 re : fclean all
