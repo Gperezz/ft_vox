@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Chunk.cc                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/26 10:47:00 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/27 22:24:30 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,8 +138,7 @@ void		Chunk::conditionValidate(vector<vbo_type> &tempVbo, BlockPos posInMesh, bo
 
 void		Chunk::generateVbo(char index, vector<vbo_type> tempVbo)
 {
-	GLenum err;
-
+	// GLenum err;
 	// while((err = glGetError()) != GL_NO_ERROR)
 	// 	std::cout << BOLD_RED << "AVANT Error " << err << '\n' << NA;
 

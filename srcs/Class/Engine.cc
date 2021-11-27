@@ -6,13 +6,15 @@
 /*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/26 15:29:37 by maiwenn          ###   ########.fr       */
+/*   Updated: 2021/11/27 23:03:26 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Engine.hpp"
 
 using namespace std;
+extern t_txt_path g_txt_path[];
+
 
 Engine::Engine()
 {
@@ -115,7 +117,7 @@ static bool isInAirBlock(Block currentBlock)
 Block		*Engine::getBlockFromPos(Chunk **chunk, glm::vec3 pos, glm::vec4 &bP, World &world)
 {
 	Block		*block;
-	ChunkPos	chunkPos = Camera::getCurrentChunkPos(pos);
+	// ChunkPos	chunkPos = Camera::getCurrentChunkPos(pos);
 
 	// (*chunk) = world.getSafe(chunkPos); A REMMETTRE
 	if (!chunk)
@@ -190,7 +192,7 @@ void		Engine::rayCasting(Chunk *chunk, World &world)
 	glm::vec4		currentBP;
 	glm::vec4		saveBP;
 	unsigned int	i;
-	Chunk			*saveChunk;
+	Chunk			*saveChunk = nullptr;
 
 	if (!chunk || this->lockRay)
 		return;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Hud.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/03 20:11:46 by gperez            #+#    #+#             */
-/*   Updated: 2020/12/23 04:22:24 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/27 22:38:33 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,13 +25,6 @@
 # define FRAGMENT_HUD "shader/fragmentHud.glsl"
 
 enum	e_cursor_color {WHITE_CURSOR, GREEN_CURSOR, RED_CURSOR};
-
-static float	square_pt[] = {
-	-1.0, 1.0,
-	-1.0, -1.0,
-	1.0, 1.0,
-	1.0, -1.0
-};
 
 class Hud
 {
