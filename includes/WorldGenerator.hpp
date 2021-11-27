@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WorldGenerator.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/30 16:22:18 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/25 16:45:48 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/26 16:30:24 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,6 @@ class WorldGenerator{
 		void genChunk(Chunk*);
 		void configure(unsigned long* seed);
 		int biomeHeight(ChunkPos pos, unsigned char biome, int x, int z);
-		unsigned char blockColor(double moisure, double elevation, unsigned char *type);
+		unsigned char blockColor(double moisure, double *elevation, unsigned char *type);
 };
 #endif

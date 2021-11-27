@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WorldGenerator.cc                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/02 08:06:26 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/19 11:35:47 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/26 17:14:22 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,36 +44,40 @@ WorldGenerator::WorldGenerator(unsigned long* seed)
 	this->tP = PerlinNoise(this->seed);
 }
 
-unsigned char WorldGenerator::blockColor(double moisure, double elevation, unsigned char *type)
+unsigned char WorldGenerator::blockColor(double moisure, double *elevation, unsigned char *type)
 {
-    if (elevation < 110)
+    if (*elevation < 110.)
 	{
 		*type = WATER;
         return OCEAN;
 	}
-	if (elevation < 111)
+	if (*elevation < 111.)
     {
 		*type = SAND;
 	    return BEACH;
 	}
-    if (elevation > 150) 
+    if (*elevation > 150.) 
     {
-        if (moisure < 130)
+        if (moisure < 130.)
             *type = STONE;
         *type = SNOW;
 		return MOUNTAIN;
     }
-    if (elevation < 197)
+    if (*elevation < 150.)
     {
-        if (moisure < 108)
+        if (moisure < 108.)
 		{
+			if (*elevation < 139)
+				*elevation += 1;
+			else if  (*elevation > 139)
+				*elevation -= 1;
 			*type = SAND;
             return DESERT;
 		}
 		*type = GRASS;
-        if (moisure < 114)
+        if (moisure < 120.)
 			return GRASSLAND;
-        else if (moisure < 76)
+        else if (moisure < 140.)
 			return FOREST;
     }
 	*type = GRASS;
@@ -88,44 +92,25 @@ double elevation(double x, double z, double seed)
 		+ 3.25 * noise.perlin(1, 0.005, 2, 3 * x, 3 * z)
 		+ 2.13 * noise.perlin(1, 0.004, 6, 4 * x, 4 * z)
 		+ 1.06 * noise.perlin(1, 0.03, 1, 5 * x, 5 * z)
-		// + 0.03 * noise.perlin(1, 0.01, 6, 6 * x, 6 * z)
 	);
-    e = e / (5.00 + 4.50 + 3.25 + 2.13 + 1.06 /*+ 0.03*/);
+    e = e / (5.00 + 4.50 + 3.25 + 2.13 + 1.06);
     e = pow(e, 1.0);
     return (e);
 }
-
-// double moisure(double x, double z, double seed)
-// {
-// 	PerlinNoise noise = PerlinNoise();
-// 	double m = (1.00 * noise.perlin(1, 1.0, 3, x, z)
-// 		+ 0.75 * noise.perlin(1, 1.0, 3, 2 * x, 2 * z)
-// 		+ 0.33 * noise.perlin(1, 1.0, 3, 3 * x, 3 * z)
-// 		+ 0.33 * noise.perlin(1, 1.0, 3, 4 * x, 4 * z)
-// 		+ 0.33 * noise.perlin(1, 1.0, 3, 5 * x, 5 * z)
-// 		+ 0.50 * noise.perlin(1, 1.0, 3, 6 * x, 6 * z)
-// 	);
-//     m = m / (1.00 + 0.75 + 0.33 /*+ 0.33 + 0.33 + 0.50*/);
-// 	return(m);
-// }
 
 void	putBlock(Chunk *chunk, unsigned char biome, unsigned char type, int x, int y, int z, double e)
 {
 	
 	for (y; y < e; y++)
 	{
-		// printf("----NewBlock\n");
-		// printBiome(biome);
 		chunk->setBlock(BlockPos((int[4]){y / 16, x, y % 16, z}),
 				(t_block_info){type,0,0,0}, biome);
-		// printBiome(chunk->getBiome(BlockPos((int[4]){y / 16, x, y % 16, z})));
 	}
 	
 }
 
 void	chooseBlock(Chunk *chunk, unsigned char biome, unsigned char type, int x, int z, double e)
 {
-	// printBiome(biome);
 	if (type == WATER)
 	{
 		putBlock(chunk, biome, SAND, x, 0, z, e);
@@ -138,8 +123,8 @@ void	chooseBlock(Chunk *chunk, unsigned char biome, unsigned char type, int x, i
 	}
 	else if (type == GRASS)
 	{
-		putBlock(chunk, biome, STONE, x, 0, z, e / 2);
-		putBlock(chunk, biome, DIRT, x, e / 2, z, e - 1);
+		putBlock(chunk, biome, STONE, x, 0, z, 2 * (e / 3));
+		putBlock(chunk, biome, DIRT, x, 2 * (e / 3), z, e - 1);
 		putBlock(chunk, biome, GRASS, x, e, z, e);
 	}
 	else
@@ -164,8 +149,7 @@ void	WorldGenerator::genChunk(Chunk *chunk)
 			e = ((e + 1) / 2) * 255;
 			m = ((m + 1) / 2) * 255;
 			unsigned char type;
-			unsigned char biome = blockColor(m, e, &type);
-			// printBiome(biome);
+			unsigned char biome = blockColor(m, &e, &type);
 			chooseBlock(chunk, biome, type, x, z, e);
 		}
 	}
