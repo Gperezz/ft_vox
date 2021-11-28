@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Shader.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 17:47:37 by gperez            #+#    #+#             */
-/*   Updated: 2021/10/08 18:46:57 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/27 23:59:24 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 
 extern "C"
 {
-	# include "glad.h" // Implementation OpenGl
+	# include "glad/glad.h" // Implementation OpenGl
 }
 
 # define VERTEX "shader/vertex.glsl"

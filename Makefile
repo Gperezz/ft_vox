@@ -6,7 +6,7 @@
 #    By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/10/10 18:22:58 by gperez            #+#    #+#              #
-#    Updated: 2021/11/27 23:43:17 by maiwenn          ###   ########.fr        #
+#    Updated: 2021/11/28 14:36:37 by maiwenn          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -62,14 +62,16 @@ COLOR2 = \033[38;5;178m
 LIB_G = libs/glfw_mac/lib-macos/libglfw3.a 
 
 LIBS_H =	libs/glfw_mac/include/GLFW \
-			libs/glad/include/glad \
 			libs/ \
-			libs/CL \
 			includes \
+			libs/glad/include/ \
 			libs/stb \
+			
 
 LIB_GLM =	libs/glm/glm \
 			libs/glm/glm/gtc
+
+LIB_GLAD = libs/glad/libglad.dylib
 
 LIBS = $(addprefix -I,$(LIBS_H) $(LIB_GLM))
 
@@ -88,14 +90,14 @@ INC =	includes/ft_vox.hpp \
 OBJ = $(SRC:.cc=.o)
 
 .PHONY : all
-all : $(NAME) 
+all :  $(NAME) 
 
-$(OBJ): $(LIB_GLM)
+$(OBJ): $(LIB_GLM) $(LIB_GLAD)
 
 $(NAME) : $(OBJ) 
-	@gcc-10 $(FLAG) -o srcs/glad.o -c libs/glad/src/glad.c
-	@g++-10 $(FLAG) $(FLAGCPP) $(FLAG_OPENCL) $(FLAG_OPENGL) $(LIB_G) srcs/glad.o $^ -o $(NAME)
-	@printf "$(BOLD)$(COLOR1)%20s : $(RS_BL)$(RS_BO)$(GREEN)succesfuly made!$(NC)%20s\n" $(NAME)
+	g++ $(FLAG) $(FLAGCPP) $(FLAG_OPENCL) $(FLAG_OPENGL) $(LIB_G) $(LIB_GLAD) $^ -o $(NAME)
+	install_name_tool -add_rpath @executable_path/libs/glad/ $(NAME)
+	install_name_tool -change /usr/local/lib/libglad.dylib @rpath/libglad.dylib $(NAME)
 
 
 libs/glm/CMakeLists.txt :
@@ -105,11 +107,16 @@ $(LIB_GLM) : libs/glm/CMakeLists.txt
 	cmake libs/glm/CMakeLists.txt -D BUILD_SHARED_LIBS=ON
 	cmake --build libs/glm/.  #build faster
 
+libs/glad/CMakeLists.txt :
+	git clone https://github.com/Dav1dde/glad.git libs/glad
+
+$(LIB_GLAD) : libs/glad/CMakeLists.txt
+	cmake libs/glad/CMakeLists.txt -D BUILD_SHARED_LIBS=ON
+	cmake --build libs/glad/.  #build faster
+
 
 %.o : %.cc $(INC)
-	# @printf "$(BOLD)$(COLOR1)%20s : $(RS_BO)$(COLOR2)%20s$(WHITE) ...$(NC)" $(NAME) $(<F)
-	g++-10 $(FLAG) $(FLAGCPP) $(LIBS) -o $@ -c $<
-	# @printf "\r"
+	g++ $(FLAG) $(FLAGCPP) $(LIBS) -o $@ -c $<
 
 .PHONY : clean
 clean :

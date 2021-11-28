@@ -6,7 +6,7 @@
 /*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:14:08 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/25 10:12:34 by maiwenn          ###   ########.fr       */
+/*   Updated: 2021/11/27 23:59:38 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 extern "C"
 {
-	# include "glad.h" // Implementation OpenGl
+	# include "glad/glad.h" // Implementation OpenGl
 }
 
 # include "glfw3.h" // Load fenetre
