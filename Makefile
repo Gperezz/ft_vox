@@ -6,7 +6,7 @@
 #    By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/10/10 18:22:58 by gperez            #+#    #+#              #
-#    Updated: 2021/11/28 14:47:19 by maiwenn          ###   ########.fr        #
+#    Updated: 2021/11/28 18:25:03 by maiwenn          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -59,12 +59,12 @@ RED = \033[38;5;203m
 COLOR1 = \033[38;5;75m
 COLOR2 = \033[38;5;178m
 
-LIB_G = libs/glfw_mac/lib-macos/libglfw3.a 
+LIB_GLFW = libs/glfw/src/libglfw.3.4.dylib \
 
-LIBS_H =	libs/glfw_mac/include/GLFW \
-			libs/ \
+LIBS_H =	libs/ \
 			includes \
 			libs/glad/include/ \
+			libs/glfw/include/GLFW/
 			
 
 LIB_GLM =	libs/glm/glm \
@@ -93,13 +93,14 @@ OBJ = $(SRC:.cc=.o)
 .PHONY : all
 all :  $(NAME) 
 
-$(OBJ): $(LIB_GLM) $(LIB_GLAD) $(LIB_STB)
+$(OBJ): $(LIB_GLM) $(LIB_GLAD) $(LIB_STB) $(LIB_GLFW)
 
 $(NAME) : $(OBJ) 
-	g++ $(FLAG) $(FLAGCPP) $(FLAG_OPENCL) $(FLAG_OPENGL) $(LIB_G) $(LIB_GLAD) $^ -o $(NAME)
+	g++ $(FLAG) $(FLAGCPP) $(FLAG_OPENCL) $(FLAG_OPENGL) $(LIB_GLAD) $(LIB_GLFW) $^ -o $(NAME)
 	install_name_tool -add_rpath @executable_path/libs/glad/ $(NAME)
 	install_name_tool -change /usr/local/lib/libglad.dylib @rpath/libglad.dylib $(NAME)
-
+	install_name_tool -add_rpath @executable_path/libs/glfw/src/ $(NAME)
+	install_name_tool -change /usr/local/lib/libglfw.3.4.dylib @rpath/libglfw.3.4.dylib $(NAME)
 
 libs/glm/CMakeLists.txt :
 	git clone https://github.com/g-truc/glm.git libs/glm
@@ -119,6 +120,13 @@ libs/stb/include/stb_image.h :
 	git clone https://github.com/franko/stb_image.git libs/stb
 
 $(LIB_STB) : libs/stb/include/stb_image.h
+
+libs/glfw/CMakeLists.txt :
+	git clone https://github.com/glfw/glfw.git libs/glfw
+
+$(LIB_GLFW) : libs/glfw/CMakeLists.txt
+	cmake libs/glfw/CMakeLists.txt -D BUILD_SHARED_LIBS=ON
+	cmake --build libs/glfw/.  #build faster
 
 
 %.o : %.cc $(INC)
