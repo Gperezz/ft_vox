@@ -6,7 +6,7 @@
 #    By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/10/10 18:22:58 by gperez            #+#    #+#              #
-#    Updated: 2021/11/28 14:36:37 by maiwenn          ###   ########.fr        #
+#    Updated: 2021/11/28 14:47:19 by maiwenn          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -65,7 +65,6 @@ LIBS_H =	libs/glfw_mac/include/GLFW \
 			libs/ \
 			includes \
 			libs/glad/include/ \
-			libs/stb \
 			
 
 LIB_GLM =	libs/glm/glm \
@@ -73,7 +72,9 @@ LIB_GLM =	libs/glm/glm \
 
 LIB_GLAD = libs/glad/libglad.dylib
 
-LIBS = $(addprefix -I,$(LIBS_H) $(LIB_GLM))
+LIB_STB = libs/stb/include
+
+LIBS = $(addprefix -I,$(LIBS_H) $(LIB_GLM) $(LIB_STB))
 
 INC =	includes/ft_vox.hpp \
 		includes/Coords.hpp \
@@ -92,7 +93,7 @@ OBJ = $(SRC:.cc=.o)
 .PHONY : all
 all :  $(NAME) 
 
-$(OBJ): $(LIB_GLM) $(LIB_GLAD)
+$(OBJ): $(LIB_GLM) $(LIB_GLAD) $(LIB_STB)
 
 $(NAME) : $(OBJ) 
 	g++ $(FLAG) $(FLAGCPP) $(FLAG_OPENCL) $(FLAG_OPENGL) $(LIB_G) $(LIB_GLAD) $^ -o $(NAME)
@@ -113,6 +114,11 @@ libs/glad/CMakeLists.txt :
 $(LIB_GLAD) : libs/glad/CMakeLists.txt
 	cmake libs/glad/CMakeLists.txt -D BUILD_SHARED_LIBS=ON
 	cmake --build libs/glad/.  #build faster
+
+libs/stb/include/stb_image.h :
+	git clone https://github.com/franko/stb_image.git libs/stb
+
+$(LIB_STB) : libs/stb/include/stb_image.h
 
 
 %.o : %.cc $(INC)

@@ -1,4 +1,0 @@
-/Users/maiwenn/Documents/projet/ft_vox/libs/glad/CMakeFiles/rebuild_cache.dir
-/Users/maiwenn/Documents/projet/ft_vox/libs/glad/CMakeFiles/edit_cache.dir
-/Users/maiwenn/Documents/projet/ft_vox/libs/glad/CMakeFiles/glad.dir
-/Users/maiwenn/Documents/projet/ft_vox/libs/glad/CMakeFiles/glad-generate-files.dir
