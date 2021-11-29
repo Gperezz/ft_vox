@@ -21,7 +21,6 @@ UNAME := $(shell uname)
 ifeq ($(UNAME), Linux)
 FLAG_OPENGL =	-lGL	\
 				-ldl
-DYLIB = so
 endif
 ifeq ($(UNAME), Darwin)
 FLAG_OPENGL =	-framework Cocoa	\
@@ -72,8 +71,16 @@ RED = \033[38;5;203m
 COLOR1 = \033[38;5;75m
 COLOR2 = \033[38;5;178m
 
-LIB_GLFW = libs/glfw/src/libglfw.3.4.$(DYLIB)\
+ifeq ($(UNAME), Linux)
+LIB_GLFW = libs/glfw/src/libglfw.so.3.4
 
+LIB_GLAD = libs/glad/libglad.so
+endif
+ifeq ($(UNAME), Darwin)
+LIB_GLFW = libs/glfw/src/libglfw.3.4.dylib
+
+LIB_GLAD = libs/glad/libglad.dylib
+endif
 LIBS_H =	libs/ \
 			includes \
 			libs/glad/include/ \
@@ -82,8 +89,6 @@ LIBS_H =	libs/ \
 			libs/glm/glm/gtc \
 			
 LIB_GLM =	libs/glm/glm/gtc/test.s
-
-LIB_GLAD = libs/glad/libglad.$(DYLIB)
 
 LIB_STB = libs/stb/include
 
@@ -109,26 +114,26 @@ all :  $(NAME)
 $(OBJ): $(LIB_GLM) $(LIB_GLAD) $(LIB_STB) $(LIB_GLFW)
 
 $(NAME) : $(OBJ) 
-	# g++ $(FLAG) $(FLAGCPP) $(FLAG_OPENCL) $(FLAG_OPENGL) $(LIB_GLAD) $(LIB_GLFW) $^ -o $(NAME)
-	# ifeq ($(UNAME), Darwin)
-	# install_name_tool -add_rpath @executable_path/libs/glad/ $(NAME)
-	# install_name_tool -change /usr/local/lib/libglad.dylib @rpath/libglad.dylib $(NAME)
-	# install_name_tool -add_rpath @executable_path/libs/glfw/src/ $(NAME)
-	# install_name_tool -change /usr/local/lib/libglfw.3.4.dylib @rpath/libglfw.3.4.dylib $(NAME)
-	# endif
+	g++ -Wl,rpath/@executable_path/libs/glad/ -Wl,rpath/@executable_path/libs/glfw/src/ $(FLAG) $(FLAGCPP) $(FLAG_OPENCL) $(FLAG_OPENGL) $(LIB_GLAD) $(LIB_GLFW) $^ -o $(NAME)
+	ifeq ($(UNAME), Darwin)
+	install_name_tool -add_rpath @executable_path/libs/glad/ $(NAME)
+	install_name_tool -change /usr/local/lib/libglad.dylib @rpath/libglad.dylib $(NAME)
+	install_name_tool -add_rpath @executable_path/libs/glfw/src/ $(NAME)
+	install_name_tool -change /usr/local/lib/libglfw.3.4.dylib @rpath/libglfw.3.4.dylib $(NAME)
+	endif
 
 libs/glm/CMakeLists.txt :
 	git clone  https://github.com/g-truc/glm.git libs/glm
 
 $(LIB_GLM) : libs/glm/CMakeLists.txt
-	cmake libs/glm/CMakeLists.txt #-D BUILD_SHARED_LIBS=ON
+	cmake libs/glm/CMakeLists.txt -D BUILD_SHARED_LIBS=ON
 	cmake --build libs/glm/.
 
 libs/glad/CMakeLists.txt :
 	git clone https://github.com/Dav1dde/glad.git libs/glad
 
 $(LIB_GLAD) : libs/glad/CMakeLists.txt
-	cmake libs/glad/CMakeLists.txt # -D BUILD_SHARED_LIBS=ON
+	cmake libs/glad/CMakeLists.txt -D BUILD_SHARED_LIBS=ON
 	cmake --build libs/glad/.
 
 libs/stb/include/stb_image.h :
@@ -140,7 +145,7 @@ libs/glfw/CMakeLists.txt :
 	git clone https://github.com/glfw/glfw.git libs/glfw
 
 $(LIB_GLFW) : libs/glfw/CMakeLists.txt
-	cmake libs/glfw/CMakeLists.txt # -D BUILD_SHARED_LIBS=ON
+	cmake libs/glfw/CMakeLists.txt -D BUILD_SHARED_LIBS=ON
 	cmake --build libs/glfw/.
 
 
