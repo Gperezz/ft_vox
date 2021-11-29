@@ -16,7 +16,20 @@ FLAGCPP = -std=c++11
 
 FLAG = -Wall -g -O2 #-flto # -Werror -Wextra
 
-FLAG_OPENGL = -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo
+UNAME := $(shell uname)
+
+ifeq ($(UNAME), Linux)
+FLAG_OPENGL =	-lGL	\
+				-ldl
+DYLIB = so
+endif
+ifeq ($(UNAME), Darwin)
+FLAG_OPENGL =	-framework Cocoa	\
+				-framework OpenGL	\
+				-framework IOKit	\
+				-framework CoreVideo	
+DYLIB = dylib
+endif
 
 APP = -framework AppKit
 
@@ -49,7 +62,7 @@ RS_I = \033[23m
 RS_U =\033[24m
 RS_BL = \033[25m
 
-WHITE = \033[37m
+WHITE = \033[37ml
 BLUE = \033[38;5;37m
 CYAN = \033[38;5;117m
 GREEN = \033[38;5;120m
@@ -59,22 +72,22 @@ RED = \033[38;5;203m
 COLOR1 = \033[38;5;75m
 COLOR2 = \033[38;5;178m
 
-LIB_GLFW = libs/glfw/src/libglfw.3.4.dylib \
+LIB_GLFW = libs/glfw/src/libglfw.3.4.$(DYLIB)\
 
 LIBS_H =	libs/ \
 			includes \
 			libs/glad/include/ \
-			libs/glfw/include/GLFW/
+			libs/glfw/include/GLFW/\
+			libs/glm/glm \
+			libs/glm/glm/gtc \
 			
+LIB_GLM =	libs/glm/glm/gtc/test.s
 
-LIB_GLM =	libs/glm/glm \
-			libs/glm/glm/gtc
-
-LIB_GLAD = libs/glad/libglad.dylib
+LIB_GLAD = libs/glad/libglad.$(DYLIB)
 
 LIB_STB = libs/stb/include
 
-LIBS = $(addprefix -I,$(LIBS_H) $(LIB_GLM) $(LIB_STB))
+LIBS = $(addprefix -I,$(LIBS_H) $(LIB_STB))
 
 INC =	includes/ft_vox.hpp \
 		includes/Coords.hpp \
@@ -96,25 +109,27 @@ all :  $(NAME)
 $(OBJ): $(LIB_GLM) $(LIB_GLAD) $(LIB_STB) $(LIB_GLFW)
 
 $(NAME) : $(OBJ) 
-	g++ $(FLAG) $(FLAGCPP) $(FLAG_OPENCL) $(FLAG_OPENGL) $(LIB_GLAD) $(LIB_GLFW) $^ -o $(NAME)
-	install_name_tool -add_rpath @executable_path/libs/glad/ $(NAME)
-	install_name_tool -change /usr/local/lib/libglad.dylib @rpath/libglad.dylib $(NAME)
-	install_name_tool -add_rpath @executable_path/libs/glfw/src/ $(NAME)
-	install_name_tool -change /usr/local/lib/libglfw.3.4.dylib @rpath/libglfw.3.4.dylib $(NAME)
+	# g++ $(FLAG) $(FLAGCPP) $(FLAG_OPENCL) $(FLAG_OPENGL) $(LIB_GLAD) $(LIB_GLFW) $^ -o $(NAME)
+	# ifeq ($(UNAME), Darwin)
+	# install_name_tool -add_rpath @executable_path/libs/glad/ $(NAME)
+	# install_name_tool -change /usr/local/lib/libglad.dylib @rpath/libglad.dylib $(NAME)
+	# install_name_tool -add_rpath @executable_path/libs/glfw/src/ $(NAME)
+	# install_name_tool -change /usr/local/lib/libglfw.3.4.dylib @rpath/libglfw.3.4.dylib $(NAME)
+	# endif
 
 libs/glm/CMakeLists.txt :
-	git clone https://github.com/g-truc/glm.git libs/glm
+	git clone  https://github.com/g-truc/glm.git libs/glm
 
 $(LIB_GLM) : libs/glm/CMakeLists.txt
-	cmake libs/glm/CMakeLists.txt -D BUILD_SHARED_LIBS=ON
-	cmake --build libs/glm/.  #build faster
+	cmake libs/glm/CMakeLists.txt #-D BUILD_SHARED_LIBS=ON
+	cmake --build libs/glm/.
 
 libs/glad/CMakeLists.txt :
 	git clone https://github.com/Dav1dde/glad.git libs/glad
 
 $(LIB_GLAD) : libs/glad/CMakeLists.txt
-	cmake libs/glad/CMakeLists.txt -D BUILD_SHARED_LIBS=ON
-	cmake --build libs/glad/.  #build faster
+	cmake libs/glad/CMakeLists.txt # -D BUILD_SHARED_LIBS=ON
+	cmake --build libs/glad/.
 
 libs/stb/include/stb_image.h :
 	git clone https://github.com/franko/stb_image.git libs/stb
@@ -125,8 +140,8 @@ libs/glfw/CMakeLists.txt :
 	git clone https://github.com/glfw/glfw.git libs/glfw
 
 $(LIB_GLFW) : libs/glfw/CMakeLists.txt
-	cmake libs/glfw/CMakeLists.txt -D BUILD_SHARED_LIBS=ON
-	cmake --build libs/glfw/.  #build faster
+	cmake libs/glfw/CMakeLists.txt # -D BUILD_SHARED_LIBS=ON
+	cmake --build libs/glfw/.
 
 
 %.o : %.cc $(INC)
