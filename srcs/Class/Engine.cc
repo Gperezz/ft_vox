@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/30 13:38:32 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/30 17:13:47 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,57 @@ using namespace std;
 
 Engine::Engine()
 {
+	this->isCursor = false;
 	this->sky = false;
 	this->firstMouse = true;
 	this->lockRay = false;
+	for (unsigned int i = 0; i < GLFW_KEY_END; i++)
+		this->keys[i] = KEY_RELEASE;
 }
 
-void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+void				Engine::inputKey(unsigned int key)
+{
+	if (glfwGetKey(this->window, key) == GLFW_PRESS
+		&& this->keys[key] == KEY_RELEASE)
+	{
+		this->keys[key] = KEY_PRESS;
+		this->queue.push(key);
+	}
+	else if (glfwGetKey(this->window, key) == GLFW_RELEASE
+		&& this->keys[key] == KEY_DONE)
+			this->keys[key] = KEY_RELEASE;
+}
+
+void				Engine::getKeys(float deltaFrameTime)
+{
+	float speed = SPEED;
+
+	if (glfwGetKey(this->window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		glfwSetWindowShouldClose(this->window, true);
+	if (glfwGetKey(this->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+			speed = SPEED_SPRINT;
+	else if (glfwGetKey(this->window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS)
+			speed = SPEED_ACCEL;
+
+	if (glfwGetKey(this->window, GLFW_KEY_S) == GLFW_PRESS)
+		this->camera.translate(E_FRONT, speed * deltaFrameTime);
+	if (glfwGetKey(this->window, GLFW_KEY_W) == GLFW_PRESS)
+		this->camera.translate(E_FRONT, -speed * deltaFrameTime);
+	if (glfwGetKey(this->window, GLFW_KEY_A) == GLFW_PRESS)
+		this->camera.translate(E_RIGHT, speed * deltaFrameTime);
+	if (glfwGetKey(this->window, GLFW_KEY_D) == GLFW_PRESS)
+		this->camera.translate(E_RIGHT, -speed * deltaFrameTime);
+	if (glfwGetKey(this->window, GLFW_KEY_SPACE) == GLFW_PRESS)
+		this->camera.translate(E_UP, speed * deltaFrameTime);
+	if (glfwGetKey(this->window, GLFW_KEY_X) == GLFW_PRESS)
+		this->camera.translate(E_UP, -speed * deltaFrameTime);
+
+	this->inputKey(GLFW_KEY_APOSTROPHE);
+	this->inputKey(GLFW_KEY_MINUS);
+	this->inputKey(GLFW_KEY_EQUAL);
+}
+
+void				mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
 	Engine		*engine = (Engine*)glfwGetWindowUserPointer(window);
 	glm::vec2	offsetMouse;
@@ -40,6 +85,30 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 	engine->setMouseLastPos(glm::vec2(xpos, ypos));
 	offsetMouse *= SENSITIVITY;
 	engine->getCam().rotate(glm::vec3(offsetMouse.x, offsetMouse.y, 0.0));
+}
+
+void				Engine::checkKeys(World &world)
+{
+	char	i;
+
+	while (this->queue.size())
+	{
+		i = this->queue.front();
+		if (i == GLFW_KEY_APOSTROPHE)
+		{
+			this->isCursor = !this->isCursor;
+			glfwSetInputMode(window, GLFW_CURSOR, this->isCursor
+				? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+			glfwSetCursorPosCallback(this->window, this->isCursor
+				? NULL : mouse_callback);
+		}
+		else if (i == GLFW_KEY_MINUS)
+			world.decreaseDist();
+		else if (i == GLFW_KEY_EQUAL)
+			world.increaseDist();
+		this->keys[(int)i] = KEY_DONE;
+		this->queue.pop();
+	}
 }
 
 static void	framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -189,9 +258,9 @@ void		Engine::rayCasting(World &world)
 	glm::vec4		saveBP;
 	unsigned int	i;
 	Chunk			*saveChunk;
-	Chunk			*chunk = NULL;// = world.get(this->camera.getCurrentChunkPos());
+	Chunk			*chunk = NULL;
 
-	if (this->lockRay)//|| !chunk )
+	if (this->lockRay || this->isCursor)
 		return;
 	if (this->getButton(GLFW_MOUSE_BUTTON_1) == false && this->getButton(GLFW_MOUSE_BUTTON_2) == false)
 	{

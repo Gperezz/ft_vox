@@ -6,52 +6,11 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/29 14:35:06 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/30 15:12:58 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_vox.hpp"
-
-void	key(Engine &env, float deltaFrameTime)
-{
-	float speed = SPEED;
-	if (glfwGetKey(env.getWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(env.getWindow(), true);
-	if (glfwGetKey(env.getWindow(), GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-			speed = SPEED_SPRINT;
-	else if (glfwGetKey(env.getWindow(), GLFW_KEY_LEFT_ALT) == GLFW_PRESS)
-			speed = SPEED_ACCEL;
-	if (glfwGetKey(env.getWindow(), GLFW_KEY_S) == GLFW_PRESS)
-	{
-		env.getCam().translate(E_FRONT, speed * deltaFrameTime);
-		// env.getCam().printMatrix(true);
-	}
-	if (glfwGetKey(env.getWindow(), GLFW_KEY_W) == GLFW_PRESS)
-	{
-		env.getCam().translate(E_FRONT, -speed * deltaFrameTime);
-		// env.getCam().printMatrix(true);
-	}
-	if (glfwGetKey(env.getWindow(), GLFW_KEY_A) == GLFW_PRESS)
-	{
-		env.getCam().translate(E_RIGHT, speed * deltaFrameTime);
-		// env.getCam().printMatrix(true);
-	}
-	if (glfwGetKey(env.getWindow(), GLFW_KEY_D) == GLFW_PRESS)
-	{
-		env.getCam().translate(E_RIGHT, -speed * deltaFrameTime);
-		// env.getCam().printMatrix(true);
-	}
-	if (glfwGetKey(env.getWindow(), GLFW_KEY_SPACE) == GLFW_PRESS)
-	{
-		env.getCam().translate(E_UP, speed * deltaFrameTime);
-		// env.getCam().printMatrix(true);
-	}
-	if (glfwGetKey(env.getWindow(), GLFW_KEY_X) == GLFW_PRESS)
-	{
-		env.getCam().translate(E_UP, -speed * deltaFrameTime);
-		// env.getCam().printMatrix(true);
-	}
-}
 
 static int	checkMouse(Engine &env, unsigned int b)
 {
@@ -77,7 +36,8 @@ void	exec(World &world, Engine &env, TimeMs time)
 
 	iImg++;
 	timeForFps += world.getDeltaFrameTime();
-	key(env, world.getDeltaFrameTime());
+	env.getKeys(world.getDeltaFrameTime());
+	env.checkKeys(world);
 	if (checkMouse(env, GLFW_MOUSE_BUTTON_1)
 		|| checkMouse(env, GLFW_MOUSE_BUTTON_2))
 		return ;

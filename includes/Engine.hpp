@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:35:15 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/30 13:38:17 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/30 17:12:46 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,14 +34,22 @@ extern "C"
 # define RENDER_DIST 1000.0f
 # define VERTEX_SKY "shader/vertexSky.glsl"
 # define FRAGMENT_SKY "shader/fragmentSky.glsl"
+# include <queue>
 
-enum e_vsync {VSYNC_OFF, VSYNC_ON};
+enum	e_vsync {VSYNC_OFF, VSYNC_ON};
+enum	e_stateKey {KEY_PRESS, KEY_DONE, KEY_RELEASE};
 
 class Engine
 {
 	private:
 		GLFWwindow				*window;
+		// Keys //
+		bool					isCursor;
+		std::queue<char>		queue;
+		char					keys[GLFW_KEY_END];
+		void					inputKey(unsigned int key);
 		bool					buttons[GLFW_MOUSE_BUTTON_LAST + 1];
+	
 		Camera					camera;
 		Shader					shader;
 		std::vector<Textures*>	textures;
@@ -57,6 +65,8 @@ class Engine
 
 	public:
 		Engine();
+		void			getKeys(float deltaFrameTime);
+		void			checkKeys(World &wolrd);
 		void			rayCasting(World &world);
 		int				initWindow(void);
 		GLFWwindow		*getWindow(void);
