@@ -6,7 +6,7 @@
 #    By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/10/10 18:22:58 by gperez            #+#    #+#              #
-#    Updated: 2021/11/28 18:25:03 by maiwenn          ###   ########.fr        #
+#    Updated: 2021/11/30 09:31:14 by maiwenn          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,7 +27,6 @@ FLAG_OPENGL =	-framework Cocoa	\
 				-framework OpenGL	\
 				-framework IOKit	\
 				-framework CoreVideo	
-DYLIB = dylib
 endif
 
 APP = -framework AppKit
@@ -113,14 +112,18 @@ all :  $(NAME)
 
 $(OBJ): $(LIB_GLM) $(LIB_GLAD) $(LIB_STB) $(LIB_GLFW)
 
-$(NAME) : $(OBJ) 
+ifeq ($(UNAME), Linux)
+$(NAME) : $(OBJ)
 	g++ -Wl,rpath/@executable_path/libs/glad/ -Wl,rpath/@executable_path/libs/glfw/src/ $(FLAG) $(FLAGCPP) $(FLAG_OPENCL) $(FLAG_OPENGL) $(LIB_GLAD) $(LIB_GLFW) $^ -o $(NAME)
-	ifeq ($(UNAME), Darwin)
+endif
+ifeq ($(UNAME), Darwin)
+$(NAME) : $(OBJ)
+	g++ $(FLAG) $(FLAGCPP) $(FLAG_OPENCL) $(FLAG_OPENGL) $(LIB_GLAD) $(LIB_GLFW) $^ -o $(NAME)
 	install_name_tool -add_rpath @executable_path/libs/glad/ $(NAME)
 	install_name_tool -change /usr/local/lib/libglad.dylib @rpath/libglad.dylib $(NAME)
 	install_name_tool -add_rpath @executable_path/libs/glfw/src/ $(NAME)
 	install_name_tool -change /usr/local/lib/libglfw.3.4.dylib @rpath/libglfw.3.4.dylib $(NAME)
-	endif
+endif
 
 libs/glm/CMakeLists.txt :
 	git clone  https://github.com/g-truc/glm.git libs/glm
