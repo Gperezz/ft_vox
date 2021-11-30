@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:35:15 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/30 17:12:46 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/30 17:35:17 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,8 @@ extern "C"
 # include <iostream>
 # include <vector>
 
-# define WIDTH  2560
-# define HEIGHT 1600
+# define WIDTH  600//2560
+# define HEIGHT 600//1600
 # define RENDER_DIST 1000.0f
 # define VERTEX_SKY "shader/vertexSky.glsl"
 # define FRAGMENT_SKY "shader/fragmentSky.glsl"
@@ -45,11 +45,12 @@ class Engine
 		GLFWwindow				*window;
 		// Keys //
 		bool					isCursor;
-		std::queue<char>		queue;
-		char					keys[GLFW_KEY_END];
+		std::queue<short>		queue;
+		char					keys[GLFW_KEY_LAST];
 		void					inputKey(unsigned int key);
 		bool					buttons[GLFW_MOUSE_BUTTON_LAST + 1];
-	
+
+		bool					speed20;
 		Camera					camera;
 		Shader					shader;
 		std::vector<Textures*>	textures;

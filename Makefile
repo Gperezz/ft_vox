@@ -6,7 +6,7 @@
 #    By: gperez <gperez@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/10/10 18:22:58 by gperez            #+#    #+#              #
-#    Updated: 2021/11/26 11:39:02 by gperez           ###   ########.fr        #
+#    Updated: 2021/11/30 17:24:34 by gperez           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -83,6 +83,7 @@ INC =	includes/ft_vox.hpp \
 		includes/Perlin.hpp \
 		includes/Cave.hpp \
 		includes/Camera.hpp \
+		includes/Engine.hpp \
 
 OBJ = $(SRC:.cc=.o)
 

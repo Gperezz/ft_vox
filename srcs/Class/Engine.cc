@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/30 17:13:47 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/30 17:35:46 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,8 @@ Engine::Engine()
 	this->sky = false;
 	this->firstMouse = true;
 	this->lockRay = false;
-	for (unsigned int i = 0; i < GLFW_KEY_END; i++)
+	this->speed20 = false;
+	for (unsigned int i = 0; i < GLFW_KEY_LAST; i++)
 		this->keys[i] = KEY_RELEASE;
 }
 
@@ -43,10 +44,10 @@ void				Engine::getKeys(float deltaFrameTime)
 
 	if (glfwGetKey(this->window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(this->window, true);
-	if (glfwGetKey(this->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-			speed = SPEED_SPRINT;
-	else if (glfwGetKey(this->window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS)
-			speed = SPEED_ACCEL;
+	if (glfwGetKey(this->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS && !this->speed20)
+		speed = SPEED_SPRINT;
+	else if (this->speed20)
+		speed = SPEED_ACCEL;
 
 	if (glfwGetKey(this->window, GLFW_KEY_S) == GLFW_PRESS)
 		this->camera.translate(E_FRONT, speed * deltaFrameTime);
@@ -64,6 +65,7 @@ void				Engine::getKeys(float deltaFrameTime)
 	this->inputKey(GLFW_KEY_APOSTROPHE);
 	this->inputKey(GLFW_KEY_MINUS);
 	this->inputKey(GLFW_KEY_EQUAL);
+	this->inputKey(GLFW_KEY_LEFT_ALT);
 }
 
 void				mouse_callback(GLFWwindow* window, double xpos, double ypos)
@@ -89,7 +91,7 @@ void				mouse_callback(GLFWwindow* window, double xpos, double ypos)
 
 void				Engine::checkKeys(World &world)
 {
-	char	i;
+	short	i;
 
 	while (this->queue.size())
 	{
@@ -102,6 +104,8 @@ void				Engine::checkKeys(World &world)
 			glfwSetCursorPosCallback(this->window, this->isCursor
 				? NULL : mouse_callback);
 		}
+		else if (i == GLFW_KEY_LEFT_ALT)
+			this->speed20 = !this->speed20;
 		else if (i == GLFW_KEY_MINUS)
 			world.decreaseDist();
 		else if (i == GLFW_KEY_EQUAL)
@@ -129,9 +133,9 @@ int			Engine::initWindow(void)
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-	glfwWindowHint(GLFW_AUTO_ICONIFY, GL_TRUE);
-	// this->window = glfwCreateWindow(WIDTH, HEIGHT, "ft_vox", NULL, NULL);
-	this->window = glfwCreateWindow(WIDTH, HEIGHT, "ft_vox", glfwGetPrimaryMonitor(), NULL);
+	// glfwWindowHint(GLFW_AUTO_ICONIFY, GL_TRUE);
+	this->window = glfwCreateWindow(WIDTH, HEIGHT, "ft_vox", NULL, NULL);
+	// this->window = glfwCreateWindow(WIDTH, HEIGHT, "ft_vox", glfwGetPrimaryMonitor(), NULL);
 	if (this->window == NULL)
 	{
 		cout << "Failed to create GLFW window" << endl;
@@ -416,9 +420,6 @@ void		Engine::displaySky(Textures *t)
 		"nbTxt"), SKY_BOTTOM_T - END_BLOCK_T);
 	glDrawArrays(GL_TRIANGLES, 0, NB_PTS_CUBE);
 	glDepthMask(true);
-	glFrontFace(GL_CCW);
-	glCullFace(GL_BACK);
-	glEnable(GL_CULL_FACE);
 }
 
 Camera&		Engine::getCam(void)
