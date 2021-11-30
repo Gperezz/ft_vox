@@ -6,7 +6,7 @@
 /*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/02 08:06:26 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/30 11:22:10 by maiwenn          ###   ########.fr       */
+/*   Updated: 2021/11/30 13:53:11 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,24 +49,24 @@ unsigned char WorldGenerator::blockColor(double moisure, double *elevation, unsi
     if (*elevation < 110.)
 	{
 		*type = WATER;
-		*elevation += 9;
+		*elevation += 10;
         return OCEAN;
 	}
 	if (*elevation < 111.)
     {
 		*type = SAND;
-		*elevation += 9;
+		*elevation += 10;
 	    return BEACH;
 	}
     if (*elevation > 150.) 
     {
+		*type = SNOW;
         if (moisure < 130.)
             *type = STONE;
-        *type = SNOW;
 		return MOUNTAIN;
     }
-	if (*elevation < 122)
-		*elevation = 122;
+	if (*elevation < 121)
+		*elevation = 121;
     if (*elevation < 150.)
     {
         if (moisure < 108.)
@@ -100,7 +100,7 @@ double elevation(double x, double z, double seed)
 
 void	putBlock(Chunk *chunk, unsigned char biome, unsigned char type, int x, int y, int z, double e)
 {
-	for (y; y < e; y++)
+	for (y; y <= e; y++)
 	{
 		chunk->setBlock(BlockPos((int[4]){y / 16, x, y % 16, z}),
 				(t_block_info){type,0,0,0}, biome);
