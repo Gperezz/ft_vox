@@ -6,7 +6,7 @@
 /*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/02 08:06:26 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/26 17:14:22 by maiwenn          ###   ########.fr       */
+/*   Updated: 2021/11/30 11:22:10 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,11 +49,13 @@ unsigned char WorldGenerator::blockColor(double moisure, double *elevation, unsi
     if (*elevation < 110.)
 	{
 		*type = WATER;
+		*elevation += 9;
         return OCEAN;
 	}
 	if (*elevation < 111.)
     {
 		*type = SAND;
+		*elevation += 9;
 	    return BEACH;
 	}
     if (*elevation > 150.) 
@@ -63,14 +65,12 @@ unsigned char WorldGenerator::blockColor(double moisure, double *elevation, unsi
         *type = SNOW;
 		return MOUNTAIN;
     }
+	if (*elevation < 122)
+		*elevation = 122;
     if (*elevation < 150.)
     {
         if (moisure < 108.)
 		{
-			if (*elevation < 139)
-				*elevation += 1;
-			else if  (*elevation > 139)
-				*elevation -= 1;
 			*type = SAND;
             return DESERT;
 		}
@@ -100,13 +100,11 @@ double elevation(double x, double z, double seed)
 
 void	putBlock(Chunk *chunk, unsigned char biome, unsigned char type, int x, int y, int z, double e)
 {
-	
 	for (y; y < e; y++)
 	{
 		chunk->setBlock(BlockPos((int[4]){y / 16, x, y % 16, z}),
 				(t_block_info){type,0,0,0}, biome);
 	}
-	
 }
 
 void	chooseBlock(Chunk *chunk, unsigned char biome, unsigned char type, int x, int z, double e)
@@ -114,7 +112,7 @@ void	chooseBlock(Chunk *chunk, unsigned char biome, unsigned char type, int x, i
 	if (type == WATER)
 	{
 		putBlock(chunk, biome, SAND, x, 0, z, e);
-		putBlock(chunk, biome, WATER, x, e, z, 111);
+		putBlock(chunk, biome, WATER, x, e, z, 120);
 	}
 	else if (type == SNOW)
 	{

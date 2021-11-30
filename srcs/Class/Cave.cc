@@ -108,8 +108,9 @@ bool findCave(Chunk *chunk, int x, int z, t_startPoint *start, int seed)
 		
 		double e = elevation(start->noise.x, start->noise.z, seed);
 		e = ((e + 1) / 2) * 255;
+		if (e < 125)
+			e = 125;
 		start->chunk = glm::vec3(blockPos.x + (16 * x), e, blockPos.z + (16 * z));
-
 		return(true);
 	}
 	return(false);
