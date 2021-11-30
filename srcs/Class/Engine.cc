@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/26 12:05:11 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/30 13:38:32 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ int			Engine::initWindow(void)
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	glfwWindowHint(GLFW_AUTO_ICONIFY, GL_TRUE);
+	// this->window = glfwCreateWindow(WIDTH, HEIGHT, "ft_vox", NULL, NULL);
 	this->window = glfwCreateWindow(WIDTH, HEIGHT, "ft_vox", glfwGetPrimaryMonitor(), NULL);
 	if (this->window == NULL)
 	{
@@ -115,7 +116,7 @@ Block		*Engine::getBlockFromPos(Chunk **chunk, glm::vec3 pos, glm::vec4 &bP, Wor
 	Block		*block;
 	ChunkPos	chunkPos = Camera::getCurrentChunkPos(pos);
 
-	// (*chunk) = world.getSafe(chunkPos); A REMMETTRE
+	(*chunk) = world.getUnsafe(chunkPos);// A REMMETTRE
 	if (!chunk)
 		return (NULL);
 	bP = glm::vec4(Camera::getCurrentOffset(pos), (int)(pos.y / 16.));
@@ -154,12 +155,12 @@ static void	genNeighboor(Direction dir, Chunk *chunk, glm::vec4 posB)
 {
 	Chunk	*neighboor;
 
-	neighboor = chunk->getNeighboor(dir);
+	neighboor = chunk->getNeighboorUnsafe(dir);
 	if (neighboor)
 		neighboor->generateGraphics((int)posB.w);
 }
 
-static void	setGenBlock(glm::vec4 posB, Chunk *chunk, e_BlockType type)
+static void	setGenBlock(glm::vec4 posB, Chunk *chunk, e_BlockType type) // A VOIR
 {
 	chunk->setBlock((int[4]){(int)posB.w, (int)posB.x, (int)posB.y, (int)posB.z},
 		(t_block_info){(unsigned char)type, 0, 0, 0});
@@ -178,7 +179,7 @@ static void	setGenBlock(glm::vec4 posB, Chunk *chunk, e_BlockType type)
 		chunk->generateGraphics((int)posB.w + 1);
 }
 
-void		Engine::rayCasting(Chunk *chunk, World &world)
+void		Engine::rayCasting(World &world)
 {
 	glm::vec3		ray;
 	glm::vec3		pos = this->camera.getTranslate();
@@ -188,14 +189,16 @@ void		Engine::rayCasting(Chunk *chunk, World &world)
 	glm::vec4		saveBP;
 	unsigned int	i;
 	Chunk			*saveChunk;
+	Chunk			*chunk = NULL;// = world.get(this->camera.getCurrentChunkPos());
 
-	if (!chunk || this->lockRay)
+	if (this->lockRay)//|| !chunk )
 		return;
 	if (this->getButton(GLFW_MOUSE_BUTTON_1) == false && this->getButton(GLFW_MOUSE_BUTTON_2) == false)
 	{
 		this->getHud().setCursorColor(WHITE_CURSOR);
 		return ;
 	}
+
 	currentBlock = getBlockFromPos(&chunk, pos, currentBP, world); // Check si la position de base est dans un cube d'air
 	if (!currentBlock || !chunk || !isInAirBlock(*currentBlock) || chunk->getFenced() == UNFENCED) //
 	{

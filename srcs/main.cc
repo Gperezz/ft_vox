@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/25 18:25:36 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/29 14:35:06 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,6 @@ void	exec(World &world, Engine &env, TimeMs time)
 	static int		imgNb;
 	Textures		*t;
 	int				idx;
-	// Chunk*			chunk = NULL;
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -82,11 +81,7 @@ void	exec(World &world, Engine &env, TimeMs time)
 	if (checkMouse(env, GLFW_MOUSE_BUTTON_1)
 		|| checkMouse(env, GLFW_MOUSE_BUTTON_2))
 		return ;
-	
-	// chunk = world.get(env.getCam().getCurrentChunkPos());
-	// if (chunk)
-	// 	env.rayCasting(chunk, world); // FAIT SEGFAULT QUAND LE CHUNK OU L ON SE TROUVE N EST PAS GENERER
-	
+
 	world.display(env, time.getTimeSeconds());
 	idx = env.getNbTextures() - 1;
 	t = env.getTexture(idx);

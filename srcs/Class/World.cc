@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/26 12:44:42 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/30 13:31:10 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -455,6 +455,11 @@ void	World::queueToDisplay(void)
 
 void	World::display(Engine &e, float currentFrameTime)
 {
+	{unique_lock<mutex> lockMem(this->memoryMutex);
+	unique_lock<mutex> lockGraph(this->graphicMutex);
+		e.rayCasting(*this); // FAIT SEGFAULT QUAND LE CHUNK OU L ON SE TROUVE N EST PAS GENERER
+	}
+
 	this->queueToDisplay();
 	if (e.isSkybox() && e.getTexture(1))
 		e.displaySky(e.getTexture(1));
@@ -514,21 +519,6 @@ Chunk	*World::operator[](ChunkPos cp)
 {
 	return this->get(cp);
 }
-
-// Chunk	*World::getMemoryChunk(ChunkPos pos)
-// {
-// 	return (this->memoryChunks.at(pos));
-// }
-
-// set<ChunkPos>	&World::getDisplayedChunks(void)
-// {
-// 	return (this->displayedChunks);
-// }
-
-// void	World::loadChunk(int x, int z)
-// {
-// 	return (this->loadChunk(ChunkPos((int[2]){x, z})));
-// }
 
 float	World::getDeltaFrameTime(void)
 {

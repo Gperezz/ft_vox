@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:35:15 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/26 11:59:49 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/30 13:38:17 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,20 +22,18 @@ extern "C"
 # include "stb_image.h" // Load image
 # include "glm.hpp" // Implementation matrices
 
-# include "StructBlock.hpp"
-# include "Shader.hpp"
-# include "Camera.hpp"
+# include "World.hpp"
 # include "Chunk.hpp"
 # include "Hud.hpp"
+
 # include <iostream>
 # include <vector>
 
-# define WIDTH  1920
-# define HEIGHT 1080
+# define WIDTH  2560
+# define HEIGHT 1600
 # define RENDER_DIST 1000.0f
 # define VERTEX_SKY "shader/vertexSky.glsl"
 # define FRAGMENT_SKY "shader/fragmentSky.glsl"
-
 
 enum e_vsync {VSYNC_OFF, VSYNC_ON};
 
@@ -59,7 +57,7 @@ class Engine
 
 	public:
 		Engine();
-		void			rayCasting(Chunk *chunk, World &world);
+		void			rayCasting(World &world);
 		int				initWindow(void);
 		GLFWwindow		*getWindow(void);
 		int				setButton(unsigned int b, bool value);
