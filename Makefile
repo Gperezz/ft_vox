@@ -6,7 +6,7 @@
 #    By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/10/10 18:22:58 by gperez            #+#    #+#              #
-#    Updated: 2021/11/30 09:31:14 by maiwenn          ###   ########.fr        #
+#    Updated: 2021/11/30 09:43:09 by maiwenn          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -129,8 +129,6 @@ libs/glm/CMakeLists.txt :
 	git clone  https://github.com/g-truc/glm.git libs/glm
 
 $(LIB_GLM) : libs/glm/CMakeLists.txt
-	cmake libs/glm/CMakeLists.txt -D BUILD_SHARED_LIBS=ON
-	cmake --build libs/glm/.
 
 libs/glad/CMakeLists.txt :
 	git clone https://github.com/Dav1dde/glad.git libs/glad
