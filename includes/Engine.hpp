@@ -3,9 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Engine.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:35:15 by gperez            #+#    #+#             */
+/*   Updated: 2021/11/27 23:59:13 by maiwenn          ###   ########.fr       */
 /*   Updated: 2021/11/30 17:35:17 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -15,7 +16,7 @@
 
 extern "C"
 {
-	# include "glad.h" // Implementation OpenGl
+	# include "glad/glad.h" // Implementation OpenGl
 }
 
 # include "glfw3.h" // Load fenetre
@@ -29,8 +30,6 @@ extern "C"
 # include <iostream>
 # include <vector>
 
-# define WIDTH  600//2560
-# define HEIGHT 600//1600
 # define RENDER_DIST 1000.0f
 # define VERTEX_SKY "shader/vertexSky.glsl"
 # define FRAGMENT_SKY "shader/fragmentSky.glsl"
@@ -49,6 +48,8 @@ class Engine
 		char					keys[GLFW_KEY_LAST];
 		void					inputKey(unsigned int key);
 		bool					buttons[GLFW_MOUSE_BUTTON_LAST + 1];
+		int						monitorWidth;
+		int						monitorHeight;
 
 		bool					speed20;
 		Camera					camera;
@@ -68,6 +69,8 @@ class Engine
 		Engine();
 		void			getKeys(float deltaFrameTime);
 		void			checkKeys(World &wolrd);
+		int				getWidth(void);
+		int				getHeight(void);
 		void			rayCasting(World &world);
 		int				initWindow(void);
 		GLFWwindow		*getWindow(void);
@@ -93,6 +96,7 @@ class Engine
 		void			setMouseLastPos(glm::vec2 v);
 		bool			isFirst(void);
 		void			setFirst(bool f);
+		void			deleteText();
 		~Engine();
 };
 

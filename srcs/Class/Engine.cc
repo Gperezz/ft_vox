@@ -3,16 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   Engine.cc                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
+/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/26 15:29:37 by maiwenn          ###   ########.fr       */
+/*   Updated: 2021/12/01 19:28:27 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Engine.hpp"
 
 using namespace std;
+extern t_txt_path g_txt_path[];
+
 
 Engine::Engine()
 {
@@ -65,7 +67,17 @@ void				Engine::getKeys(float deltaFrameTime)
 	this->inputKey(GLFW_KEY_APOSTROPHE);
 	this->inputKey(GLFW_KEY_MINUS);
 	this->inputKey(GLFW_KEY_EQUAL);
-	this->inputKey(GLFW_KEY_LEFT_ALT);
+	this->inputKey(GLFW_KEY_C);
+}
+
+int					Engine::getWidth(void)
+{
+	return this->monitorWidth;
+}
+
+int					Engine::getHeight(void)
+{
+	return this->monitorHeight;
 }
 
 void				mouse_callback(GLFWwindow* window, double xpos, double ypos)
@@ -104,7 +116,7 @@ void				Engine::checkKeys(World &world)
 			glfwSetCursorPosCallback(this->window, this->isCursor
 				? NULL : mouse_callback);
 		}
-		else if (i == GLFW_KEY_LEFT_ALT)
+		else if (i == GLFW_KEY_C)
 			this->speed20 = !this->speed20;
 		else if (i == GLFW_KEY_MINUS)
 			world.decreaseDist();
@@ -128,14 +140,18 @@ int			Engine::initWindow(void)
 		cout << "Failed to initialize GLFW" << endl;
 		return (-1);
 	}
+	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-	// glfwWindowHint(GLFW_AUTO_ICONIFY, GL_TRUE);
-	this->window = glfwCreateWindow(WIDTH, HEIGHT, "ft_vox", NULL, NULL);
-	// this->window = glfwCreateWindow(WIDTH, HEIGHT, "ft_vox", glfwGetPrimaryMonitor(), NULL);
+	glfwWindowHint(GLFW_AUTO_ICONIFY, GL_TRUE);
+	this->monitorWidth = mode->width;
+	this->monitorHeight = mode->height;
+	this->window = glfwCreateWindow(mode->width, mode->height, "ft_vox", monitor, NULL);
 	if (this->window == NULL)
 	{
 		cout << "Failed to create GLFW window" << endl;
@@ -191,7 +207,7 @@ Block		*Engine::getBlockFromPos(Chunk **chunk, glm::vec3 pos, glm::vec4 &bP, Wor
 	Block		*block;
 	ChunkPos	chunkPos = Camera::getCurrentChunkPos(pos);
 
-	(*chunk) = world.getUnsafe(chunkPos);// A REMMETTRE
+	(*chunk) = world.getUnsafe(chunkPos);
 	if (!chunk)
 		return (NULL);
 	bP = glm::vec4(Camera::getCurrentOffset(pos), (int)(pos.y / 16.));
@@ -264,8 +280,9 @@ void		Engine::rayCasting(World &world)
 	glm::vec4		currentBP;
 	glm::vec4		saveBP;
 	unsigned int	i;
-	Chunk			*saveChunk;
-	Chunk			*chunk = NULL;
+
+	Chunk			*saveChunk = nullptr;
+	Chunk			*chunk = nullptr;
 
 	if (this->lockRay || this->isCursor)
 		return;
@@ -281,7 +298,7 @@ void		Engine::rayCasting(World &world)
 		this->getHud().setCursorColor(RED_CURSOR);
 		return;
 	}
-	ray = this->camera.createRay(glm::vec2((float)WIDTH / 2.0, (float)HEIGHT / 2.0), WIDTH, HEIGHT);
+	ray = this->camera.createRay(glm::vec2((float)this->monitorWidth / 2.0, (float)this->monitorHeight / 2.0), this->monitorWidth, this->monitorHeight);
 	for (i = 0; currentBlock && i < distBlock && isInAirBlock(*currentBlock); i++)
 	{
 		saveChunk = chunk;
@@ -630,7 +647,7 @@ void		Engine::setFirst(bool f)
 	this->firstMouse = f;
 }
 
-Engine::~Engine()
+void 		Engine::deleteText()
 {
 	int				i;
 	int				t;
@@ -646,7 +663,11 @@ Engine::~Engine()
 	}
 	if (this->shader.getProgram())
 		this->shader.freeProgram();
+	this->hud.deleteHud();
+}
 
+Engine::~Engine()
+{
 }
 
 ///////////////Private///////////////

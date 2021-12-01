@@ -6,27 +6,11 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/02 08:06:26 by gperez            #+#    #+#             */
-/*   Updated: 2021/12/01 18:10:54 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/27 22:25:41 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "WorldGenerator.hpp"
-
-static void		printBiome(unsigned char biome)
-{
-	if (biome == OCEAN)
-		printf("ocean\n");
-	if (biome == BEACH)
-		printf("beach\n");
-	if (biome == FOREST)
-		printf("forest\n");
-	if (biome == GRASSLAND)
-		printf("grassland\n");
-	if (biome == DESERT)
-		printf("desert\n");
-	if (biome == MOUNTAIN)
-		printf("mountain\n");
-}
 
 WorldGenerator::WorldGenerator()
 {
@@ -112,7 +96,7 @@ double elevation(double x, double z, double seed)
 void	putBlock(Chunk *chunk, unsigned char biome, unsigned char type, int x, int y, int z, double e)
 {
 	
-	for (y; y < e; y++)
+	for (; y < e; y++)
 	{
 		// printf("----NewBlock\n");
 		// printBiome(biome);
@@ -151,8 +135,6 @@ void	chooseBlock(Chunk *chunk, unsigned char biome, unsigned char type, int x, i
 void	WorldGenerator::genChunk(Chunk *chunk)
 {
 	Cave cave = Cave();
-	ChunkPos pos = chunk->getPos();
-
 	for (int x = 0; x < 16; x++){
 		for (int z = 0; z < 16; z++){
 			

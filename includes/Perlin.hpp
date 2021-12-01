@@ -8,7 +8,6 @@ using namespace std;
 
 class PerlinNoise {
 	private:
-		int cellSize;
 		int seed;
 	public:
 		PerlinNoise();
