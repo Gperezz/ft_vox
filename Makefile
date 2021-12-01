@@ -6,7 +6,7 @@
 #    By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/10/10 18:22:58 by gperez            #+#    #+#              #
-#    Updated: 2021/12/02 00:06:41 by maiwenn          ###   ########.fr        #
+#    Updated: 2021/12/02 00:14:06 by maiwenn          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,7 +15,7 @@ NAME = ft_vox
 
 FLAGCPP = -std=c++11
 
-FLAG = -Wall -g -O2 #-flto # -Werror -Wextra
+FLAG = -Wall -g -O2 
 
 UNAME := $(shell uname)
 
@@ -106,27 +106,27 @@ $(NAME) : $(OBJ)
 endif
 
 libs/glm/CMakeLists.txt :
-	git clone  https://github.com/g-truc/glm.git libs/glm
+	git clone  https://github.com/g-truc/glm.git libs/glm --depth=1
 
 $(LIB_GLM) : libs/glm/CMakeLists.txt
 
 libs/glad/CMakeLists.txt :
-	git clone https://github.com/Dav1dde/glad.git libs/glad
+	git clone https://github.com/Dav1dde/glad.git libs/glad --depth=1
 
 $(LIB_GLAD) : libs/glad/CMakeLists.txt
 	cmake libs/glad/CMakeLists.txt -D BUILD_SHARED_LIBS=ON -D GLAD_REPRODUCIBLE=ON
 	cmake --build libs/glad/.
 
 libs/stb/include/stb_image.h :
-	git clone https://github.com/franko/stb_image.git libs/stb
+	git clone https://github.com/franko/stb_image.git libs/stb --depth=1
 
 $(LIB_STB) : libs/stb/include/stb_image.h
 
 libs/glfw/CMakeLists.txt :
-	git clone https://github.com/glfw/glfw.git libs/glfw
+	git clone https://github.com/glfw/glfw.git libs/glfw --depth=1
 
 $(LIB_GLFW) : libs/glfw/CMakeLists.txt
-	cmake libs/glfw/CMakeLists.txt -D BUILD_SHARED_LIBS=ON -D GLFW_STANDALONE=ON
+	cmake libs/glfw/CMakeLists.txt -D BUILD_SHARED_LIBS=ON -D GLFW_BUILD_EXAMPLES=OFF -D GLFW_BUILD_TESTS=OFF
 	cmake --build libs/glfw/.
 
 
