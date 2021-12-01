@@ -7,7 +7,7 @@
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:35:15 by gperez            #+#    #+#             */
 /*   Updated: 2021/11/27 23:59:13 by maiwenn          ###   ########.fr       */
-/*   Updated: 2021/11/30 17:35:17 by gperez           ###   ########.fr       */r
+/*   Updated: 2021/11/30 17:35:17 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,8 @@ class Engine
 		char					keys[GLFW_KEY_LAST];
 		void					inputKey(unsigned int key);
 		bool					buttons[GLFW_MOUSE_BUTTON_LAST + 1];
+		int						monitorWidth;
+		int						monitorHeight;
 
 		bool					speed20;
 		Camera					camera;
@@ -67,6 +69,8 @@ class Engine
 		Engine();
 		void			getKeys(float deltaFrameTime);
 		void			checkKeys(World &wolrd);
+		int				getWidth(void);
+		int				getHeight(void);
 		void			rayCasting(World &world);
 		int				initWindow(void);
 		GLFWwindow		*getWindow(void);

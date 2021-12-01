@@ -70,6 +70,16 @@ void				Engine::getKeys(float deltaFrameTime)
 	this->inputKey(GLFW_KEY_LEFT_ALT);
 }
 
+int					Engine::getWidth(void)
+{
+	return this->monitorWidth;
+}
+
+int					Engine::getHeight(void)
+{
+	return this->monitorHeight;
+}
+
 void				mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
 	Engine		*engine = (Engine*)glfwGetWindowUserPointer(window);
@@ -139,6 +149,8 @@ int			Engine::initWindow(void)
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	glfwWindowHint(GLFW_AUTO_ICONIFY, GL_TRUE);
+	this->monitorWidth = mode->width;
+	this->monitorHeight = mode->height;
 	this->window = glfwCreateWindow(mode->width, mode->height, "ft_vox", monitor, NULL);
 	if (this->window == NULL)
 	{
@@ -193,9 +205,9 @@ static bool isInAirBlock(Block currentBlock)
 Block		*Engine::getBlockFromPos(Chunk **chunk, glm::vec3 pos, glm::vec4 &bP, World &world)
 {
 	Block		*block;
-	// ChunkPos	chunkPos = Camera::getCurrentChunkPos(pos);
+	ChunkPos	chunkPos = Camera::getCurrentChunkPos(pos);
 
-	(*chunk) = world.getUnsafe(chunkPos);// A REMMETTRE
+	(*chunk) = world.getUnsafe(chunkPos);
 	if (!chunk)
 		return (NULL);
 	bP = glm::vec4(Camera::getCurrentOffset(pos), (int)(pos.y / 16.));
@@ -286,7 +298,7 @@ void		Engine::rayCasting(World &world)
 		this->getHud().setCursorColor(RED_CURSOR);
 		return;
 	}
-	ray = this->camera.createRay(glm::vec2((float)WIDTH / 2.0, (float)HEIGHT / 2.0), WIDTH, HEIGHT);
+	ray = this->camera.createRay(glm::vec2((float)this->monitorWidth / 2.0, (float)this->monitorHeight / 2.0), this->monitorWidth, this->monitorHeight);
 	for (i = 0; currentBlock && i < distBlock && isInAirBlock(*currentBlock); i++)
 	{
 		saveChunk = chunk;

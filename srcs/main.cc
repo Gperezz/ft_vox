@@ -98,10 +98,10 @@ int		main(int argc, char *argv[])
 
 	World			world(env, &seed);
 
-	mat = glm::perspective(glm::radians(80.0f),
-		(float)WIDTH / (float)HEIGHT, 0.1f, (float)RENDER_DIST);
 	if (env.initWindow() == -1)
 		return (1);
+	mat = glm::perspective(glm::radians(80.0f),
+		(float)env.getWidth() / (float)env.getHeight(), 0.1f, (float)RENDER_DIST);
 	if (shader.loadShader((char*)VERTEX, (char*)FRAGMENT))
 		return (1);
 	if (env.genTextures())

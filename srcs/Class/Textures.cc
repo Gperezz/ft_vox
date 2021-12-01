@@ -23,6 +23,7 @@ t_txt_path g_txt_path[] = {
 	{LEAVES_OAK_T, LEAVES, "textures/blocks/leaves_oak.png"},
 	{LOG_OAK_T, LOG, "textures/blocks/log_oak.png"},
 	{STONE_T, STONE, "textures/blocks/stone.png"},
+	{SAND_T, SAND, "textures/blocks/sand.png"},
 	{END_BLOCK_T, (e_BlockType)0, ""},
 	{SKY_FRONT_T, (e_BlockType)SKY_DIR_FRONT, "textures/skybox/front.png"},
 	{SKY_LEFT_T, (e_BlockType)SKY_DIR_LEFT, "textures/skybox/left.png"},
