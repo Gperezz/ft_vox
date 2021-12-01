@@ -3,10 +3,11 @@
 /*                                                        :::      ::::::::   */
 /*   Textures.cc                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
+/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/13 17:54:04 by gperez            #+#    #+#             */
 /*   Updated: 2021/11/27 23:02:41 by maiwenn          ###   ########.fr       */
+/*   Updated: 2021/11/26 12:20:25 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,8 +115,6 @@ e_txt			Textures::getIndexTxt(e_BlockType type)
 	if (type == SNOW)
 		type = STONE;
 	else if (type == WATER)
-		type = STONE;
-	else if (type == SAND)
 		type = STONE;
 
 	for (int i = 0; find == false && i < END_T; i++)

@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:08:20 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/26 11:20:23 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/30 17:13:14 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,12 +19,11 @@
 # include <set>
 
 # include "Engine.hpp"
-# include "Chunk.hpp"
 # include "WorldGenerator.hpp"
-# define CHK_RND_DIST 14//10//7//14
-# define CHK_DEL_DIST 18//14//9//18
-# define CHK_DIST_MEM 20//10//20
-# define CHK_DEL_DIST_MEM 25//15//30
+# define CHK_RND_DIST 14
+# define CHK_DEL_DIST 18
+# define CHK_DIST_MEM 20
+# define CHK_DEL_DIST_MEM 25
 
 # define CHK_SAFE_DIST CHK_RND_DIST * CHK_RND_DIST
 
@@ -42,6 +41,8 @@ class World
 		mutex					startLoadMutex;
 		bool					startLoad;
 		bool					start;
+		bool					reloadDist;
+
 		bool					queueOn;
 		mutex					queueOnMutex;
 		mutex					genQueueMutex;
@@ -59,9 +60,11 @@ class World
 		string					path;
 		float					deltaFrameTime;
 		float					lastFrameTime;
-	
 
-		void					initSet(void);
+		int						renderDist;
+		int						delDist;
+		int						distMem;
+		int						delDistMem;
 
 		void					insertGenQueue(void);
 		void					insertLoadQueue(void);
@@ -78,9 +81,6 @@ class World
 
 	public:
 							World(Engine& engine, unsigned long* = NULL);
-							World(Engine& engine, string&, unsigned long* = NULL);
-							// World(string pathStr, );
-							// World(string )
 							~World();
 
 	void					loopGen(bool value);
@@ -89,16 +89,15 @@ class World
 	void					queueToDisplay(void);
 	void					display(Engine &e, float currentFrameTime);
 	ChunkPos				getCameraChunkPos();
-	// void					loadChunk(int x, int z);
 	Chunk					*get(ChunkPos);
 	Chunk					*getUnsafe(ChunkPos);
-	// Chunk					*getMemoryChunk(ChunkPos pos);
-	// set<ChunkPos>			&getDisplayedChunks(void);
 	float					getDeltaFrameTime(void);
 	Chunk					*operator[](ChunkPos);
 	void					end(void);
 	bool					isEnd(void);
 	bool					isStarted(void);
+	void					increaseDist(void);
+	void					decreaseDist(void);
 };
 
 #endif

@@ -18,12 +18,59 @@ extern t_txt_path g_txt_path[];
 
 Engine::Engine()
 {
+	this->isCursor = false;
 	this->sky = false;
 	this->firstMouse = true;
 	this->lockRay = false;
+	this->speed20 = false;
+	for (unsigned int i = 0; i < GLFW_KEY_LAST; i++)
+		this->keys[i] = KEY_RELEASE;
 }
 
-void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+void				Engine::inputKey(unsigned int key)
+{
+	if (glfwGetKey(this->window, key) == GLFW_PRESS
+		&& this->keys[key] == KEY_RELEASE)
+	{
+		this->keys[key] = KEY_PRESS;
+		this->queue.push(key);
+	}
+	else if (glfwGetKey(this->window, key) == GLFW_RELEASE
+		&& this->keys[key] == KEY_DONE)
+			this->keys[key] = KEY_RELEASE;
+}
+
+void				Engine::getKeys(float deltaFrameTime)
+{
+	float speed = SPEED;
+
+	if (glfwGetKey(this->window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		glfwSetWindowShouldClose(this->window, true);
+	if (glfwGetKey(this->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS && !this->speed20)
+		speed = SPEED_SPRINT;
+	else if (this->speed20)
+		speed = SPEED_ACCEL;
+
+	if (glfwGetKey(this->window, GLFW_KEY_S) == GLFW_PRESS)
+		this->camera.translate(E_FRONT, speed * deltaFrameTime);
+	if (glfwGetKey(this->window, GLFW_KEY_W) == GLFW_PRESS)
+		this->camera.translate(E_FRONT, -speed * deltaFrameTime);
+	if (glfwGetKey(this->window, GLFW_KEY_A) == GLFW_PRESS)
+		this->camera.translate(E_RIGHT, speed * deltaFrameTime);
+	if (glfwGetKey(this->window, GLFW_KEY_D) == GLFW_PRESS)
+		this->camera.translate(E_RIGHT, -speed * deltaFrameTime);
+	if (glfwGetKey(this->window, GLFW_KEY_SPACE) == GLFW_PRESS)
+		this->camera.translate(E_UP, speed * deltaFrameTime);
+	if (glfwGetKey(this->window, GLFW_KEY_X) == GLFW_PRESS)
+		this->camera.translate(E_UP, -speed * deltaFrameTime);
+
+	this->inputKey(GLFW_KEY_APOSTROPHE);
+	this->inputKey(GLFW_KEY_MINUS);
+	this->inputKey(GLFW_KEY_EQUAL);
+	this->inputKey(GLFW_KEY_LEFT_ALT);
+}
+
+void				mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
 	Engine		*engine = (Engine*)glfwGetWindowUserPointer(window);
 	glm::vec2	offsetMouse;
@@ -42,6 +89,32 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 	engine->setMouseLastPos(glm::vec2(xpos, ypos));
 	offsetMouse *= SENSITIVITY;
 	engine->getCam().rotate(glm::vec3(offsetMouse.x, offsetMouse.y, 0.0));
+}
+
+void				Engine::checkKeys(World &world)
+{
+	short	i;
+
+	while (this->queue.size())
+	{
+		i = this->queue.front();
+		if (i == GLFW_KEY_APOSTROPHE)
+		{
+			this->isCursor = !this->isCursor;
+			glfwSetInputMode(window, GLFW_CURSOR, this->isCursor
+				? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+			glfwSetCursorPosCallback(this->window, this->isCursor
+				? NULL : mouse_callback);
+		}
+		else if (i == GLFW_KEY_LEFT_ALT)
+			this->speed20 = !this->speed20;
+		else if (i == GLFW_KEY_MINUS)
+			world.decreaseDist();
+		else if (i == GLFW_KEY_EQUAL)
+			world.increaseDist();
+		this->keys[(int)i] = KEY_DONE;
+		this->queue.pop();
+	}
 }
 
 static void	framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -122,7 +195,7 @@ Block		*Engine::getBlockFromPos(Chunk **chunk, glm::vec3 pos, glm::vec4 &bP, Wor
 	Block		*block;
 	// ChunkPos	chunkPos = Camera::getCurrentChunkPos(pos);
 
-	// (*chunk) = world.getSafe(chunkPos); A REMMETTRE
+	(*chunk) = world.getUnsafe(chunkPos);// A REMMETTRE
 	if (!chunk)
 		return (NULL);
 	bP = glm::vec4(Camera::getCurrentOffset(pos), (int)(pos.y / 16.));
@@ -161,12 +234,12 @@ static void	genNeighboor(Direction dir, Chunk *chunk, glm::vec4 posB)
 {
 	Chunk	*neighboor;
 
-	neighboor = chunk->getNeighboor(dir);
+	neighboor = chunk->getNeighboorUnsafe(dir);
 	if (neighboor)
 		neighboor->generateGraphics((int)posB.w);
 }
 
-static void	setGenBlock(glm::vec4 posB, Chunk *chunk, e_BlockType type)
+static void	setGenBlock(glm::vec4 posB, Chunk *chunk, e_BlockType type) // A VOIR
 {
 	int pos[4] = {(int)posB.w, (int)posB.x, (int)posB.y, (int)posB.z};
 	chunk->setBlock(pos,
@@ -186,7 +259,7 @@ static void	setGenBlock(glm::vec4 posB, Chunk *chunk, e_BlockType type)
 		chunk->generateGraphics((int)posB.w + 1);
 }
 
-void		Engine::rayCasting(Chunk *chunk, World &world)
+void		Engine::rayCasting(World &world)
 {
 	glm::vec3		ray;
 	glm::vec3		pos = this->camera.getTranslate();
@@ -195,15 +268,18 @@ void		Engine::rayCasting(Chunk *chunk, World &world)
 	glm::vec4		currentBP;
 	glm::vec4		saveBP;
 	unsigned int	i;
-	Chunk			*saveChunk = nullptr;
 
-	if (!chunk || this->lockRay)
+	Chunk			*saveChunk = nullptr;
+	Chunk			*chunk = nullptr;
+
+	if (this->lockRay || this->isCursor)
 		return;
 	if (this->getButton(GLFW_MOUSE_BUTTON_1) == false && this->getButton(GLFW_MOUSE_BUTTON_2) == false)
 	{
 		this->getHud().setCursorColor(WHITE_CURSOR);
 		return ;
 	}
+
 	currentBlock = getBlockFromPos(&chunk, pos, currentBP, world); // Check si la position de base est dans un cube d'air
 	if (!currentBlock || !chunk || !isInAirBlock(*currentBlock) || chunk->getFenced() == UNFENCED) //
 	{
@@ -352,9 +428,6 @@ void		Engine::displaySky(Textures *t)
 		"nbTxt"), SKY_BOTTOM_T - END_BLOCK_T);
 	glDrawArrays(GL_TRIANGLES, 0, NB_PTS_CUBE);
 	glDepthMask(true);
-	glFrontFace(GL_CCW);
-	glCullFace(GL_BACK);
-	glEnable(GL_CULL_FACE);
 }
 
 Camera&		Engine::getCam(void)

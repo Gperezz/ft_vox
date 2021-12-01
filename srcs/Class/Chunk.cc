@@ -7,6 +7,7 @@
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
 /*   Updated: 2021/11/27 22:24:30 by maiwenn          ###   ########.fr       */
+/*   Updated: 2021/11/26 12:54:11 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +23,8 @@ Chunk::Chunk()
 	this->generate = false;
 	bzero(this->tabVao, sizeof(unsigned int) * 16);
 	bzero(this->tabVbo, sizeof(unsigned int) * 16);
+	bzero(this->tabVaoWater, sizeof(unsigned int) * 16);
+	bzero(this->tabVboWater, sizeof(unsigned int) * 16);
 }
 
 Chunk::Chunk(World *w)
@@ -32,6 +35,8 @@ Chunk::Chunk(World *w)
 	this->generate = false;
 	bzero(this->tabVao, sizeof(unsigned int) * 16);
 	bzero(this->tabVbo, sizeof(unsigned int) * 16);
+	bzero(this->tabVaoWater, sizeof(unsigned int) * 16);
+	bzero(this->tabVboWater, sizeof(unsigned int) * 16);
 }
 
 Chunk::Chunk(World *w, ChunkPos pos)
@@ -43,6 +48,8 @@ Chunk::Chunk(World *w, ChunkPos pos)
 	this->generate = false;
 	bzero(this->tabVao, sizeof(unsigned int) * 16);
 	bzero(this->tabVbo, sizeof(unsigned int) * 16);
+	bzero(this->tabVaoWater, sizeof(unsigned int) * 16);
+	bzero(this->tabVboWater, sizeof(unsigned int) * 16);
 }
 
 Chunk::Chunk(const Chunk& copy)
@@ -97,53 +104,70 @@ void	Chunk::fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, Blo
 		tempVbo.push_back(vboType);
 		iPt++;
 	}
-	// ft_printf(RED"Direction : %d\n" NA, dir_c.axis);
-
 }
-void		Chunk::canPrintBlockLoop(vector<vbo_type> &tempVbo, BlockPos posInMesh, int &i, char &dir)
+void		Chunk::canPrintBlockLoop(vector<vbo_type> &tempVbo, vector<vbo_type> &tempVboTrans, BlockPos posInMesh, int &i, char &dir, bool &isTrans)
 {
 	Block *tmp = this->getBlockNeighboor(posInMesh, (Direction)i);
 	if ((!tmp || Block::isTransparentBlock(*tmp)))
 	{
 		e_BlockType type = (e_BlockType)this->getBlock(posInMesh).getInfo().id;
-		if (type == WATER && tmp->getInfo().id != AIR)
-			return;
-		dir += 1 << i; //Faces visibles
-		this->fillTempVbo(tempVbo, (t_direction_consts)g_dir_c[i], posInMesh, (t_id){
+		if (type == WATER && tmp->getInfo().id == AIR)
+		{
+			this->fillTempVbo(tempVboTrans, (t_direction_consts)g_dir_c[i], posInMesh, (t_id){
 			Textures::getIndexTxt(type), type});
+			isTrans = true;
+		}
+		else if (type == WATER)
+			return;
+		else
+		{
+			this->fillTempVbo(tempVbo, (t_direction_consts)g_dir_c[i], posInMesh, (t_id){
+				Textures::getIndexTxt(type), type});
+		}
+		dir += 1 << i; //Faces visibles
 	}
 }
 
-bool		Chunk::canPrintBlock(vector<vbo_type> &tempVbo, BlockPos posInMesh)
+bool		Chunk::canPrintBlock(std::vector<vbo_type> &tempVbo, std::vector<vbo_type> &tempVboTrans, BlockPos posInMesh, bool &isTrans)
 {
 	char	dir = 0;
 	int		i = NORTH;
 
 	while (i < 6)
 	{
-		canPrintBlockLoop(tempVbo, posInMesh, i, dir);
+		canPrintBlockLoop(tempVbo, tempVboTrans, posInMesh, i, dir, isTrans);
 		i++;
 	}
-	// ft_printf(YELLOW"dir %b\n" NA, dir);
 	return (dir != 0);
 }
 
-void		Chunk::conditionValidate(vector<vbo_type> &tempVbo, BlockPos posInMesh, bool &b)
+void		Chunk::conditionValidate(std::vector<vbo_type> &tempVbo, vector<vbo_type>	&tempVboTrans, BlockPos posInMesh, bool &b, bool &bT)
 {
+	bool	isTrans = false;
 	if (this->getBlock(posInMesh).getInfo().id == AIR
-		|| !this->canPrintBlock(tempVbo, posInMesh))
+		|| !this->canPrintBlock(tempVbo, tempVboTrans, posInMesh, isTrans))
 		return;
-	b = 1;
+	if (isTrans)
+		bT = 1;
+	else
+		b = 1;
 }
 
-void		Chunk::generateVbo(char index, vector<vbo_type> tempVbo)
+void		Chunk::generateVbo(char index, vector<vbo_type> tempVbo, bool isT)
 {
 	GLenum err;
 	// while((err = glGetError()) != GL_NO_ERROR)
 	// 	std::cout << BOLD_RED << "AVANT Error " << err << '\n' << NA;
-
-	glBindVertexArray(tabVao[(int)index]);
-	glBindBuffer(GL_ARRAY_BUFFER, tabVbo[(int)index]);
+	if (isT)
+	{
+		glBindVertexArray(tabVaoWater[(int)index]);
+		glBindBuffer(GL_ARRAY_BUFFER, tabVboWater[(int)index]);
+	}
+	else
+	{
+		glBindVertexArray(tabVao[(int)index]);
+		glBindBuffer(GL_ARRAY_BUFFER, tabVbo[(int)index]);
+	}
 	glBufferData(GL_ARRAY_BUFFER, tempVbo.size() * sizeof(vbo_type), &tempVbo[0], GL_DYNAMIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8 + sizeof(float), (void*)0);
@@ -163,22 +187,23 @@ void		Chunk::generateVbo(char index, vector<vbo_type> tempVbo)
 void		Chunk::validateMesh(char meshIdx)
 {
 	BlockPos				pos; // [meshY][x][y][z]
-	bool					validateValue;
+	bool					validateValue = 0;
+	bool					validateValueTrans = 0;
 	vector<vbo_type>		tempVbo;
-	{	//unique_lock<mutex> lock(this->validMutex);
-		if (this->valid.find(meshIdx) != Chunk::valid.end())
-			this->valid.erase(meshIdx);
-	}
-	validateValue = 0;
+	vector<vbo_type>		tempVboTrans;
+
+	if (this->valid.find(meshIdx) != this->valid.end())
+		this->valid.erase(meshIdx);
+	if (this->validTrans.find(meshIdx) != this->validTrans.end())
+		this->validTrans.erase(meshIdx);
 	pos[MY] = meshIdx;
 	while (pos[X] < 16)
 	{
-		// ft_printf(BOLD_YELLOW "X = %d\n" NA, pos[X]);
 		while (pos[Y] < 16)
 		{
 			while (pos[Z] < 16)
 			{
-				conditionValidate(tempVbo, pos, validateValue);
+				conditionValidate(tempVbo, tempVboTrans, pos, validateValue, validateValueTrans);
 				pos[Z]++;
 			}
 			pos[Z] = 0;
@@ -189,10 +214,13 @@ void		Chunk::validateMesh(char meshIdx)
 	}
 	if (validateValue && tempVbo.size())
 	{
-		generateVbo(meshIdx, tempVbo);
-		// ft_printf(GREEN "generate VBO (Mesh %d) %d points (%d floats)\n" NA, meshIdx, tempVbo.size(), tempVbo.size() * 3);
-		// unique_lock<mutex> lock(this->validMutex);
+		generateVbo(meshIdx, tempVbo, false);
 		this->valid.insert({meshIdx, tempVbo.size()});
+	}
+	if (validateValueTrans && tempVboTrans.size())
+	{
+		generateVbo(meshIdx, tempVboTrans, true);
+		this->validTrans.insert({meshIdx, tempVboTrans.size()});
 	}
 }
 
@@ -202,6 +230,8 @@ void		Chunk::deleteVbos(void)
 	{
 		glDeleteBuffers(16, &(this->tabVbo[0]));
 		glDeleteVertexArrays(16, &(this->tabVao[0]));
+		glDeleteBuffers(16, &(this->tabVboWater[0]));
+		glDeleteVertexArrays(16, &(this->tabVaoWater[0]));
 		this->generate = false;
 	}
 }
@@ -396,24 +426,45 @@ void		Chunk::generateGraphics(void)
 	{
 		glGenVertexArrays(16,  &(this->tabVao[0]));
 		glGenBuffers(16,  &(this->tabVbo[0]));
+		glGenVertexArrays(16,  &(this->tabVaoWater[0]));
+		glGenBuffers(16,  &(this->tabVboWater[0]));
 		int err;
 		while((err = glGetError()) != GL_NO_ERROR)
 			std::cout << BOLD_RED << "Error " << err << '\n' << NA;
 		this->generate = true;
 	}
-	// std::cout << GREEN << "Chunk " << this->getPos().get(0) << " " << this->getPos().get(1) << "\n" << NA;
 	for (int i = 15; i >= 0; i--)
 		validateMesh((unsigned int)i);
 }
 
 void		Chunk::displayChunk(Camera cam, Shader shader, Textures *t)
 {
-	// unique_lock<mutex>						lock(this->validMutex);
 	std::map<char, unsigned int>::iterator	it = this->valid.begin();
 
 	while (it != this->valid.end())
 	{
 		glBindVertexArray(this->tabVao[(int)it->first]);
+		glUseProgram(shader.getProgram());
+		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),
+			"view"), 1, GL_FALSE, glm::value_ptr(cam.getMatrix(false)));
+		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),
+			"projection"), 1, GL_FALSE, glm::value_ptr(cam.getProjMatrix()));
+		glUniform1i(glGetUniformLocation(shader.getProgram(),
+			"nbTxt"), END_BLOCK_T);
+		glUniform1i(glGetUniformLocation(shader.getProgram(),
+			"basicTexture"), t ? t->getTxt() : 0);
+		glDrawArrays(GL_TRIANGLES, 0, it->second);
+		it++;
+	}
+}
+
+void		Chunk::displayChunkTransparency(Camera cam, Shader shader, Textures *t)
+{
+	std::map<char, unsigned int>::iterator	it = this->validTrans.begin();
+
+	while (it != this->validTrans.end())
+	{
+		glBindVertexArray(this->tabVaoWater[(int)it->first]);
 		glUseProgram(shader.getProgram());
 		glUniformMatrix4fv(glGetUniformLocation(shader.getProgram(),
 			"view"), 1, GL_FALSE, glm::value_ptr(cam.getMatrix(false)));

@@ -43,7 +43,5 @@ void	main()
 		textureColor = (textureColor + vec4(1., 1., 1., 1.)) / 2;
 	else if (type == WATER)
 		colorAddedTexture = vec4(convertRGB(vec3(0, 100, 255)), 0.7);
-	else if (type == SAND)
-		colorAddedTexture = vec4(convertRGB(vec3(200, 150, 0)), 1.0);
 	FragColor = vec4(diffuse, 1.0) * colorAddedTexture * textureColor;
 }

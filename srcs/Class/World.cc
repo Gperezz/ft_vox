@@ -19,9 +19,14 @@ World::World(Engine& engine, unsigned long *seed)
 	startGen(true),
 	startLoad(true),
 	start(true),
+	reloadDist(false),
 	enginePtr(engine),
 	deltaFrameTime(0.0),
-	lastFrameTime(0.0)
+	lastFrameTime(0.0),
+	renderDist(CHK_RND_DIST),
+	delDist(CHK_DEL_DIST),
+	distMem(CHK_DIST_MEM),
+	delDistMem(CHK_DEL_DIST_MEM)
 	{
 		// initSet();
 		{unique_lock<mutex>	lk(this->queueOnMutex);
@@ -56,20 +61,6 @@ void		World::end(void)
 		}
 	}
 }
-
-// void	World::initSet(void)
-// {
-// 	auto cmp = [this](ChunkPos a, ChunkPos b)->bool{
-// 		ChunkPos center = this->getCameraChunkPos();
-// 		// printf("center : %d, %d\n", center[0], center[1]);
-// 		float da = a.distance(center);
-// 		float db = b.distance(center);
-// 		if (da == db)
-// 			return a < b;
-// 		return da < db;
-// 	};
-// 	this->graphicQueue = set<ChunkPos, function<bool (ChunkPos, ChunkPos)>>(cmp);
-// }
 
 bool		World::isStarted(void)
 {
@@ -111,7 +102,7 @@ void	World::loopLoad(bool value)
 void	World::insertGenQueue(void)
 {
 	static ChunkPos	prevPos;
-	int				renderDist = CHK_DIST_MEM;
+	int				renderDist = this->distMem;
 	ChunkPos		pos = this->getCameraChunkPos();
 
 	if (prevPos == pos && !this->startGen)
@@ -150,7 +141,7 @@ void	World::insertGenQueue(void)
 void	World::insertLoadQueue(void)
 {
 	static ChunkPos	prevPos;
-	int				renderDist = CHK_RND_DIST;
+	int				renderDist = this->renderDist;
 	ChunkPos		pos = this->getCameraChunkPos();
 
 	if (prevPos == pos && !this->startLoad)
@@ -321,20 +312,6 @@ void	World::pushInDisplay(Chunk* chunk, bool alreadyGen)
 			this->graphicQueue.insert(chunkP);
 		}
 	}
-	// Chunk*	tmp;
-	// int		i = 0;
-	// while (i < 4 && !alreadyGen)
-	// {
-	// 	tmp = chunk->getNeighboorUnsafe((Direction)i);
-	// 	if (tmp && tmp->getFenced())
-	// 	{
-	// 		this->displayedChunks.insert(tmp->getPos());
-	// 		{unique_lock<mutex> lk(this->graphicMutex); //tmp->generateGraphics();
-	// 			this->graphicQueue.insert(tmp);
-	// 		}
-	// 	}
-	// 	i++;
-	// }
 }
 
 void	World::loadGraphics(void)
@@ -366,17 +343,18 @@ void	World::deleteFarInDisplay()
 	ChunkPos				chunkP;
 	ChunkPos				pos = this->getCameraChunkPos();
 
-	if (pos == prevPos)
+	if (pos == prevPos && !this->reloadDist)
 		return ;
 
+	this->reloadDist = false;
 	{unique_lock<mutex> lock(this->displayedMutex);
 	for (auto it = this->displayedChunks.begin(); it != this->displayedChunks.end();)
 	{
 		chunkP = *it;
-		if (chunkP.get(0) - pos.get(0) > CHK_DEL_DIST 
-			|| chunkP.get(0) - pos.get(0) < -CHK_DEL_DIST
-			|| chunkP.get(1) - pos.get(1) > CHK_DEL_DIST 
-			|| chunkP.get(1) - pos.get(1) < -CHK_DEL_DIST)
+		if (chunkP.get(0) - pos.get(0) > this->delDist 
+			|| chunkP.get(0) - pos.get(0) < -this->delDist
+			|| chunkP.get(1) - pos.get(1) > this->delDist 
+			|| chunkP.get(1) - pos.get(1) < -this->delDist)
 				it = this->displayedChunks.erase(it);
 		else
 			it++;
@@ -386,10 +364,10 @@ void	World::deleteFarInDisplay()
 	for (auto it = this->genQueue.begin(); it != this->genQueue.end();)
 	{
 		chunkP = *it;
-		if (chunkP.get(0) - pos.get(0) > CHK_DEL_DIST 
-			|| chunkP.get(0) - pos.get(0) < -CHK_DEL_DIST
-			|| chunkP.get(1) - pos.get(1) > CHK_DEL_DIST 
-			|| chunkP.get(1) - pos.get(1) < -CHK_DEL_DIST)
+		if (chunkP.get(0) - pos.get(0) > this->delDist 
+			|| chunkP.get(0) - pos.get(0) < -this->delDist
+			|| chunkP.get(1) - pos.get(1) > this->delDist 
+			|| chunkP.get(1) - pos.get(1) < -this->delDist)
 				it = this->genQueue.erase(it);
 		else
 			it++;
@@ -399,10 +377,10 @@ void	World::deleteFarInDisplay()
 	for (auto it = this->loadQueue.begin(); it != this->loadQueue.end();)
 	{
 		chunkP = *it;
-		if (chunkP.get(0) - pos.get(0) > CHK_DEL_DIST 
-			|| chunkP.get(0) - pos.get(0) < -CHK_DEL_DIST
-			|| chunkP.get(1) - pos.get(1) > CHK_DEL_DIST 
-			|| chunkP.get(1) - pos.get(1) < -CHK_DEL_DIST)
+		if (chunkP.get(0) - pos.get(0) > this->delDist 
+			|| chunkP.get(0) - pos.get(0) < -this->delDist
+			|| chunkP.get(1) - pos.get(1) > this->delDist 
+			|| chunkP.get(1) - pos.get(1) < -this->delDist)
 				it = this->loadQueue.erase(it);
 		else
 			it++;
@@ -412,10 +390,10 @@ void	World::deleteFarInDisplay()
 	for (auto it = this->graphicQueue.begin(); it != this->graphicQueue.end();)
 	{
 		chunkP = *it;
-		if (chunkP.get(0) - pos.get(0) > CHK_DEL_DIST 
-			|| chunkP.get(0) - pos.get(0) < -CHK_DEL_DIST
-			|| chunkP.get(1) - pos.get(1) > CHK_DEL_DIST 
-			|| chunkP.get(1) - pos.get(1) < -CHK_DEL_DIST)
+		if (chunkP.get(0) - pos.get(0) > this->delDist 
+			|| chunkP.get(0) - pos.get(0) < -this->delDist
+			|| chunkP.get(1) - pos.get(1) > this->delDist 
+			|| chunkP.get(1) - pos.get(1) < -this->delDist)
 				it = this->graphicQueue.erase(it);
 		else
 			it++;
@@ -429,16 +407,18 @@ void	World::deleteFar(void)
 	ChunkPos		pos = this->getCameraChunkPos();
 	ChunkPos		chunkP;
 
-	if (pos == prevPos)
+	if (pos == prevPos && !this->reloadDist)
 		return ;
+	this->reloadDist = false;
+	
 	unique_lock<mutex> lockMem(this->memoryMutex);
 	for (auto it = this->memoryChunks.begin(); it != this->memoryChunks.end();)
 	{
 		chunkP = it->first;
-		if (chunkP.get(0) - pos.get(0) > CHK_DEL_DIST_MEM 
-			|| chunkP.get(0) - pos.get(0) < -CHK_DEL_DIST_MEM
-			|| chunkP.get(1) - pos.get(1) > CHK_DEL_DIST_MEM 
-			|| chunkP.get(1) - pos.get(1) < -CHK_DEL_DIST_MEM)
+		if (chunkP.get(0) - pos.get(0) > this->delDistMem 
+			|| chunkP.get(0) - pos.get(0) < -this->delDistMem
+			|| chunkP.get(1) - pos.get(1) > this->delDistMem 
+			|| chunkP.get(1) - pos.get(1) < -this->delDistMem)
 		{
 			Chunk* delChunk = it->second;
 			delChunk->updateDelFenced();
@@ -460,6 +440,11 @@ void	World::queueToDisplay(void)
 
 void	World::display(Engine &e, float currentFrameTime)
 {
+	{unique_lock<mutex> lockMem(this->memoryMutex);
+	unique_lock<mutex> lockGraph(this->graphicMutex);
+		e.rayCasting(*this); // FAIT SEGFAULT QUAND LE CHUNK OU L ON SE TROUVE N EST PAS GENERER
+	}
+
 	this->queueToDisplay();
 	if (e.isSkybox() && e.getTexture(1))
 		e.displaySky(e.getTexture(1));
@@ -476,6 +461,12 @@ void	World::display(Engine &e, float currentFrameTime)
 		chunk = this->memoryChunks.find(*it);
 		if (chunk != this->memoryChunks.end() && chunk->second->isGenerated())
 			chunk->second->displayChunk(cam, shader, texture);
+	}
+	for (auto it = this->displayedChunks.begin(); it != this->displayedChunks.end(); it++)
+	{
+		chunk = this->memoryChunks.find(*it);
+		if (chunk != this->memoryChunks.end() && chunk->second->isGenerated())
+			chunk->second->displayChunkTransparency(cam, shader, texture);
 	}
 	this->deltaFrameTime = currentFrameTime - this->lastFrameTime;
 	this->lastFrameTime = currentFrameTime;
@@ -515,22 +506,33 @@ Chunk	*World::operator[](ChunkPos cp)
 	return this->get(cp);
 }
 
-// Chunk	*World::getMemoryChunk(ChunkPos pos)
-// {
-// 	return (this->memoryChunks.at(pos));
-// }
-
-// set<ChunkPos>	&World::getDisplayedChunks(void)
-// {
-// 	return (this->displayedChunks);
-// }
-
-// void	World::loadChunk(int x, int z)
-// {
-// 	return (this->loadChunk(ChunkPos((int[2]){x, z})));
-// }
-
 float	World::getDeltaFrameTime(void)
 {
 	return (this->deltaFrameTime);
+}
+
+void	World::increaseDist(void)
+{
+	if (this->renderDist > 19)
+		return;
+	this->renderDist++;
+	this->delDist++;
+	this->distMem++;
+	this->delDistMem++;
+	this->startGen = true;
+	this->startLoad = true;
+	this->reloadDist = true;
+}
+
+void	World::decreaseDist(void)
+{
+	if (this->renderDist < 2)
+		return;
+	this->renderDist--;
+	this->delDist--;
+	this->distMem--;
+	this->delDistMem--;
+	this->startGen = true;
+	this->startLoad = true;
+	this->reloadDist = true;
 }

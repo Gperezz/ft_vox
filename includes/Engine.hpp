@@ -7,6 +7,7 @@
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:35:15 by gperez            #+#    #+#             */
 /*   Updated: 2021/11/27 23:59:13 by maiwenn          ###   ########.fr       */
+/*   Updated: 2021/11/30 17:35:17 by gperez           ###   ########.fr       */r
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,28 +23,33 @@ extern "C"
 # include "stb_image.h" // Load image
 # include "glm.hpp" // Implementation matrices
 
-# include "StructBlock.hpp"
-# include "Shader.hpp"
-# include "Camera.hpp"
+# include "World.hpp"
 # include "Chunk.hpp"
 # include "Hud.hpp"
+
 # include <iostream>
 # include <vector>
 
-# define WIDTH  1200
-# define HEIGHT 900
 # define RENDER_DIST 1000.0f
 # define VERTEX_SKY "shader/vertexSky.glsl"
 # define FRAGMENT_SKY "shader/fragmentSky.glsl"
+# include <queue>
 
-
-enum e_vsync {VSYNC_OFF, VSYNC_ON};
+enum	e_vsync {VSYNC_OFF, VSYNC_ON};
+enum	e_stateKey {KEY_PRESS, KEY_DONE, KEY_RELEASE};
 
 class Engine
 {
 	private:
 		GLFWwindow				*window;
+		// Keys //
+		bool					isCursor;
+		std::queue<short>		queue;
+		char					keys[GLFW_KEY_LAST];
+		void					inputKey(unsigned int key);
 		bool					buttons[GLFW_MOUSE_BUTTON_LAST + 1];
+
+		bool					speed20;
 		Camera					camera;
 		Shader					shader;
 		std::vector<Textures*>	textures;
@@ -59,7 +65,9 @@ class Engine
 
 	public:
 		Engine();
-		void			rayCasting(Chunk *chunk, World &world);
+		void			getKeys(float deltaFrameTime);
+		void			checkKeys(World &wolrd);
+		void			rayCasting(World &world);
 		int				initWindow(void);
 		GLFWwindow		*getWindow(void);
 		int				setButton(unsigned int b, bool value);
