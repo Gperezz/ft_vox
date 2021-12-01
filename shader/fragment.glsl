@@ -35,9 +35,9 @@ void	main()
 	brightness = clamp(dot(normal, vecToLight) + 0.1, 0.2, 1.);
 	diffuse = brightness * lightColor;
 	textureColor = texture(basicTexture, tCoords);
-	if (textureColor.w < 0.9 && type != WATER)
+	if (textureColor.w < 0.9)
 		discard;
 	if (type == WATER)
-		textureColor.w = 0.7;
+		textureColor.w = 0.8;
 	FragColor = vec4(diffuse, 1.0) * textureColor;
 }
