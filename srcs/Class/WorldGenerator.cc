@@ -3,9 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WorldGenerator.cc                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/02 08:06:26 by gperez            #+#    #+#             */
+/*   Updated: 2021/11/30 13:53:11 by maiwenn          ###   ########.fr       */
 /*   Updated: 2021/11/27 22:25:41 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -23,36 +24,40 @@ WorldGenerator::WorldGenerator(unsigned long* seed)
 	this->seed = *seed;
 }
 
-unsigned char WorldGenerator::blockColor(double moisure, double elevation, unsigned char *type)
+unsigned char WorldGenerator::blockColor(double moisure, double *elevation, unsigned char *type)
 {
-    if (elevation < 110)
+    if (*elevation < 110.)
 	{
 		*type = WATER;
+		*elevation += 10;
         return OCEAN;
 	}
-	if (elevation < 111)
+	if (*elevation < 111.)
     {
 		*type = SAND;
+		*elevation += 10;
 	    return BEACH;
 	}
-    if (elevation > 150) 
+    if (*elevation > 150.) 
     {
-        if (moisure < 130)
+		*type = SNOW;
+        if (moisure < 130.)
             *type = STONE;
-        *type = SNOW;
 		return MOUNTAIN;
     }
-    if (elevation < 197)
+	if (*elevation < 121)
+		*elevation = 121;
+    if (*elevation < 150.)
     {
-        if (moisure < 108)
+        if (moisure < 108.)
 		{
 			*type = SAND;
             return DESERT;
 		}
 		*type = GRASS;
-        if (moisure < 114)
+        if (moisure < 120.)
 			return GRASSLAND;
-        else if (moisure < 76)
+        else if (moisure < 140.)
 			return FOREST;
     }
 	*type = GRASS;
@@ -73,7 +78,6 @@ double elevation(double x, double z, double seed)
     return (e);
 }
 
-
 void	putBlock(Chunk *chunk, unsigned char biome, unsigned char type, int x, int y, int z, double e)
 {
 	for (; y < e; y++)
@@ -81,7 +85,6 @@ void	putBlock(Chunk *chunk, unsigned char biome, unsigned char type, int x, int 
 		int pos[4] = {y / 16, x, y % 16, z};
 		chunk->setBlock(BlockPos(pos), (t_block_info){type,0,0,0}, biome);
 	}
-	
 }
 
 void	chooseBlock(Chunk *chunk, unsigned char biome, unsigned char type, int x, int z, double e)
@@ -89,7 +92,7 @@ void	chooseBlock(Chunk *chunk, unsigned char biome, unsigned char type, int x, i
 	if (type == WATER)
 	{
 		putBlock(chunk, biome, SAND, x, 0, z, e);
-		putBlock(chunk, biome, WATER, x, e, z, 111);
+		putBlock(chunk, biome, WATER, x, e, z, 120);
 	}
 	else if (type == SNOW)
 	{
@@ -98,8 +101,8 @@ void	chooseBlock(Chunk *chunk, unsigned char biome, unsigned char type, int x, i
 	}
 	else if (type == GRASS)
 	{
-		putBlock(chunk, biome, STONE, x, 0, z, e / 2);
-		putBlock(chunk, biome, DIRT, x, e / 2, z, e - 1);
+		putBlock(chunk, biome, STONE, x, 0, z, 2 * (e / 3));
+		putBlock(chunk, biome, DIRT, x, 2 * (e / 3), z, e - 1);
 		putBlock(chunk, biome, GRASS, x, e, z, e);
 	}
 	else
@@ -120,7 +123,7 @@ void	WorldGenerator::genChunk(Chunk *chunk)
 			e = ((e + 1) / 2) * 255;
 			m = ((m + 1) / 2) * 255;
 			unsigned char type;
-			unsigned char biome = blockColor(m, e, &type);
+			unsigned char biome = blockColor(m, &e, &type);
 			chooseBlock(chunk, biome, type, x, z, e);
 		}
 	}
