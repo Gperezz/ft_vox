@@ -80,7 +80,7 @@ double elevation(double x, double z, double seed)
 
 void	putBlock(Chunk *chunk, unsigned char biome, unsigned char type, int x, int y, int z, double e)
 {
-	for (; y < e; y++)
+	for (; y <= e; y++)
 	{
 		int pos[4] = {y / 16, x, y % 16, z};
 		chunk->setBlock(BlockPos(pos), (t_block_info){type,0,0,0}, biome);
