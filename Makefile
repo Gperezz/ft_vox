@@ -20,7 +20,7 @@ UNAME := $(shell uname)
 
 ifeq ($(UNAME), Linux)
 FLAG_OPENGL =	-lGL	\
-				-ldl
+				-lpthread
 endif
 ifeq ($(UNAME), Darwin)
 FLAG_OPENGL =	-framework Cocoa	\
@@ -47,29 +47,6 @@ SRC =	srcs/main.cc \
 		srcs/Class/Perlin.cc \
 		srcs/Class/Cave.cc
 
-NC = \033[0m
-BOLD =\033[1m
-DIM =\033[2m
-ITALIC =\033[3m
-UNDER =\033[4m
-BLINK =\033[5m
-
-RS_BO = \033[21m
-RS_D = \033[22m
-RS_I = \033[23m
-RS_U =\033[24m
-RS_BL = \033[25m
-
-WHITE = \033[37ml
-BLUE = \033[38;5;37m
-CYAN = \033[38;5;117m
-GREEN = \033[38;5;120m
-MAGENTA = \033[38;5;135m
-RED = \033[38;5;203m
-
-COLOR1 = \033[38;5;75m
-COLOR2 = \033[38;5;178m
-
 ifeq ($(UNAME), Linux)
 LIB_GLFW = libs/glfw/src/libglfw.so.3.4
 
@@ -84,14 +61,13 @@ LIBS_H =	libs/ \
 			includes \
 			libs/glad/include/ \
 			libs/glfw/include/GLFW/\
-			libs/glm/glm \
-			libs/glm/glm/gtc \
 			
-LIB_GLM =	libs/glm/glm/gtc/test.s
+LIB_GLM =	libs/glm/glm/gtc/ \
+			libs/glm/glm 
 
 LIB_STB = libs/stb/include
 
-LIBS = $(addprefix -I,$(LIBS_H) $(LIB_STB))
+LIBS = $(addprefix -I,$(LIBS_H) $(LIB_STB) $(LIB_GLM))
 
 INC =	includes/ft_vox.hpp \
 		includes/Coords.hpp \
@@ -114,11 +90,11 @@ $(OBJ): $(LIB_GLM) $(LIB_GLAD) $(LIB_STB) $(LIB_GLFW)
 
 ifeq ($(UNAME), Linux)
 $(NAME) : $(OBJ)
-	g++ -Wl,rpath/@executable_path/libs/glad/ -Wl,rpath/@executable_path/libs/glfw/src/ $(FLAG) $(FLAGCPP) $(FLAG_OPENCL) $(FLAG_OPENGL) $(LIB_GLAD) $(LIB_GLFW) $^ -o $(NAME)
+	g++ $^ -Wl,-rpath=$(PWD)/libs/glad/ -Wl,-rpath=$(PWD)/libs/glfw/src/ $(FLAG) $(FLAGCPP) $(FLAG_OPENGL) $(LIB_GLAD) $(LIB_GLFW)  -o $(NAME)
 endif
 ifeq ($(UNAME), Darwin)
 $(NAME) : $(OBJ)
-	g++ $(FLAG) $(FLAGCPP) $(FLAG_OPENCL) $(FLAG_OPENGL) $(LIB_GLAD) $(LIB_GLFW) $^ -o $(NAME)
+	g++ $(FLAG) $(FLAGCPP) $(FLAG_OPENGL) $(LIB_GLAD) $(LIB_GLFW) $^ -o $(NAME)
 	install_name_tool -add_rpath @executable_path/libs/glad/ $(NAME)
 	install_name_tool -change /usr/local/lib/libglad.dylib @rpath/libglad.dylib $(NAME)
 	install_name_tool -add_rpath @executable_path/libs/glfw/src/ $(NAME)
