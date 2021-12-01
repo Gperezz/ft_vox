@@ -57,13 +57,16 @@ int			Engine::initWindow(void)
 		cout << "Failed to initialize GLFW" << endl;
 		return (-1);
 	}
+	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	glfwWindowHint(GLFW_AUTO_ICONIFY, GL_TRUE);
-	this->window = glfwCreateWindow(WIDTH, HEIGHT, "ft_vox", NULL, NULL);
+	this->window = glfwCreateWindow(mode->width, mode->height, "ft_vox", monitor, NULL);
 	if (this->window == NULL)
 	{
 		cout << "Failed to create GLFW window" << endl;
