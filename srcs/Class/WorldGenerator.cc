@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   WorldGenerator.cc                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
+/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/02 08:06:26 by gperez            #+#    #+#             */
 /*   Updated: 2021/11/27 22:25:41 by maiwenn          ###   ########.fr       */
@@ -132,8 +132,6 @@ void	chooseBlock(Chunk *chunk, unsigned char biome, unsigned char type, int x, i
 	}	
 }
 
-#define SEED_CAVE 6
-
 void	WorldGenerator::genChunk(Chunk *chunk)
 {
 	Cave cave = Cave();
@@ -151,7 +149,7 @@ void	WorldGenerator::genChunk(Chunk *chunk)
 			chooseBlock(chunk, biome, type, x, z, e);
 		}
 	}
-	cave.createCave(chunk, SEED_CAVE);
+	cave.createCave(chunk, this->seed);
 }
 
 void	WorldGenerator::configure(unsigned long* seed)
