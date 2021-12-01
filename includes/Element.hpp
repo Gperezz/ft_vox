@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Element.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
+/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/03 21:33:58 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/27 23:59:54 by maiwenn          ###   ########.fr       */
+/*   Updated: 2021/12/01 18:57:36 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 extern "C"
 {
-	#include "glad/glad.h" // Implementation OpenGl
+	#include "glad.h" // Implementation OpenGl
 }
 
 # include "Mat.hpp"

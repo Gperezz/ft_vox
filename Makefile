@@ -3,11 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+         #
+#    By: gperez <gperez@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/10/10 18:22:58 by gperez            #+#    #+#              #
-#    Updated: 2021/11/30 09:43:09 by maiwenn          ###   ########.fr        #
-#    Updated: 2021/12/01 13:34:16 by gperez           ###   ########.fr        #
+#    Updated: 2021/12/01 18:55:49 by gperez           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,20 +14,9 @@ NAME = ft_vox
 
 FLAGCPP = -std=c++11
 
-FLAG = -Wall -g -O2 #-flto # -Werror -Wextra
+FLAG = -Wall -g -O2 -flto # -Werror -Wextra
 
-UNAME := $(shell uname)
-
-ifeq ($(UNAME), Linux)
-FLAG_OPENGL =	-lGL	\
-				-lpthread
-endif
-ifeq ($(UNAME), Darwin)
-FLAG_OPENGL =	-framework Cocoa	\
-				-framework OpenGL	\
-				-framework IOKit	\
-				-framework CoreVideo	
-endif
+FLAG_OPENGL = -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo
 
 APP = -framework AppKit
 
@@ -49,27 +37,41 @@ SRC =	srcs/main.cc \
 		srcs/Class/Cave.cc \
 		srcs/Class/Error.cc \
 
-ifeq ($(UNAME), Linux)
-LIB_GLFW = libs/glfw/src/libglfw.so.3.4
+NC = \033[0m
+BOLD =\033[1m
+DIM =\033[2m
+ITALIC =\033[3m
+UNDER =\033[4m
+BLINK =\033[5m
 
-LIB_GLAD = libs/glad/libglad.so
-endif
-ifeq ($(UNAME), Darwin)
-LIB_GLFW = libs/glfw/src/libglfw.3.4.dylib
+RS_BO = \033[21m
+RS_D = \033[22m
+RS_I = \033[23m
+RS_U =\033[24m
+RS_BL = \033[25m
 
-LIB_GLAD = libs/glad/libglad.dylib
-endif
-LIBS_H =	libs/ \
+WHITE = \033[37m
+BLUE = \033[38;5;37m
+CYAN = \033[38;5;117m
+GREEN = \033[38;5;120m
+MAGENTA = \033[38;5;135m
+RED = \033[38;5;203m
+
+COLOR1 = \033[38;5;75m
+COLOR2 = \033[38;5;178m
+
+LIB_G = libs/glfw_mac/lib-macos/libglfw3.a 
+
+LIBS_H =	libs/glfw_mac/include/GLFW \
+			libs/glad/include/glad \
+			libs/ \
+			libs/CL \
+			libs/glm \
+			libs/glm/gtc \
 			includes \
-			libs/glad/include/ \
-			libs/glfw/include/GLFW/\
-			
-LIB_GLM =	libs/glm/glm/gtc/ \
-			libs/glm/glm 
+			libs/stb \
 
-LIB_STB = libs/stb/include
-
-LIBS = $(addprefix -I,$(LIBS_H) $(LIB_STB) $(LIB_GLM))
+LIBS = $(addprefix -I,$(LIBS_H))
 
 INC =	includes/ft_vox.hpp \
 		includes/Coords.hpp \
@@ -87,60 +89,23 @@ INC =	includes/ft_vox.hpp \
 
 OBJ = $(SRC:.cc=.o)
 
-.PHONY : all
-all :  $(NAME) 
+all : $(NAME)
 
-$(OBJ): $(LIB_GLM) $(LIB_GLAD) $(LIB_STB) $(LIB_GLFW)
-
-ifeq ($(UNAME), Linux)
 $(NAME) : $(OBJ)
-	g++ $^ -Wl,-rpath=$(PWD)/libs/glad/ -Wl,-rpath=$(PWD)/libs/glfw/src/ $(FLAG) $(FLAGCPP) $(FLAG_OPENGL) $(LIB_GLAD) $(LIB_GLFW)  -o $(NAME)
-endif
-ifeq ($(UNAME), Darwin)
-$(NAME) : $(OBJ)
-	g++ $(FLAG) $(FLAGCPP) $(FLAG_OPENGL) $(LIB_GLAD) $(LIB_GLFW) $^ -o $(NAME)
-	install_name_tool -add_rpath @executable_path/libs/glad/ $(NAME)
-	install_name_tool -change /usr/local/lib/libglad.dylib @rpath/libglad.dylib $(NAME)
-	install_name_tool -add_rpath @executable_path/libs/glfw/src/ $(NAME)
-	install_name_tool -change /usr/local/lib/libglfw.3.4.dylib @rpath/libglfw.3.4.dylib $(NAME)
-endif
-
-libs/glm/CMakeLists.txt :
-	git clone  https://github.com/g-truc/glm.git libs/glm
-
-$(LIB_GLM) : libs/glm/CMakeLists.txt
-
-libs/glad/CMakeLists.txt :
-	git clone https://github.com/Dav1dde/glad.git libs/glad
-
-$(LIB_GLAD) : libs/glad/CMakeLists.txt
-	cmake libs/glad/CMakeLists.txt -D BUILD_SHARED_LIBS=ON
-	cmake --build libs/glad/.
-
-libs/stb/include/stb_image.h :
-	git clone https://github.com/franko/stb_image.git libs/stb
-
-$(LIB_STB) : libs/stb/include/stb_image.h
-
-libs/glfw/CMakeLists.txt :
-	git clone https://github.com/glfw/glfw.git libs/glfw
-
-$(LIB_GLFW) : libs/glfw/CMakeLists.txt
-	cmake libs/glfw/CMakeLists.txt -D BUILD_SHARED_LIBS=ON
-	cmake --build libs/glfw/.
-
+	@gcc $(FLAG) -o srcs/glad.o -c libs/glad/src/glad.c
+	@g++ $(FLAG) $(FLAGCPP) $(FLAG_OPENCL) $(FLAG_OPENGL) $(LIB_G) srcs/glad.o $^ -o $(NAME)
+	@printf "$(BOLD)$(COLOR1)%20s : $(RS_BL)$(RS_BO)$(GREEN)succesfuly made!$(NC)%20s\n" $(NAME)
 
 %.o : %.cc $(INC)
-	g++ $(FLAG) $(FLAGCPP) $(LIBS) -o $@ -c $<
+	@printf "$(BOLD)$(COLOR1)%20s : $(RS_BO)$(COLOR2)%20s$(WHITE) ...$(NC)" $(NAME) $(<F)
+	@g++ $(FLAG) $(FLAGCPP) $(LIBS) -o $@ -c $<
+	@printf "\r"
 
-.PHONY : clean
 clean :
 	@/bin/rm -rf srcs/*.o
 	@/bin/rm -rf srcs/Class/*.o
 
-.PHONY : fclean
 fclean : clean
 	@/bin/rm -rf $(NAME)
 
-.PHONY : re
 re : fclean all

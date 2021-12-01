@@ -3,20 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   Engine.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
+/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:35:15 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/27 23:59:13 by maiwenn          ###   ########.fr       */
-/*   Updated: 2021/11/30 17:35:17 by gperez           ###   ########.fr       */
+/*   Updated: 2021/12/01 18:56:48 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #ifndef _ENGINE_HPP_
 # define _ENGINE_HPP_
 
 extern "C"
 {
-	# include "glad/glad.h" // Implementation OpenGl
+	# include "glad.h" // Implementation OpenGl
 }
 
 # include "glfw3.h" // Load fenetre
