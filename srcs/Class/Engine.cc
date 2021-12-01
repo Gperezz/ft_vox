@@ -63,7 +63,7 @@ int			Engine::initWindow(void)
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	glfwWindowHint(GLFW_AUTO_ICONIFY, GL_TRUE);
-	this->window = glfwCreateWindow(WIDTH, HEIGHT, "ft_vox", glfwGetPrimaryMonitor(), NULL);
+	this->window = glfwCreateWindow(WIDTH, HEIGHT, "ft_vox", NULL, NULL);
 	if (this->window == NULL)
 	{
 		cout << "Failed to create GLFW window" << endl;
@@ -559,7 +559,7 @@ void		Engine::setFirst(bool f)
 	this->firstMouse = f;
 }
 
-Engine::~Engine()
+void 		Engine::deleteText()
 {
 	int				i;
 	int				t;
@@ -575,7 +575,11 @@ Engine::~Engine()
 	}
 	if (this->shader.getProgram())
 		this->shader.freeProgram();
+	this->hud.deleteHud();
+}
 
+Engine::~Engine()
+{
 }
 
 ///////////////Private///////////////

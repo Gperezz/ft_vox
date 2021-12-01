@@ -30,8 +30,8 @@ extern "C"
 # include <iostream>
 # include <vector>
 
-# define WIDTH  1920
-# define HEIGHT 1080
+# define WIDTH  400
+# define HEIGHT 400
 # define RENDER_DIST 1000.0f
 # define VERTEX_SKY "shader/vertexSky.glsl"
 # define FRAGMENT_SKY "shader/fragmentSky.glsl"
@@ -84,6 +84,7 @@ class Engine
 		void			setMouseLastPos(glm::vec2 v);
 		bool			isFirst(void);
 		void			setFirst(bool f);
+		void			deleteText();
 		~Engine();
 };
 

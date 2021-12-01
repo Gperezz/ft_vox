@@ -19,7 +19,7 @@ void	key(Engine &env, float deltaFrameTime)
 		glfwSetWindowShouldClose(env.getWindow(), true);
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 			speed = SPEED_SPRINT;
-	else if (glfwGetKey(env.getWindow(), GLFW_KEY_LEFT_ALT) == GLFW_PRESS)
+	else if (glfwGetKey(env.getWindow(), GLFW_KEY_Z) == GLFW_PRESS)
 			speed = SPEED_ACCEL;
 	if (glfwGetKey(env.getWindow(), GLFW_KEY_S) == GLFW_PRESS)
 	{
@@ -104,10 +104,10 @@ void	exec(World &world, Engine &env, TimeMs time)
 int		main(void)
 {
 	Engine			env;
-	World			world(env);
 	Shader&			shader(env.getShader());
 	TimeMs			time;
 	glm::mat4		mat;
+	World			world(env);
 
 	mat = glm::perspective(glm::radians(80.0f),
 		(float)WIDTH / (float)HEIGHT, 0.1f, (float)RENDER_DIST);
@@ -160,7 +160,7 @@ int		main(void)
 	world.end();
 	t0.join();
 	t1.join();
-
+	env.deleteText();
 	glfwDestroyWindow(env.getWindow());
 	glfwTerminate();
 	return (0);

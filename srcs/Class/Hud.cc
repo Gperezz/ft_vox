@@ -150,10 +150,14 @@ Shader&		Hud::getShader(void)
 	return (this->shader);
 }
 
-Hud::~Hud()
+void		Hud::deleteHud(void)
 {
 	for (int i = this->hudElements.size() - 1; i >= 0; i--)
 		delete this->hudElements[i];
 	if (this->shader.getProgram())
 		this->shader.freeProgram();
+}
+
+Hud::~Hud()
+{
 }

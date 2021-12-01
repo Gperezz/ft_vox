@@ -48,6 +48,7 @@ class Hud
 		void					display(int fps, unsigned int txt);
 		void					deleteElement(unsigned int i);
 		Shader&					getShader(void);
+		void					deleteHud(void);
 		~Hud();
 };
 

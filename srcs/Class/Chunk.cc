@@ -138,7 +138,7 @@ void		Chunk::conditionValidate(vector<vbo_type> &tempVbo, BlockPos posInMesh, bo
 
 void		Chunk::generateVbo(char index, vector<vbo_type> tempVbo)
 {
-	// GLenum err;
+	GLenum err;
 	// while((err = glGetError()) != GL_NO_ERROR)
 	// 	std::cout << BOLD_RED << "AVANT Error " << err << '\n' << NA;
 
@@ -155,8 +155,8 @@ void		Chunk::generateVbo(char index, vector<vbo_type> tempVbo)
 	glEnableVertexAttribArray(2);
 	glEnableVertexAttribArray(3);
 
-	// while((err = glGetError()) != GL_NO_ERROR)
-    //         std::cout << BOLD_RED << "Error " << err << '\n' << NA;
+	while((err = glGetError()) != GL_NO_ERROR)
+            std::cout << BOLD_RED << "Error " << err << '\n' << NA;
 
 }
 
