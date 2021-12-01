@@ -37,11 +37,7 @@ void	main()
 	textureColor = texture(basicTexture, tCoords);
 	if (textureColor.w < 0.9)
 		discard;
-	if ((int(textureType) == 1 && type == GRASS) || type == LEAVES)
-		colorAddedTexture = vec4(convertRGB(vec3(176, 252, 113)), 1.0);
-	else if (type == SNOW)
-		textureColor = (textureColor + vec4(1., 1., 1., 1.)) / 2;
-	else if (type == WATER)
-		colorAddedTexture = vec4(convertRGB(vec3(0, 100, 255)), 0.7);
-	FragColor = vec4(diffuse, 1.0) * colorAddedTexture * textureColor;
+	if (type == WATER)
+		textureColor.w = 0.8;
+	FragColor = vec4(diffuse, 1.0) * textureColor;
 }

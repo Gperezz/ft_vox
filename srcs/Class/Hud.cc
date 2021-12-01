@@ -3,14 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   Hud.cc                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/03 20:12:28 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/26 10:40:56 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/27 22:38:40 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Hud.hpp"
+
+static float	square_pt[] = {
+	-1.0, 1.0,
+	-1.0, -1.0,
+	1.0, 1.0,
+	1.0, -1.0
+};
 
 Hud::Hud()
 {
@@ -143,10 +150,14 @@ Shader&		Hud::getShader(void)
 	return (this->shader);
 }
 
-Hud::~Hud()
+void		Hud::deleteHud(void)
 {
 	for (int i = this->hudElements.size() - 1; i >= 0; i--)
 		delete this->hudElements[i];
 	if (this->shader.getProgram())
 		this->shader.freeProgram();
+}
+
+Hud::~Hud()
+{
 }

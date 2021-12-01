@@ -6,22 +6,81 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/26 12:05:11 by gperez           ###   ########.fr       */
+/*   Updated: 2021/12/01 19:28:27 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Engine.hpp"
 
 using namespace std;
+extern t_txt_path g_txt_path[];
+
 
 Engine::Engine()
 {
+	this->isCursor = false;
 	this->sky = false;
 	this->firstMouse = true;
 	this->lockRay = false;
+	this->speed20 = false;
+	for (unsigned int i = 0; i < GLFW_KEY_LAST; i++)
+		this->keys[i] = KEY_RELEASE;
 }
 
-void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+void				Engine::inputKey(unsigned int key)
+{
+	if (glfwGetKey(this->window, key) == GLFW_PRESS
+		&& this->keys[key] == KEY_RELEASE)
+	{
+		this->keys[key] = KEY_PRESS;
+		this->queue.push(key);
+	}
+	else if (glfwGetKey(this->window, key) == GLFW_RELEASE
+		&& this->keys[key] == KEY_DONE)
+			this->keys[key] = KEY_RELEASE;
+}
+
+void				Engine::getKeys(float deltaFrameTime)
+{
+	float speed = SPEED;
+
+	if (glfwGetKey(this->window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		glfwSetWindowShouldClose(this->window, true);
+	if (glfwGetKey(this->window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS && !this->speed20)
+		speed = SPEED_SPRINT;
+	else if (this->speed20)
+		speed = SPEED_ACCEL;
+
+	if (glfwGetKey(this->window, GLFW_KEY_S) == GLFW_PRESS)
+		this->camera.translate(E_FRONT, speed * deltaFrameTime);
+	if (glfwGetKey(this->window, GLFW_KEY_W) == GLFW_PRESS)
+		this->camera.translate(E_FRONT, -speed * deltaFrameTime);
+	if (glfwGetKey(this->window, GLFW_KEY_A) == GLFW_PRESS)
+		this->camera.translate(E_RIGHT, speed * deltaFrameTime);
+	if (glfwGetKey(this->window, GLFW_KEY_D) == GLFW_PRESS)
+		this->camera.translate(E_RIGHT, -speed * deltaFrameTime);
+	if (glfwGetKey(this->window, GLFW_KEY_SPACE) == GLFW_PRESS)
+		this->camera.translate(E_UP, speed * deltaFrameTime);
+	if (glfwGetKey(this->window, GLFW_KEY_X) == GLFW_PRESS)
+		this->camera.translate(E_UP, -speed * deltaFrameTime);
+
+	this->inputKey(GLFW_KEY_APOSTROPHE);
+	this->inputKey(GLFW_KEY_MINUS);
+	this->inputKey(GLFW_KEY_EQUAL);
+	this->inputKey(GLFW_KEY_C);
+}
+
+int					Engine::getWidth(void)
+{
+	return this->monitorWidth;
+}
+
+int					Engine::getHeight(void)
+{
+	return this->monitorHeight;
+}
+
+void				mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
 	Engine		*engine = (Engine*)glfwGetWindowUserPointer(window);
 	glm::vec2	offsetMouse;
@@ -42,6 +101,32 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 	engine->getCam().rotate(glm::vec3(offsetMouse.x, offsetMouse.y, 0.0));
 }
 
+void				Engine::checkKeys(World &world)
+{
+	short	i;
+
+	while (this->queue.size())
+	{
+		i = this->queue.front();
+		if (i == GLFW_KEY_APOSTROPHE)
+		{
+			this->isCursor = !this->isCursor;
+			glfwSetInputMode(window, GLFW_CURSOR, this->isCursor
+				? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+			glfwSetCursorPosCallback(this->window, this->isCursor
+				? NULL : mouse_callback);
+		}
+		else if (i == GLFW_KEY_C)
+			this->speed20 = !this->speed20;
+		else if (i == GLFW_KEY_MINUS)
+			world.decreaseDist();
+		else if (i == GLFW_KEY_EQUAL)
+			world.increaseDist();
+		this->keys[(int)i] = KEY_DONE;
+		this->queue.pop();
+	}
+}
+
 static void	framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	(void)window;
@@ -55,13 +140,18 @@ int			Engine::initWindow(void)
 		cout << "Failed to initialize GLFW" << endl;
 		return (-1);
 	}
+	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	glfwWindowHint(GLFW_AUTO_ICONIFY, GL_TRUE);
-	this->window = glfwCreateWindow(WIDTH, HEIGHT, "ft_vox", glfwGetPrimaryMonitor(), NULL);
+	this->monitorWidth = mode->width;
+	this->monitorHeight = mode->height;
+	this->window = glfwCreateWindow(mode->width, mode->height, "ft_vox", monitor, NULL);
 	if (this->window == NULL)
 	{
 		cout << "Failed to create GLFW window" << endl;
@@ -72,6 +162,8 @@ int			Engine::initWindow(void)
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
 		cout << "Failed to initialize GLAD" << endl;
+		glfwDestroyWindow(this->window);
+		glfwTerminate();
 		return (-1);
 	}
 	glfwSetCursorPosCallback(this->window, mouse_callback);
@@ -115,7 +207,7 @@ Block		*Engine::getBlockFromPos(Chunk **chunk, glm::vec3 pos, glm::vec4 &bP, Wor
 	Block		*block;
 	ChunkPos	chunkPos = Camera::getCurrentChunkPos(pos);
 
-	// (*chunk) = world.getSafe(chunkPos); A REMMETTRE
+	(*chunk) = world.getUnsafe(chunkPos);
 	if (!chunk)
 		return (NULL);
 	bP = glm::vec4(Camera::getCurrentOffset(pos), (int)(pos.y / 16.));
@@ -141,12 +233,6 @@ Block		*Engine::getBlockFromPos(Chunk **chunk, glm::vec3 pos, glm::vec4 &bP, Wor
 	if (!(*chunk))
 		return (NULL);
 	block = &(*chunk)->getBlock(bP.w, bP.x, bP.y, bP.z);
-	// if ((this->getButton(GLFW_MOUSE_BUTTON_1) == true || this->getButton(GLFW_MOUSE_BUTTON_2) == true)
-	// 	&& this->lockRay == false)
-	// {
-	// 	printf(RED "ChunkPos %d %d\n" NA, (*chunk)->getPos().get(0), (*chunk)->getPos().get(1));
-	// 	printf(ORANGE "Bp %f %f %f\n" NA, bP.x, bP.y, bP.z);
-	// }
 	return (block);
 }
 
@@ -154,14 +240,15 @@ static void	genNeighboor(Direction dir, Chunk *chunk, glm::vec4 posB)
 {
 	Chunk	*neighboor;
 
-	neighboor = chunk->getNeighboor(dir);
+	neighboor = chunk->getNeighboorUnsafe(dir);
 	if (neighboor)
 		neighboor->generateGraphics((int)posB.w);
 }
 
-static void	setGenBlock(glm::vec4 posB, Chunk *chunk, e_BlockType type)
+static void	setGenBlock(glm::vec4 posB, Chunk *chunk, e_BlockType type) // A VOIR
 {
-	chunk->setBlock((int[4]){(int)posB.w, (int)posB.x, (int)posB.y, (int)posB.z},
+	int pos[4] = {(int)posB.w, (int)posB.x, (int)posB.y, (int)posB.z};
+	chunk->setBlock(pos,
 		(t_block_info){(unsigned char)type, 0, 0, 0});
 	chunk->generateGraphics((int)posB.w);
 	if ((int)posB.x == 0)
@@ -178,7 +265,7 @@ static void	setGenBlock(glm::vec4 posB, Chunk *chunk, e_BlockType type)
 		chunk->generateGraphics((int)posB.w + 1);
 }
 
-void		Engine::rayCasting(Chunk *chunk, World &world)
+void		Engine::rayCasting(World &world)
 {
 	glm::vec3		ray;
 	glm::vec3		pos = this->camera.getTranslate();
@@ -187,22 +274,25 @@ void		Engine::rayCasting(Chunk *chunk, World &world)
 	glm::vec4		currentBP;
 	glm::vec4		saveBP;
 	unsigned int	i;
-	Chunk			*saveChunk;
 
-	if (!chunk || this->lockRay)
+	Chunk			*saveChunk = nullptr;
+	Chunk			*chunk = nullptr;
+
+	if (this->lockRay || this->isCursor)
 		return;
 	if (this->getButton(GLFW_MOUSE_BUTTON_1) == false && this->getButton(GLFW_MOUSE_BUTTON_2) == false)
 	{
 		this->getHud().setCursorColor(WHITE_CURSOR);
 		return ;
 	}
+
 	currentBlock = getBlockFromPos(&chunk, pos, currentBP, world); // Check si la position de base est dans un cube d'air
 	if (!currentBlock || !chunk || !isInAirBlock(*currentBlock) || chunk->getFenced() == UNFENCED) //
 	{
 		this->getHud().setCursorColor(RED_CURSOR);
 		return;
 	}
-	ray = this->camera.createRay(glm::vec2((float)WIDTH / 2.0, (float)HEIGHT / 2.0), WIDTH, HEIGHT);
+	ray = this->camera.createRay(glm::vec2((float)this->monitorWidth / 2.0, (float)this->monitorHeight / 2.0), this->monitorWidth, this->monitorHeight);
 	for (i = 0; currentBlock && i < distBlock && isInAirBlock(*currentBlock); i++)
 	{
 		saveChunk = chunk;
@@ -344,9 +434,6 @@ void		Engine::displaySky(Textures *t)
 		"nbTxt"), SKY_BOTTOM_T - END_BLOCK_T);
 	glDrawArrays(GL_TRIANGLES, 0, NB_PTS_CUBE);
 	glDepthMask(true);
-	glFrontFace(GL_CCW);
-	glCullFace(GL_BACK);
-	glEnable(GL_CULL_FACE);
 }
 
 Camera&		Engine::getCam(void)
@@ -554,7 +641,7 @@ void		Engine::setFirst(bool f)
 	this->firstMouse = f;
 }
 
-Engine::~Engine()
+void 		Engine::deleteText()
 {
 	int				i;
 	int				t;
@@ -570,7 +657,11 @@ Engine::~Engine()
 	}
 	if (this->shader.getProgram())
 		this->shader.freeProgram();
+	this->hud.deleteHud();
+}
 
+Engine::~Engine()
+{
 }
 
 ///////////////Private///////////////

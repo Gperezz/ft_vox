@@ -100,20 +100,17 @@ void		Mat::printMatrix(bool calc)
 
 void		Mat::translate(glm::vec3 v)
 {
-	// std::unique_lock<std::mutex> lk(this->translateMutex);
 	Mat::trans += v;
 }
 
 void		Mat::setTranslate(glm::vec3 v)
 {
-	// std::unique_lock<std::mutex> lk(this->translateMutex);
 	Mat::trans = v;
 }
 
 glm::vec3	Mat::getTranslate(void)
 {
 	glm::vec3 out;
-	// std::unique_lock<std::mutex> lk(this->translateMutex);
 	out = Mat::trans;
 	return (out);
 }

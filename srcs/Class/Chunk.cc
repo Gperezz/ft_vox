@@ -3,9 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Chunk.cc                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
+/*   Updated: 2021/11/27 22:24:30 by maiwenn          ###   ########.fr       */
 /*   Updated: 2021/11/26 12:54:11 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -154,10 +155,6 @@ void		Chunk::conditionValidate(std::vector<vbo_type> &tempVbo, vector<vbo_type>	
 
 void		Chunk::generateVbo(char index, vector<vbo_type> tempVbo, bool isT)
 {
-	GLenum err;
-
-	// while((err = glGetError()) != GL_NO_ERROR)
-	// 	std::cout << BOLD_RED << "AVANT Error " << err << '\n' << NA;
 	if (isT)
 	{
 		glBindVertexArray(tabVaoWater[(int)index]);
@@ -178,9 +175,6 @@ void		Chunk::generateVbo(char index, vector<vbo_type> tempVbo, bool isT)
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
 	glEnableVertexAttribArray(3);
-
-	// while((err = glGetError()) != GL_NO_ERROR)
-    //         std::cout << BOLD_RED << "Error " << err << '\n' << NA;
 
 }
 
