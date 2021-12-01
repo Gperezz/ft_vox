@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Engine.cc                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
+/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/27 23:03:26 by maiwenn          ###   ########.fr       */
+/*   Updated: 2021/12/01 19:28:27 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ void				Engine::getKeys(float deltaFrameTime)
 	this->inputKey(GLFW_KEY_APOSTROPHE);
 	this->inputKey(GLFW_KEY_MINUS);
 	this->inputKey(GLFW_KEY_EQUAL);
-	this->inputKey(GLFW_KEY_LEFT_ALT);
+	this->inputKey(GLFW_KEY_C);
 }
 
 int					Engine::getWidth(void)
@@ -116,7 +116,7 @@ void				Engine::checkKeys(World &world)
 			glfwSetCursorPosCallback(this->window, this->isCursor
 				? NULL : mouse_callback);
 		}
-		else if (i == GLFW_KEY_LEFT_ALT)
+		else if (i == GLFW_KEY_C)
 			this->speed20 = !this->speed20;
 		else if (i == GLFW_KEY_MINUS)
 			world.decreaseDist();

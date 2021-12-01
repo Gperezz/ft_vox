@@ -6,10 +6,10 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/13 17:54:04 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/27 23:02:41 by maiwenn          ###   ########.fr       */
-/*   Updated: 2021/11/26 12:20:25 by gperez           ###   ########.fr       */
+/*   Updated: 2021/12/01 19:19:49 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #include "Textures.hpp"
 
@@ -24,6 +24,8 @@ t_txt_path g_txt_path[] = {
 	{LOG_OAK_T, LOG, "textures/blocks/log_oak.png"},
 	{STONE_T, STONE, "textures/blocks/stone.png"},
 	{SAND_T, SAND, "textures/blocks/sand.png"},
+	{SNOW_T, SNOW, "textures/blocks/snow.png"},
+	{WATER_T, WATER, "textures/blocks/water_still.png"},
 	{END_BLOCK_T, (e_BlockType)0, ""},
 	{SKY_FRONT_T, (e_BlockType)SKY_DIR_FRONT, "textures/skybox/front.png"},
 	{SKY_LEFT_T, (e_BlockType)SKY_DIR_LEFT, "textures/skybox/left.png"},
@@ -113,10 +115,6 @@ e_txt			Textures::getIndexTxt(e_BlockType type)
 {
 	e_txt	index = (e_txt)0;
 	bool	find = false;
-	if (type == SNOW)
-		type = STONE;
-	else if (type == WATER)
-		type = STONE;
 
 	for (int i = 0; find == false && i < END_T; i++)
 	{

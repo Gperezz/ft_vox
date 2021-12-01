@@ -3,13 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   Textures.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
+/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/13 17:42:19 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/27 23:02:11 by maiwenn          ###   ########.fr       */
-/*   Updated: 2021/11/26 12:19:13 by gperez           ###   ########.fr       */
+/*   Updated: 2021/12/01 19:04:41 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #ifndef TEXTURES_HPP
 # define TEXTURES_HPP
@@ -19,7 +19,7 @@
 # include "str_color.hpp"
 
 enum e_txt {DIRT_T, GRASS_TOP_T, GRASS_SIDE_T, LEAVES_OAK_T, LOG_OAK_T,
-	STONE_T, SAND_T, END_BLOCK_T, SKY_FRONT_T, SKY_LEFT_T, SKY_BACK_T, SKY_RIGHT_T, 
+	STONE_T, SAND_T, SNOW_T, WATER_T, END_BLOCK_T, SKY_FRONT_T, SKY_LEFT_T, SKY_BACK_T, SKY_RIGHT_T, 
 	SKY_TOP_T, SKY_BOTTOM_T, SKY_T, TEST_T, TXT_HUD, END_T};
 
 typedef struct s_txt_path
