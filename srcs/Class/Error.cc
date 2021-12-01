@@ -1,22 +1,37 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_vox.hpp                                         :+:      :+:    :+:   */
+/*   Error.cc                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/03/21 17:43:41 by gperez            #+#    #+#             */
-/*   Updated: 2021/12/01 15:04:12 by gperez           ###   ########.fr       */
+/*   Created: 2021/03/12 16:01:12 by gperez            #+#    #+#             */
+/*   Updated: 2021/03/12 16:20:07 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef _FT_VOX_HPP_
-# define _FT_VOX_HPP_
-
-
-# include "Engine.hpp"
-# include "World.hpp"
-# include "TimeMs.hpp"
 # include "Error.hpp"
 
-#endif
+Error::Error(int nb, std::string const& str, int lvl) throw()
+	:errNb(nb),errStr(str),errLvl(lvl)
+{}
+
+const char*	Error::what(void) const throw()
+{
+	return (this->errStr.c_str());
+}
+
+int			Error::getNb() const throw()
+{
+	return (this->errNb);
+}
+
+int			Error::getLvl() const throw()
+{
+	return (this->errLvl);
+}
+
+Error::~Error() throw()
+{
+	
+}

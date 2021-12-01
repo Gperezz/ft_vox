@@ -6,52 +6,11 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/25 18:25:36 by gperez           ###   ########.fr       */
+/*   Updated: 2021/12/01 15:38:09 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_vox.hpp"
-
-void	key(Engine &env, float deltaFrameTime)
-{
-	float speed = SPEED;
-	if (glfwGetKey(env.getWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(env.getWindow(), true);
-	if (glfwGetKey(env.getWindow(), GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-			speed = SPEED_SPRINT;
-	else if (glfwGetKey(env.getWindow(), GLFW_KEY_LEFT_ALT) == GLFW_PRESS)
-			speed = SPEED_ACCEL;
-	if (glfwGetKey(env.getWindow(), GLFW_KEY_S) == GLFW_PRESS)
-	{
-		env.getCam().translate(E_FRONT, speed * deltaFrameTime);
-		// env.getCam().printMatrix(true);
-	}
-	if (glfwGetKey(env.getWindow(), GLFW_KEY_W) == GLFW_PRESS)
-	{
-		env.getCam().translate(E_FRONT, -speed * deltaFrameTime);
-		// env.getCam().printMatrix(true);
-	}
-	if (glfwGetKey(env.getWindow(), GLFW_KEY_A) == GLFW_PRESS)
-	{
-		env.getCam().translate(E_RIGHT, speed * deltaFrameTime);
-		// env.getCam().printMatrix(true);
-	}
-	if (glfwGetKey(env.getWindow(), GLFW_KEY_D) == GLFW_PRESS)
-	{
-		env.getCam().translate(E_RIGHT, -speed * deltaFrameTime);
-		// env.getCam().printMatrix(true);
-	}
-	if (glfwGetKey(env.getWindow(), GLFW_KEY_SPACE) == GLFW_PRESS)
-	{
-		env.getCam().translate(E_UP, speed * deltaFrameTime);
-		// env.getCam().printMatrix(true);
-	}
-	if (glfwGetKey(env.getWindow(), GLFW_KEY_X) == GLFW_PRESS)
-	{
-		env.getCam().translate(E_UP, -speed * deltaFrameTime);
-		// env.getCam().printMatrix(true);
-	}
-}
 
 static int	checkMouse(Engine &env, unsigned int b)
 {
@@ -71,22 +30,18 @@ void	exec(World &world, Engine &env, TimeMs time)
 	static int		imgNb;
 	Textures		*t;
 	int				idx;
-	// Chunk*			chunk = NULL;
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	iImg++;
 	timeForFps += world.getDeltaFrameTime();
-	key(env, world.getDeltaFrameTime());
+	env.getKeys(world.getDeltaFrameTime());
+	env.checkKeys(world);
 	if (checkMouse(env, GLFW_MOUSE_BUTTON_1)
 		|| checkMouse(env, GLFW_MOUSE_BUTTON_2))
 		return ;
-	
-	// chunk = world.get(env.getCam().getCurrentChunkPos());
-	// if (chunk)
-	// 	env.rayCasting(chunk, world); // FAIT SEGFAULT QUAND LE CHUNK OU L ON SE TROUVE N EST PAS GENERER
-	
+
 	world.display(env, time.getTimeSeconds());
 	idx = env.getNbTextures() - 1;
 	t = env.getTexture(idx);
@@ -101,13 +56,47 @@ void	exec(World &world, Engine &env, TimeMs time)
 	glfwPollEvents();
 }
 
-int		main(void)
+
+
+int		main(int argc, char *argv[])
 {
 	Engine			env;
-	World			world(env);
 	Shader&			shader(env.getShader());
 	TimeMs			time;
 	glm::mat4		mat;
+	unsigned long	seed = SEED;
+
+	if (argc == 2)
+	{
+		std::string str = std::string(argv[1]);
+		if (str.size() < 20)
+		{
+			for (std::string::iterator it = str.begin(); it != str.end();)
+			{
+				if (!std::isalnum((int)(*it)))
+					it = str.erase(it);
+				else
+					it++;
+			}
+			try{
+				if (str.size())
+					seed = std::stoul(str, 0, 36);
+			}
+			catch(Error const &e){
+				std::cout << e.what() << "\n";
+				return (1);
+			}
+			if (seed < MIN_SEED)
+			{
+				seed = SEED;
+				std::cout << "Seed too short\n" << NA;
+			}
+		}
+		else
+			std::cout << "Argument is too long\n" << NA;
+	}
+
+	World			world(env, &seed);
 
 	mat = glm::perspective(glm::radians(80.0f),
 		(float)WIDTH / (float)HEIGHT, 0.1f, (float)RENDER_DIST);

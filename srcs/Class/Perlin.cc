@@ -9,7 +9,6 @@ PerlinNoise::PerlinNoise(int s)
 {
 	this->seed = s;
 }
-#define SEED 1567612511
 
 double PerlinNoise::rand_noise(int t)
 {

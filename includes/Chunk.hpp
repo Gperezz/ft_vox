@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 18:17:27 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/25 17:15:46 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/26 13:00:04 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,15 +23,6 @@
 # include <mutex>
 
 class World;
-
-// enum Biome : char{
-// 	PLAIN,
-// 	FOREST,
-// 	TAIGA,
-// 	OCEAN,
-// 	DESERT,
-// 	JUNGLE
-// };
 
 enum Geomorph : char{
 	FLAT,
@@ -58,21 +49,23 @@ enum ChunkState : char{
 
 class Chunk{
 	private:
-		std::mutex						validMutex;
 		Block							blocks[16][16][16][16]; // [meshIdx_y][Mesh_relative_x][Mesh_relative_y][mesh_relative_z]
 		unsigned int					tabVao[16];
 		unsigned int					tabVbo[16];
+		unsigned int					tabVaoWater[16];
+		unsigned int					tabVboWater[16];
 		std::map<char, unsigned int>	valid;
+		std::map<char, unsigned int>	validTrans;
 		ChunkPos						pos;
 		bool							generate;
 		ChunkState						state;
 		World							*world;
-		void							canPrintBlockLoop(std::vector<vbo_type> &tempVbo, BlockPos posInMesh, int &i, char &dir);
-		bool							canPrintBlock(std::vector<vbo_type> &tempVbo, BlockPos posInMesh);
+		void							canPrintBlockLoop(std::vector<vbo_type> &tempVbo, std::vector<vbo_type> &tempVboTrans, BlockPos posInMesh, int &i, char &dir, bool &isTrans);
+		bool							canPrintBlock(std::vector<vbo_type> &tempVbo, std::vector<vbo_type> &tempVboTrans, BlockPos posInMesh, bool &isTrans);
 		void							fillTempVbo(std::vector<vbo_type> &tempVbo, t_direction_consts dir_c, BlockPos posInMesh, t_id id);
-		void							conditionValidate(std::vector<vbo_type> &tempVbo, BlockPos posInMesh, bool &b);
+		void							conditionValidate(std::vector<vbo_type> &tempVbo, std::vector<vbo_type>	&tempVboTrans, BlockPos posInMesh, bool &b, bool &bT);
 		void							validateMesh(char meshIdx);
-		void							generateVbo(char index, std::vector<vbo_type> tempVbo);
+		void							generateVbo(char index, std::vector<vbo_type> tempVbo, bool isT);
 		void							deleteVbos(void);
 	public:
 		Chunk();
@@ -102,6 +95,7 @@ class Chunk{
 		void							generateGraphics(void);
 		void							generateGraphics(unsigned int mesh);
 		void							displayChunk(Camera cam, Shader shader, Textures *t);
+		void							displayChunkTransparency(Camera cam, Shader shader, Textures *t);
 
 		Block&							operator[](BlockPos);
 		void							operator=(const Chunk	&copy);

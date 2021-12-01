@@ -148,7 +148,7 @@ void	chooseBlock(Chunk *chunk, unsigned char biome, unsigned char type, int x, i
 	}	
 }
 
-#define SEED 6
+#define SEED_CAVE 6
 
 void	WorldGenerator::genChunk(Chunk *chunk)
 {
@@ -159,8 +159,8 @@ void	WorldGenerator::genChunk(Chunk *chunk)
 		for (int z = 0; z < 16; z++){
 			
 			ChunkPos pos = chunk->getPos();
-			double e = elevation(pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX, SEED);
-			double m = elevation(pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX, SEED / 300);
+			double e = elevation(pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX, this->seed);
+			double m = elevation(pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX, this->seed / 300);
 			e = ((e + 1) / 2) * 255;
 			m = ((m + 1) / 2) * 255;
 			unsigned char type;
@@ -169,7 +169,7 @@ void	WorldGenerator::genChunk(Chunk *chunk)
 			chooseBlock(chunk, biome, type, x, z, e);
 		}
 	}
-	cave.createCave(chunk, SEED);
+	cave.createCave(chunk, SEED_CAVE);
 }
 
 void	WorldGenerator::configure(unsigned long* seed)
