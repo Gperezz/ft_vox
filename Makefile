@@ -6,10 +6,10 @@
 #    By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/10/10 18:22:58 by gperez            #+#    #+#              #
-#    Updated: 2021/11/30 09:43:09 by maiwenn          ###   ########.fr        #
-#    Updated: 2021/12/01 13:34:16 by gperez           ###   ########.fr        #
+#    Updated: 2021/12/01 23:46:31 by maiwenn          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
+
 
 NAME = ft_vox
 
@@ -135,12 +135,12 @@ $(LIB_GLFW) : libs/glfw/CMakeLists.txt
 
 .PHONY : clean
 clean :
-	@/bin/rm -rf srcs/*.o
-	@/bin/rm -rf srcs/Class/*.o
+	rm -rf srcs/*.o
+	rm -rf srcs/Class/*.o
 
 .PHONY : fclean
 fclean : clean
-	@/bin/rm -rf $(NAME)
+	rm -rf $(NAME)
 
 .PHONY : re
 re : fclean all

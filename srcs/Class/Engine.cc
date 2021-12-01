@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Engine.cc                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2021/12/01 19:28:27 by gperez           ###   ########.fr       */
+/*   Updated: 2021/12/01 23:47:49 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -374,7 +374,7 @@ static void	fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, uns
 				vboType.coords[0] = 1. - dir_c.pts[iPt].get(X);
 		}
 		idBitwise = (int)g_txt_path[idxgTxtPath].type << 8;
-		vboType.meta = (int)vboType.meta | idBitwise;
+		vboType.meta = vboType.meta | idBitwise;
 		tempVbo.push_back(vboType);
 	}
 }

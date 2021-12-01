@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   StructBlock.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 20:41:33 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/11 12:53:58 by gperez           ###   ########.fr       */
+/*   Updated: 2021/12/01 23:52:46 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ struct	vbo_type {
 	float			pos[3];
 	float			normal[3];
 	float			coords[2];
-	float			meta;
+	int				meta;
 };
 
 typedef struct	s_add_pt {

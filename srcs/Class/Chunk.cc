@@ -6,10 +6,10 @@
 /*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/13 16:00:52 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/27 22:24:30 by maiwenn          ###   ########.fr       */
-/*   Updated: 2021/11/26 12:54:11 by gperez           ###   ########.fr       */
+/*   Updated: 2021/12/01 23:46:47 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #include "Chunk.hpp"
 #include "World.hpp"
@@ -100,7 +100,7 @@ void	Chunk::fillTempVbo(vector<vbo_type> &tempVbo, t_direction_consts dir_c, Blo
 		}
 		idTxtBitwise = id.txt << 3;
 		idBitwise = id.type << 8;
-		vboType.meta = (int)vboType.meta | idTxtBitwise | idBitwise;
+		vboType.meta = vboType.meta | idTxtBitwise | idBitwise;
 		tempVbo.push_back(vboType);
 		iPt++;
 	}

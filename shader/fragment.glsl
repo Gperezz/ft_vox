@@ -3,8 +3,8 @@
 in vec2		tCoords;
 in vec3		normal;
 in vec3		vecToLight;
-in float	textureType;
-in float	type;
+flat in int	textureType;
+flat in int	type;
 out vec4	FragColor;
 
 uniform sampler2D	basicTexture;
