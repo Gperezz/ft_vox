@@ -30,8 +30,8 @@ extern "C"
 # include <iostream>
 # include <vector>
 
-# define WIDTH  400
-# define HEIGHT 400
+# define WIDTH  1200
+# define HEIGHT 900
 # define RENDER_DIST 1000.0f
 # define VERTEX_SKY "shader/vertexSky.glsl"
 # define FRAGMENT_SKY "shader/fragmentSky.glsl"
