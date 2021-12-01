@@ -6,7 +6,7 @@
 #    By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/10/10 18:22:58 by gperez            #+#    #+#              #
-#    Updated: 2021/12/01 23:46:31 by maiwenn          ###   ########.fr        #
+#    Updated: 2021/12/02 00:06:41 by maiwenn          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -114,7 +114,7 @@ libs/glad/CMakeLists.txt :
 	git clone https://github.com/Dav1dde/glad.git libs/glad
 
 $(LIB_GLAD) : libs/glad/CMakeLists.txt
-	cmake libs/glad/CMakeLists.txt -D BUILD_SHARED_LIBS=ON
+	cmake libs/glad/CMakeLists.txt -D BUILD_SHARED_LIBS=ON -D GLAD_REPRODUCIBLE=ON
 	cmake --build libs/glad/.
 
 libs/stb/include/stb_image.h :
@@ -126,7 +126,7 @@ libs/glfw/CMakeLists.txt :
 	git clone https://github.com/glfw/glfw.git libs/glfw
 
 $(LIB_GLFW) : libs/glfw/CMakeLists.txt
-	cmake libs/glfw/CMakeLists.txt -D BUILD_SHARED_LIBS=ON
+	cmake libs/glfw/CMakeLists.txt -D BUILD_SHARED_LIBS=ON -D GLFW_STANDALONE=ON
 	cmake --build libs/glfw/.
 
 
