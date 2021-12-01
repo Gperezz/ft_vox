@@ -6,7 +6,7 @@
 #    By: gperez <gperez@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/10/10 18:22:58 by gperez            #+#    #+#              #
-#    Updated: 2021/11/30 17:24:34 by gperez           ###   ########.fr        #
+#    Updated: 2021/12/01 13:34:16 by gperez           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -34,7 +34,8 @@ SRC =	srcs/main.cc \
 		srcs/Class/Hud.cc \
 		srcs/Class/Element.cc \
 		srcs/Class/Perlin.cc \
-		srcs/Class/Cave.cc
+		srcs/Class/Cave.cc \
+		srcs/Class/Error.cc \
 
 NC = \033[0m
 BOLD =\033[1m
@@ -84,6 +85,7 @@ INC =	includes/ft_vox.hpp \
 		includes/Cave.hpp \
 		includes/Camera.hpp \
 		includes/Engine.hpp \
+		includes/Error.hpp \
 
 OBJ = $(SRC:.cc=.o)
 

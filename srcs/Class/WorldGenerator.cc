@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/02 08:06:26 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/19 11:35:47 by gperez           ###   ########.fr       */
+/*   Updated: 2021/12/01 15:34:43 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,8 +148,6 @@ void	chooseBlock(Chunk *chunk, unsigned char biome, unsigned char type, int x, i
 	}	
 }
 
-#define SEED 1567612511
-
 void	WorldGenerator::genChunk(Chunk *chunk)
 {
 	Cave cave = Cave();
@@ -159,8 +157,8 @@ void	WorldGenerator::genChunk(Chunk *chunk)
 		for (int z = 0; z < 16; z++){
 			
 			ChunkPos pos = chunk->getPos();
-			double e = elevation(pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX, SEED);
-			double m = elevation(pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX, SEED / 300);
+			double e = elevation(pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX, this->seed);
+			double m = elevation(pos[0] * 16.0 + (float)x + (float)SHRT_MAX, pos[1] * 16.0 + (float)z + (float)SHRT_MAX, this->seed / 300);
 			e = ((e + 1) / 2) * 255;
 			m = ((m + 1) / 2) * 255;
 			unsigned char type;

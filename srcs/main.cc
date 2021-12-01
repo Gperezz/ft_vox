@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/30 15:12:58 by gperez           ###   ########.fr       */
+/*   Updated: 2021/12/01 15:38:09 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,13 +56,47 @@ void	exec(World &world, Engine &env, TimeMs time)
 	glfwPollEvents();
 }
 
-int		main(void)
+
+
+int		main(int argc, char *argv[])
 {
 	Engine			env;
-	World			world(env);
 	Shader&			shader(env.getShader());
 	TimeMs			time;
 	glm::mat4		mat;
+	unsigned long	seed = SEED;
+
+	if (argc == 2)
+	{
+		std::string str = std::string(argv[1]);
+		if (str.size() < 20)
+		{
+			for (std::string::iterator it = str.begin(); it != str.end();)
+			{
+				if (!std::isalnum((int)(*it)))
+					it = str.erase(it);
+				else
+					it++;
+			}
+			try{
+				if (str.size())
+					seed = std::stoul(str, 0, 36);
+			}
+			catch(Error const &e){
+				std::cout << e.what() << "\n";
+				return (1);
+			}
+			if (seed < MIN_SEED)
+			{
+				seed = SEED;
+				std::cout << "Seed too short\n" << NA;
+			}
+		}
+		else
+			std::cout << "Argument is too long\n" << NA;
+	}
+
+	World			world(env, &seed);
 
 	mat = glm::perspective(glm::radians(80.0f),
 		(float)WIDTH / (float)HEIGHT, 0.1f, (float)RENDER_DIST);

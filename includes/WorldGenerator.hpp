@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/30 16:22:18 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/25 16:45:48 by gperez           ###   ########.fr       */
+/*   Updated: 2021/12/01 15:41:46 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,9 @@
 # include "Cave.hpp"
 # include <thread>
 # include <mutex>
+
+#define SEED 1567612511
+#define MIN_SEED 15676125
 
 class WorldGenerator{
 	private:
