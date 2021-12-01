@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Engine.cc                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/30 17:35:46 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/26 15:29:37 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,6 +146,8 @@ int			Engine::initWindow(void)
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
 		cout << "Failed to initialize GLAD" << endl;
+		glfwDestroyWindow(this->window);
+		glfwTerminate();
 		return (-1);
 	}
 	glfwSetCursorPosCallback(this->window, mouse_callback);
@@ -235,7 +237,8 @@ static void	genNeighboor(Direction dir, Chunk *chunk, glm::vec4 posB)
 
 static void	setGenBlock(glm::vec4 posB, Chunk *chunk, e_BlockType type) // A VOIR
 {
-	chunk->setBlock((int[4]){(int)posB.w, (int)posB.x, (int)posB.y, (int)posB.z},
+	int pos[4] = {(int)posB.w, (int)posB.x, (int)posB.y, (int)posB.z};
+	chunk->setBlock(pos,
 		(t_block_info){(unsigned char)type, 0, 0, 0});
 	chunk->generateGraphics((int)posB.w);
 	if ((int)posB.x == 0)

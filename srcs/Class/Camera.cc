@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Camera.cc                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/04 23:48:55 by gperez            #+#    #+#             */
-/*   Updated: 2021/10/13 11:18:28 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/26 12:11:10 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,8 @@ ChunkPos	Camera::getCurrentChunkPos(glm::vec3 pos)
 		chunkPos.x--;
 	if (chunkPos.y + PREC < 0.0)
 		chunkPos.y--;
-	return ((int[2]){(int)chunkPos.x, (int)chunkPos.y});
+	int cpos[2] = {(int)chunkPos.x, (int)chunkPos.y};
+	return (ChunkPos(cpos));
 }
 
 ChunkPos	Camera::getCurrentChunkPos(void)

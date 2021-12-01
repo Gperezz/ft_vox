@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   World.cc                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
+/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/30 17:12:27 by gperez           ###   ########.fr       */
+/*   Updated: 2021/11/26 12:16:36 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,7 +118,8 @@ void	World::insertGenQueue(void)
 		}}
 		for (int j = -renderDist; j < renderDist + 1; j++)
 		{
-			ChunkPos cp(pos + (int[]){i, j});
+			int cpos[] = {i, j};
+			ChunkPos cp(pos + cpos);
 			if (this->genQueue.size() > this->genQueue.max_size() - 2)
 			{
 				std::cout << "MAX SIZE genQueue\n";
@@ -161,7 +162,8 @@ void	World::insertLoadQueue(void)
 				std::cout << "MAX SIZE loadQueue\n";
 				return ;
 			}
-			ChunkPos cp(pos + (int[]){i, j});
+			int cpos[] = {i, j};
+			ChunkPos cp(pos + cpos);
 			if (this->loadQueue.count(cp) == 0)
 			{
 				// std::cout << BOLD_GREEN << this->loadQueue.size() << " " << this->loadQueue.max_size() << "\n" << NA;
@@ -477,7 +479,8 @@ ChunkPos	World::getCameraChunkPos()
 		cam[0] -= 1.0;
 	if (cam[1] < 0.)
 		cam[1] -= 1.0;
-	return (int[]){(int)cam[0], (int)cam[1]};
+	int cpos[] = {(int)cam[0], (int)cam[1]};
+	return (ChunkPos(cpos));
 }
 
 Chunk	*World::get(ChunkPos cp)
