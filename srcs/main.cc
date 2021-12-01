@@ -149,7 +149,7 @@ int		main(int argc, char *argv[])
 	world.end();
 	t0.join();
 	t1.join();
-
+	env.deleteText();
 	glfwDestroyWindow(env.getWindow());
 	glfwTerminate();
 	return (0);

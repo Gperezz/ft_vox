@@ -37,14 +37,6 @@ World::World(Engine& engine, unsigned long *seed)
 
 World::~World()
 {
-	{unique_lock<mutex>	lk(this->memoryMutex);
-		std::map<ChunkPos, Chunk*>::iterator it = memoryChunks.begin();
-		while (it != memoryChunks.end())
-		{
-			delete it->second;
-			it++;
-		}
-	}
 }
 
 bool		World::isEnd(void)
@@ -56,6 +48,17 @@ void		World::end(void)
 {
 	{unique_lock<mutex>	lk(this->queueOnMutex);
 		queueOn = false;
+	}
+	{unique_lock<mutex>	lk(this->memoryMutex);
+		for (auto it = this->memoryChunks.begin(); it != this->memoryChunks.end();)
+		{
+			if(it->second) {
+				Chunk* delChunk = it->second;
+            	delChunk->updateDelFenced();
+				it = this->memoryChunks.erase(it);
+				delete delChunk;
+			}
+		}
 	}
 }
 

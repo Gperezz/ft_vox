@@ -6,13 +6,15 @@
 /*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/26 15:29:37 by maiwenn          ###   ########.fr       */
+/*   Updated: 2021/11/27 23:03:26 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Engine.hpp"
 
 using namespace std;
+extern t_txt_path g_txt_path[];
+
 
 Engine::Engine()
 {
@@ -128,14 +130,16 @@ int			Engine::initWindow(void)
 		cout << "Failed to initialize GLFW" << endl;
 		return (-1);
 	}
+	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-	// glfwWindowHint(GLFW_AUTO_ICONIFY, GL_TRUE);
-	this->window = glfwCreateWindow(WIDTH, HEIGHT, "ft_vox", NULL, NULL);
-	// this->window = glfwCreateWindow(WIDTH, HEIGHT, "ft_vox", glfwGetPrimaryMonitor(), NULL);
+	glfwWindowHint(GLFW_AUTO_ICONIFY, GL_TRUE);
+	this->window = glfwCreateWindow(mode->width, mode->height, "ft_vox", monitor, NULL);
 	if (this->window == NULL)
 	{
 		cout << "Failed to create GLFW window" << endl;
@@ -189,7 +193,7 @@ static bool isInAirBlock(Block currentBlock)
 Block		*Engine::getBlockFromPos(Chunk **chunk, glm::vec3 pos, glm::vec4 &bP, World &world)
 {
 	Block		*block;
-	ChunkPos	chunkPos = Camera::getCurrentChunkPos(pos);
+	// ChunkPos	chunkPos = Camera::getCurrentChunkPos(pos);
 
 	(*chunk) = world.getUnsafe(chunkPos);// A REMMETTRE
 	if (!chunk)
@@ -264,8 +268,9 @@ void		Engine::rayCasting(World &world)
 	glm::vec4		currentBP;
 	glm::vec4		saveBP;
 	unsigned int	i;
-	Chunk			*saveChunk;
-	Chunk			*chunk = NULL;
+
+	Chunk			*saveChunk = nullptr;
+	Chunk			*chunk = nullptr;
 
 	if (this->lockRay || this->isCursor)
 		return;
@@ -630,7 +635,7 @@ void		Engine::setFirst(bool f)
 	this->firstMouse = f;
 }
 
-Engine::~Engine()
+void 		Engine::deleteText()
 {
 	int				i;
 	int				t;
@@ -646,7 +651,11 @@ Engine::~Engine()
 	}
 	if (this->shader.getProgram())
 		this->shader.freeProgram();
+	this->hud.deleteHud();
+}
 
+Engine::~Engine()
+{
 }
 
 ///////////////Private///////////////
