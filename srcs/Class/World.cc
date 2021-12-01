@@ -130,7 +130,6 @@ void	World::insertGenQueue(void)
 			}
 			if (this->genQueue.count(cp) == 0)
 			{
-				// std::cout << GREEN << this->genQueue.size() << " " << this->genQueue.max_size() << "\n" << NA;
 				this->genQueue.insert(cp);
 			}
 		}

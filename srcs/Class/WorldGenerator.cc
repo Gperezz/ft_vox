@@ -15,17 +15,12 @@
 WorldGenerator::WorldGenerator()
 {
 	this->seed = Rand<unsigned long>().generate();
-	this->tP = PerlinNoise(1);
 	
 }
 
 WorldGenerator::WorldGenerator(unsigned long* seed)
 {
-	if (!seed)
-		this->seed = Rand<unsigned long>().generate();
-	else
-		this->seed = *seed;
-	this->tP = PerlinNoise(this->seed);
+	this->seed = *seed;
 }
 
 unsigned char WorldGenerator::blockColor(double moisure, double elevation, unsigned char *type)
@@ -72,44 +67,25 @@ double elevation(double x, double z, double seed)
 		+ 3.25 * noise.perlin(1, 0.005, 2, 3 * x, 3 * z)
 		+ 2.13 * noise.perlin(1, 0.004, 6, 4 * x, 4 * z)
 		+ 1.06 * noise.perlin(1, 0.03, 1, 5 * x, 5 * z)
-		// + 0.03 * noise.perlin(1, 0.01, 6, 6 * x, 6 * z)
 	);
-    e = e / (5.00 + 4.50 + 3.25 + 2.13 + 1.06 /*+ 0.03*/);
+    e = e / (5.00 + 4.50 + 3.25 + 2.13 + 1.06);
     e = pow(e, 1.0);
     return (e);
 }
 
-// double moisure(double x, double z, double seed)
-// {
-// 	PerlinNoise noise = PerlinNoise();
-// 	double m = (1.00 * noise.perlin(1, 1.0, 3, x, z)
-// 		+ 0.75 * noise.perlin(1, 1.0, 3, 2 * x, 2 * z)
-// 		+ 0.33 * noise.perlin(1, 1.0, 3, 3 * x, 3 * z)
-// 		+ 0.33 * noise.perlin(1, 1.0, 3, 4 * x, 4 * z)
-// 		+ 0.33 * noise.perlin(1, 1.0, 3, 5 * x, 5 * z)
-// 		+ 0.50 * noise.perlin(1, 1.0, 3, 6 * x, 6 * z)
-// 	);
-//     m = m / (1.00 + 0.75 + 0.33 /*+ 0.33 + 0.33 + 0.50*/);
-// 	return(m);
-// }
 
 void	putBlock(Chunk *chunk, unsigned char biome, unsigned char type, int x, int y, int z, double e)
 {
-	
 	for (; y < e; y++)
 	{
-		// printf("----NewBlock\n");
-		// printBiome(biome);
 		int pos[4] = {y / 16, x, y % 16, z};
 		chunk->setBlock(BlockPos(pos), (t_block_info){type,0,0,0}, biome);
-		// printBiome(chunk->getBiome(BlockPos((int[4]){y / 16, x, y % 16, z})));
 	}
 	
 }
 
 void	chooseBlock(Chunk *chunk, unsigned char biome, unsigned char type, int x, int z, double e)
 {
-	// printBiome(biome);
 	if (type == WATER)
 	{
 		putBlock(chunk, biome, SAND, x, 0, z, e);
@@ -145,11 +121,10 @@ void	WorldGenerator::genChunk(Chunk *chunk)
 			m = ((m + 1) / 2) * 255;
 			unsigned char type;
 			unsigned char biome = blockColor(m, e, &type);
-			// printBiome(biome);
 			chooseBlock(chunk, biome, type, x, z, e);
 		}
 	}
-	cave.createCave(chunk, this->seed);
+	cave.createCave(chunk, this->seed / 500);
 }
 
 void	WorldGenerator::configure(unsigned long* seed)

@@ -56,7 +56,36 @@ void	exec(World &world, Engine &env, TimeMs time)
 	glfwPollEvents();
 }
 
-
+bool	calcSeed(unsigned long	*seed, char *argv) 
+{
+	std::string str = std::string(argv);
+	if (str.size() < 20)
+	{
+		for (std::string::iterator it = str.begin(); it != str.end();)
+		{
+			if (!std::isalnum((int)(*it)))
+				it = str.erase(it);
+			else
+				it++;
+		}
+		try{
+			if (str.size())
+				*seed = std::stoul(str, 0, 36);
+		}
+		catch(Error const &e){
+			std::cout << e.what() << "\n";
+			return (false);
+		}
+		if (*seed < MIN_SEED)
+		{
+			*seed = SEED;
+			std::cout << "Seed too short\n" << NA;
+		}
+	}
+	else
+		std::cout << "Argument is too long\n" << NA;
+	return (true);
+}
 
 int		main(int argc, char *argv[])
 {
@@ -68,32 +97,8 @@ int		main(int argc, char *argv[])
 
 	if (argc == 2)
 	{
-		std::string str = std::string(argv[1]);
-		if (str.size() < 20)
-		{
-			for (std::string::iterator it = str.begin(); it != str.end();)
-			{
-				if (!std::isalnum((int)(*it)))
-					it = str.erase(it);
-				else
-					it++;
-			}
-			try{
-				if (str.size())
-					seed = std::stoul(str, 0, 36);
-			}
-			catch(Error const &e){
-				std::cout << e.what() << "\n";
-				return (1);
-			}
-			if (seed < MIN_SEED)
-			{
-				seed = SEED;
-				std::cout << "Seed too short\n" << NA;
-			}
-		}
-		else
-			std::cout << "Argument is too long\n" << NA;
+		if (calcSeed(&seed, argv[1]) == false)
+			return (1);
 	}
 
 	World			world(env, &seed);

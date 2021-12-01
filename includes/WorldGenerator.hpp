@@ -26,7 +26,6 @@
 class WorldGenerator{
 	private:
 		unsigned long	seed;
-		PerlinNoise		tP;
 		void			genThreadChunk(Chunk *chunk, ChunkPos pos, int x);
 	public:
 		WorldGenerator();

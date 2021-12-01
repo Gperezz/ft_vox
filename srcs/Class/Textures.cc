@@ -59,12 +59,10 @@ Textures::Textures(char *txtPath)
 	this->loadTexture(txtPath);
 }
 
-// Textures::Textures(std::string buf, unsigned long w, unsigned long h)
 Textures::Textures(char *buf, unsigned long w, unsigned long h)
 {
 	this->isBuffer = true;
 	this->txtData = (unsigned char*)buf;
-	// this->buffer = buf;
 	this->width = w;
 	this->height = h;
 	this->load = true;

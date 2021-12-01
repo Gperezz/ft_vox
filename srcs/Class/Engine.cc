@@ -233,12 +233,6 @@ Block		*Engine::getBlockFromPos(Chunk **chunk, glm::vec3 pos, glm::vec4 &bP, Wor
 	if (!(*chunk))
 		return (NULL);
 	block = &(*chunk)->getBlock(bP.w, bP.x, bP.y, bP.z);
-	// if ((this->getButton(GLFW_MOUSE_BUTTON_1) == true || this->getButton(GLFW_MOUSE_BUTTON_2) == true)
-	// 	&& this->lockRay == false)
-	// {
-	// 	printf(RED "ChunkPos %d %d\n" NA, (*chunk)->getPos().get(0), (*chunk)->getPos().get(1));
-	// 	printf(ORANGE "Bp %f %f %f\n" NA, bP.x, bP.y, bP.z);
-	// }
 	return (block);
 }
 

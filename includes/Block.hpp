@@ -32,11 +32,6 @@ enum	e_BlockType : char {
 	WATER,
 	SNOW,
 	SAND
-	// COAL_ORE,
-	// IRON_ORE,
-	// GOLD_ORE,
-	// DIAMOND_ORE,
-	// COBBLESTONE
 };
 
 enum	e_Biome : char{

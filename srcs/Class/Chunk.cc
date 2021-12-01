@@ -155,9 +155,6 @@ void		Chunk::conditionValidate(std::vector<vbo_type> &tempVbo, vector<vbo_type>	
 
 void		Chunk::generateVbo(char index, vector<vbo_type> tempVbo, bool isT)
 {
-	GLenum err;
-	// while((err = glGetError()) != GL_NO_ERROR)
-	// 	std::cout << BOLD_RED << "AVANT Error " << err << '\n' << NA;
 	if (isT)
 	{
 		glBindVertexArray(tabVaoWater[(int)index]);
@@ -178,9 +175,6 @@ void		Chunk::generateVbo(char index, vector<vbo_type> tempVbo, bool isT)
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
 	glEnableVertexAttribArray(3);
-
-	while((err = glGetError()) != GL_NO_ERROR)
-            std::cout << BOLD_RED << "Error " << err << '\n' << NA;
 
 }
 

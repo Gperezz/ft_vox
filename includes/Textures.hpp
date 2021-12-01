@@ -41,7 +41,6 @@ class Textures
 		Textures();
 		Textures(char *txtPath);
 		Textures(char *buf, unsigned long w, unsigned long h);
-		// Textures(std::string buf, unsigned long w, unsigned long h);
 		void			loadTexture(char *txtPath);
 		int				getWidth(void) const;
 		int				getHeight(void) const;
@@ -59,7 +58,6 @@ class Textures
 		int				txt;
 		unsigned char	*txtData;
 		bool			isBuffer;
-		// std::string		buffer;
 };
 
 #endif

@@ -91,7 +91,6 @@ class Engine
 		int				genBlocksTextures(glm::vec2 len, e_txt start, e_txt end, size_t offsetInTexture);
 		void			addTexture(char *path);
 		void			addTexture(char *buffer, unsigned long width, unsigned long height);
-		// void			addTexture(std::string buffer, unsigned long width, unsigned long height);
 		glm::vec2		getMouseLastPos(void);
 		void			setMouseLastPos(glm::vec2 v);
 		bool			isFirst(void);

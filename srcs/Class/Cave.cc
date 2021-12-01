@@ -39,7 +39,6 @@ static void drawCave(glm::vec3 pos, Chunk *chunk, int x, int y, int z, unsigned 
 	{
 		int cpos[4] = {((int)pos.y + y) / 16, positionX, positionY, positionZ};
 		unsigned char biome = chunk->getBiome(BlockPos(cpos));
-		// printBiome(biome);
 		if (biome != OCEAN && biome != BEACH)
 			chunk->setBlock(BlockPos(cpos), (t_block_info){type,0,0,0});
 
