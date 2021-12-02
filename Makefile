@@ -6,7 +6,7 @@
 #    By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/10/10 18:22:58 by gperez            #+#    #+#              #
-#    Updated: 2021/12/02 00:14:06 by maiwenn          ###   ########.fr        #
+#    Updated: 2021/12/02 10:03:10 by maiwenn          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -142,5 +142,15 @@ clean :
 fclean : clean
 	rm -rf $(NAME)
 
+.PHONY : lclean
+lclean : fclean
+	rm -rf libs/glad
+	rm -rf libs/glfw
+	rm -rf libs/glm
+	rm -rf libs/stb
+
 .PHONY : re
 re : fclean all
+
+.PHONY : relib
+relib : lclean all
