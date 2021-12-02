@@ -10,7 +10,6 @@ class PerlinNoise {
 	private:
 		int seed;
 	public:
-		PerlinNoise();
 		PerlinNoise(int s);
 		double	perlin(int octaves, double frequency, double persistence, double x, double y);
 		double cubic_interpolate(double before, double p, double p2, double after, double t);

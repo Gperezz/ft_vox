@@ -6,10 +6,10 @@
 /*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/30 16:22:18 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/26 16:30:24 by maiwenn          ###   ########.fr       */
-/*   Updated: 2021/12/01 15:41:46 by gperez           ###   ########.fr       */
+/*   Updated: 2021/12/02 10:27:21 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #ifndef WORLD_GENERATOR_HPP
 # define WORLD_GENERATOR_HPP
@@ -22,7 +22,7 @@
 # include <mutex>
 
 #define SEED 1567612511
-#define MIN_SEED 15676125
+#define MIN_SEED 1
 
 class WorldGenerator{
 	private:

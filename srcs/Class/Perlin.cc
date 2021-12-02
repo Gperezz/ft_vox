@@ -1,10 +1,5 @@
 #include "Perlin.hpp"
 
-PerlinNoise::PerlinNoise()
-{
-	this->seed = random();
-}
-
 PerlinNoise::PerlinNoise(int s)
 {
 	this->seed = s;

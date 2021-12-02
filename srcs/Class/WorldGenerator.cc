@@ -6,10 +6,10 @@
 /*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/02 08:06:26 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/30 13:53:11 by maiwenn          ###   ########.fr       */
-/*   Updated: 2021/11/27 22:25:41 by maiwenn          ###   ########.fr       */
+/*   Updated: 2021/12/02 10:43:00 by maiwenn          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #include "WorldGenerator.hpp"
 
@@ -127,7 +127,7 @@ void	WorldGenerator::genChunk(Chunk *chunk)
 			chooseBlock(chunk, biome, type, x, z, e);
 		}
 	}
-	cave.createCave(chunk, this->seed / 500);
+	cave.createCave(chunk, this->seed);
 }
 
 void	WorldGenerator::configure(unsigned long* seed)
