@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2021/12/02 14:14:33 by gperez           ###   ########.fr       */
+/*   Updated: 2021/12/02 14:34:07 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -488,9 +488,12 @@ void	World::increaseDist(void)
 	this->delDist++;
 	this->distMem++;
 	this->delDistMem++;
-	this->startGen = true;
-	this->startLoad = true;
-	this->reloadDist = true;
+	{unique_lock<mutex> lockGen(this->genQueueMutex);
+		unique_lock<mutex> lockLoad(this->queueMutex);
+		this->startGen = true;
+		this->startLoad = true;
+		this->reloadDist = true;
+	}
 }
 
 void	World::decreaseDist(void)
@@ -501,7 +504,10 @@ void	World::decreaseDist(void)
 	this->delDist--;
 	this->distMem--;
 	this->delDistMem--;
-	this->startGen = true;
-	this->startLoad = true;
-	this->reloadDist = true;
+	{unique_lock<mutex> lockGen(this->genQueueMutex);
+		unique_lock<mutex> lockLoad(this->queueMutex);
+		this->startGen = true;
+		this->startLoad = true;
+		this->reloadDist = true;
+	}
 }
