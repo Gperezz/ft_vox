@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2021/12/02 14:09:28 by gperez           ###   ########.fr       */
+/*   Updated: 2021/12/02 14:14:33 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@ World::World(Engine& engine, unsigned long *seed)
 	distMem(CHK_DIST_MEM),
 	delDistMem(CHK_DEL_DIST_MEM)
 	{
-		// initSet();
 		{unique_lock<mutex>	lk(this->queueOnMutex);
 			this->queueOn = true;
 		}
