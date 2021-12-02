@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/13 17:54:04 by gperez            #+#    #+#             */
-/*   Updated: 2021/12/01 19:19:49 by gperez           ###   ########.fr       */
+/*   Updated: 2021/12/02 14:09:59 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,6 @@ void	Textures::loadTexture(char *txtPath)
 		return;
 	stbi_set_flip_vertically_on_load(true);
 	this->txtData = stbi_load(txtPath, &this->width, &this->height, &this->nrChannels, 0);
-	printf(CYAN "Height:%d Width%d\n" NA, this->height, this->width);
 	this->load = true;
 }
 

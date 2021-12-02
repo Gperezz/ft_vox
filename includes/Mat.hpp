@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/04 23:29:17 by gperez            #+#    #+#             */
-/*   Updated: 2021/10/08 19:28:40 by gperez           ###   ########.fr       */
+/*   Updated: 2021/12/02 13:57:46 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,6 @@ class					Mat
 
 		virtual glm::mat4	calcMatrix(glm::vec3 t, glm::vec3 r, glm::vec3 s);
 		virtual glm::mat4	calcMatrix(void);
-	protected:
-		std::mutex		translateMutex;
 };
 
 #endif

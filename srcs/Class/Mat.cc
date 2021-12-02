@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/04 23:19:34 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/11 19:37:49 by gperez           ###   ########.fr       */
+/*   Updated: 2021/12/02 14:05:54 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,7 @@ Mat::Mat(Mat& copy)
 	matrix(copy.matrix),
 	trans(copy.trans),
 	rot(copy.rot),
-	sc(copy.sc),
-	translateMutex()
+	sc(copy.sc)
 {}
 
 glm::mat4	Mat::getMatrix(void)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Engine.cc                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
+/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:52:39 by gperez            #+#    #+#             */
-/*   Updated: 2021/12/01 23:47:49 by maiwenn          ###   ########.fr       */
+/*   Updated: 2021/12/02 14:12:36 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -307,8 +307,8 @@ void		Engine::rayCasting(World &world)
 	}
 
 	this->getHud().setCursorColor(GREEN_CURSOR);
-	printf(BOLD_MAGENTA "Chunk %d %d\n" NA, chunk->getPos().get(0), chunk->getPos().get(1));
-	printf(MAGENTA "Cam %f %f\n" NA, this->camera.getTranslate().x, this->camera.getTranslate().z);
+	// printf(BOLD_MAGENTA "Chunk %d %d\n" NA, chunk->getPos().get(0), chunk->getPos().get(1));
+	// printf(MAGENTA "Cam %f %f\n" NA, this->camera.getTranslate().x, this->camera.getTranslate().z);
 
 	if (this->getButton(GLFW_MOUSE_BUTTON_1) == true)
 		setGenBlock(saveBP, saveChunk, STONE);
@@ -521,8 +521,6 @@ int		Engine::genBlocksTextures(glm::vec2 len, e_txt start, e_txt end, size_t off
 	int				nbTxt;
 
 	this->fillTextureVector(start, end, false);
-	for (int i = offsetInTexture; i < (int)this->textures.size(); i++)
-		printf(BLUE "Height:%d Width%d\n" NA, textures[i]->getHeight(), textures[i]->getWidth());
 	nbTxt = this->textures.size() - offsetInTexture;
 	if (nbTxt < 1)
 		return (1);

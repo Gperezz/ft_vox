@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   World.cc                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maiwenn <maiwenn@student.42.fr>            +#+  +:+       +#+        */
+/*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/22 19:13:57 by gperez            #+#    #+#             */
-/*   Updated: 2021/11/26 12:16:36 by maiwenn          ###   ########.fr       */
+/*   Updated: 2021/12/02 14:09:28 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,10 +167,7 @@ void	World::insertLoadQueue(void)
 			int cpos[] = {i, j};
 			ChunkPos cp(pos + cpos);
 			if (this->loadQueue.count(cp) == 0)
-			{
-				// std::cout << BOLD_GREEN << this->loadQueue.size() << " " << this->loadQueue.max_size() << "\n" << NA;
 				this->loadQueue.insert(cp);
-			}
 		}
 	}
 	prevPos = pos;
@@ -248,7 +245,6 @@ void	World::loadChunk(ChunkPos cp)
 		{unique_lock<mutex> lockDisp(this->displayedMutex);
 			if (this->displayedChunks.count(cp))
 				return;
-			// findChunk->second->updateFencedUnsafe(1);
 			this->pushInDisplay(findChunk->second, findChunk->second->isGenerated());
 		}
 		return;
@@ -279,7 +275,6 @@ void	World::genChunk(ChunkPos cp)
 	
 	{unique_lock<mutex> lockMem(this->memoryMutex);
 		this->memoryChunks.insert(std::pair<ChunkPos, Chunk*>(cp, newChunk));
-		// std::cout << GREEN << cp.get(0) << " " << cp.get(1) << "\n" << NA;
 		this->memoryChunks[cp]->updateFencedUnsafe(1);
 	}
 }
@@ -336,10 +331,26 @@ void	World::loadGraphics(void)
 	}
 }
 
+static void		deleteInSet(ChunkPos pos, std::set<ChunkPos> &list, int delDist)
+{
+	ChunkPos				chunkP;
+
+	for (auto it = list.begin(); it != list.end();)
+	{
+		chunkP = *it;
+		if (chunkP.get(0) - pos.get(0) > delDist 
+			|| chunkP.get(0) - pos.get(0) < -delDist
+			|| chunkP.get(1) - pos.get(1) > delDist 
+			|| chunkP.get(1) - pos.get(1) < -delDist)
+				it = list.erase(it);
+		else
+			it++;
+	}
+}
+
 void	World::deleteFarInDisplay()
 {
 	static ChunkPos			prevPos;
-	ChunkPos				chunkP;
 	ChunkPos				pos = this->getCameraChunkPos();
 
 	if (pos == prevPos && !this->reloadDist)
@@ -347,57 +358,17 @@ void	World::deleteFarInDisplay()
 
 	this->reloadDist = false;
 	{unique_lock<mutex> lock(this->displayedMutex);
-	for (auto it = this->displayedChunks.begin(); it != this->displayedChunks.end();)
-	{
-		chunkP = *it;
-		if (chunkP.get(0) - pos.get(0) > this->delDist 
-			|| chunkP.get(0) - pos.get(0) < -this->delDist
-			|| chunkP.get(1) - pos.get(1) > this->delDist 
-			|| chunkP.get(1) - pos.get(1) < -this->delDist)
-				it = this->displayedChunks.erase(it);
-		else
-			it++;
-	}}
-	
+		deleteInSet(pos, this->displayedChunks, this->delDist);
+	}
 	{unique_lock<mutex> lock(this->genQueueMutex);
-	for (auto it = this->genQueue.begin(); it != this->genQueue.end();)
-	{
-		chunkP = *it;
-		if (chunkP.get(0) - pos.get(0) > this->delDist 
-			|| chunkP.get(0) - pos.get(0) < -this->delDist
-			|| chunkP.get(1) - pos.get(1) > this->delDist 
-			|| chunkP.get(1) - pos.get(1) < -this->delDist)
-				it = this->genQueue.erase(it);
-		else
-			it++;
-	}}
-
+		deleteInSet(pos, this->genQueue, this->delDist);
+	}
 	{unique_lock<mutex> lock(this->queueMutex);
-	for (auto it = this->loadQueue.begin(); it != this->loadQueue.end();)
-	{
-		chunkP = *it;
-		if (chunkP.get(0) - pos.get(0) > this->delDist 
-			|| chunkP.get(0) - pos.get(0) < -this->delDist
-			|| chunkP.get(1) - pos.get(1) > this->delDist 
-			|| chunkP.get(1) - pos.get(1) < -this->delDist)
-				it = this->loadQueue.erase(it);
-		else
-			it++;
-	}}
-
+		deleteInSet(pos, this->loadQueue, this->delDist);
+	}
 	{unique_lock<mutex> lock(this->graphicMutex);
-	for (auto it = this->graphicQueue.begin(); it != this->graphicQueue.end();)
-	{
-		chunkP = *it;
-		if (chunkP.get(0) - pos.get(0) > this->delDist 
-			|| chunkP.get(0) - pos.get(0) < -this->delDist
-			|| chunkP.get(1) - pos.get(1) > this->delDist 
-			|| chunkP.get(1) - pos.get(1) < -this->delDist)
-				it = this->graphicQueue.erase(it);
-		else
-			it++;
-	}}
-
+		deleteInSet(pos, this->graphicQueue, this->delDist);
+	}
 }
 
 void	World::deleteFar(void)
@@ -441,7 +412,7 @@ void	World::display(Engine &e, float currentFrameTime)
 {
 	{unique_lock<mutex> lockMem(this->memoryMutex);
 	unique_lock<mutex> lockGraph(this->graphicMutex);
-		e.rayCasting(*this); // FAIT SEGFAULT QUAND LE CHUNK OU L ON SE TROUVE N EST PAS GENERER
+		e.rayCasting(*this);
 	}
 
 	this->queueToDisplay();

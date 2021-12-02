@@ -6,7 +6,7 @@
 /*   By: gperez <gperez@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/21 17:43:14 by gperez            #+#    #+#             */
-/*   Updated: 2021/12/01 15:38:09 by gperez           ###   ########.fr       */
+/*   Updated: 2021/12/02 13:57:12 by gperez           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ void	exec(World &world, Engine &env, TimeMs time)
 	glfwPollEvents();
 }
 
-bool	calcSeed(unsigned long	*seed, char *argv) 
+bool	calcSeed(unsigned long	*seed, char *argv)
 {
 	std::string str = std::string(argv);
 	if (str.size() < 20)
