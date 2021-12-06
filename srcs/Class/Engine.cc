@@ -51,23 +51,33 @@ void				Engine::getKeys(float deltaFrameTime)
 	else if (this->speed20)
 		speed = SPEED_ACCEL;
 
-	if (glfwGetKey(this->window, GLFW_KEY_S) == GLFW_PRESS)
-		this->camera.translate(E_FRONT, speed * deltaFrameTime);
-	if (glfwGetKey(this->window, GLFW_KEY_W) == GLFW_PRESS)
-		this->camera.translate(E_FRONT, -speed * deltaFrameTime);
-	if (glfwGetKey(this->window, GLFW_KEY_A) == GLFW_PRESS)
-		this->camera.translate(E_RIGHT, speed * deltaFrameTime);
-	if (glfwGetKey(this->window, GLFW_KEY_D) == GLFW_PRESS)
-		this->camera.translate(E_RIGHT, -speed * deltaFrameTime);
-	if (glfwGetKey(this->window, GLFW_KEY_SPACE) == GLFW_PRESS)
-		this->camera.translate(E_UP, speed * deltaFrameTime);
-	if (glfwGetKey(this->window, GLFW_KEY_X) == GLFW_PRESS)
-		this->camera.translate(E_UP, -speed * deltaFrameTime);
-
-	this->inputKey(GLFW_KEY_APOSTROPHE);
-	this->inputKey(GLFW_KEY_MINUS);
-	this->inputKey(GLFW_KEY_EQUAL);
-	this->inputKey(GLFW_KEY_C);
+	if (glfwGetKey(this->window, GLFW_KEY_S) == GLFW_PRESS ||
+		glfwGetKey(this->window, GLFW_KEY_W) == GLFW_PRESS ||
+		glfwGetKey(this->window, GLFW_KEY_A) == GLFW_PRESS ||
+		glfwGetKey(this->window, GLFW_KEY_D) == GLFW_PRESS ||
+		glfwGetKey(this->window, GLFW_KEY_SPACE) == GLFW_PRESS ||
+		glfwGetKey(this->window, GLFW_KEY_X) == GLFW_PRESS)
+	{
+		if (glfwGetKey(this->window, GLFW_KEY_S) == GLFW_PRESS)
+			this->camera.translate(E_FRONT, speed * deltaFrameTime);
+		if (glfwGetKey(this->window, GLFW_KEY_W) == GLFW_PRESS)
+			this->camera.translate(E_FRONT, -speed * deltaFrameTime);
+		if (glfwGetKey(this->window, GLFW_KEY_A) == GLFW_PRESS)
+			this->camera.translate(E_RIGHT, speed * deltaFrameTime);
+		if (glfwGetKey(this->window, GLFW_KEY_D) == GLFW_PRESS)
+			this->camera.translate(E_RIGHT, -speed * deltaFrameTime);
+		if (glfwGetKey(this->window, GLFW_KEY_SPACE) == GLFW_PRESS)
+			this->camera.translate(E_UP, speed * deltaFrameTime);
+		if (glfwGetKey(this->window, GLFW_KEY_X) == GLFW_PRESS)
+			this->camera.translate(E_UP, -speed * deltaFrameTime);
+	}
+	else
+	{
+		this->inputKey(GLFW_KEY_APOSTROPHE);
+		this->inputKey(GLFW_KEY_MINUS);
+		this->inputKey(GLFW_KEY_EQUAL);
+		this->inputKey(GLFW_KEY_C);
+	}
 }
 
 int					Engine::getWidth(void)
