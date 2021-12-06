@@ -422,9 +422,6 @@ void		Chunk::generateGraphics(void)
 		glGenBuffers(16,  &(this->tabVbo[0]));
 		glGenVertexArrays(16,  &(this->tabVaoWater[0]));
 		glGenBuffers(16,  &(this->tabVboWater[0]));
-		int err;
-		while((err = glGetError()) != GL_NO_ERROR)
-			std::cout << BOLD_RED << "Error " << err << '\n' << NA;
 		this->generate = true;
 	}
 	for (int i = 15; i >= 0; i--)
